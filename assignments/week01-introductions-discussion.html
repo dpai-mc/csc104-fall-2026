@@ -1,0 +1,1344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CSC 104 — Week 1 Introductions Discussion</title>
+<style>
+/* ============================================================
+   CSC 104 — Week 1 Introductions Discussion
+   Self-contained SPA for embedding in a Canvas iframe.
+   Vanilla CSS + vanilla JS. No external resources. No outbound
+   links — all navigation off this page is handled by Canvas.
+   ============================================================ */
+
+:root {
+  color-scheme: light dark;
+  --surface:      #ffffff;
+  --panel:        #f6f8fb;
+  --panel-2:      #eef2f8;
+  --accent-bg:    #e8f0fe;
+  --ink:          #16202f;
+  --muted:        #46536b;
+  --brand:        #1d4ed8;
+  --brand-ink:    #17399c;
+  --border:       #c3cddc;
+  --border-soft:  #dde4ee;
+  /* Interactive-control boundaries: must clear 3:1 for WCAG 1.4.11 */
+  --field-border: #6b7a92;
+  --btn-bg:       #1d4ed8;
+  --btn-fg:       #ffffff;
+  --btn-bg-hover: #17399c;
+  --btn2-bg:      #ffffff;
+  --btn2-fg:      #17399c;
+  --ok:           #1a6b3c;
+  --ok-bg:        #e6f4ec;
+  --warn-ink:     #7a4a06;
+  --warn-bg:      #fdf3e0;
+  --focus:        #b4530a;
+  --radius:       10px;
+  --maxw:         62rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --surface:      #0f1726;
+    --panel:        #17223a;
+    --panel-2:      #1e2b45;
+    --accent-bg:    #1a2a4d;
+    --ink:          #e9eefa;
+    --muted:        #b6c3d8;
+    --brand:        #9dbcff;
+    --brand-ink:    #bcd2ff;
+    --border:       #3a4a68;
+    --border-soft:  #2b3a56;
+    --field-border: #7b89a3;
+    --btn-bg:       #9dbcff;
+    --btn-fg:       #0b1424;
+    --btn-bg-hover: #c3d6ff;
+    --btn2-bg:      #17223a;
+    --btn2-fg:      #bcd2ff;
+    --ok:           #8fe0b0;
+    --ok-bg:        #123328;
+    --warn-ink:     #f6d59a;
+    --warn-bg:      #3a2c11;
+    --focus:        #ffb066;
+  }
+}
+
+* { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--surface);
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+/* ---------- Focus visibility (WCAG 2.4.7 / 2.4.11) ---------- */
+:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+/* Fallback for browsers without :focus-visible */
+.no-fv :focus { outline: 3px solid var(--focus); outline-offset: 2px; }
+
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  background: var(--btn-bg);
+  color: var(--btn-fg);
+  padding: 0.6rem 1rem;
+  z-index: 50;
+  font-weight: 700;
+  border-radius: 0 0 var(--radius) 0;
+}
+.skip-link:focus {
+  left: 0;
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.wrap {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 1rem 1rem 3rem;
+}
+
+/* ---------------------- Header ---------------------- */
+.page-head {
+  background: var(--panel);
+  border-bottom: 3px solid var(--brand);
+}
+.page-head .wrap { padding-bottom: 1.25rem; }
+
+.eyebrow {
+  font-size: 0.8125rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--brand-ink);
+  margin: 0.75rem 0 0.35rem;
+}
+
+h1 {
+  font-size: clamp(1.5rem, 4.2vw, 2.15rem);
+  line-height: 1.22;
+  margin: 0 0 0.6rem;
+}
+
+.lede {
+  margin: 0;
+  color: var(--muted);
+  max-width: 46rem;
+}
+
+.facts {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 1rem 0 0;
+  padding: 0;
+}
+.facts li {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0.3rem 0.85rem;
+  font-size: 0.875rem;
+}
+.facts .k {
+  font-weight: 700;
+  color: var(--brand-ink);
+}
+
+/* ---------------------- Tabs ---------------------- */
+.tabs-bar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border-soft);
+}
+.tabs {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 0.5rem 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+.tab {
+  appearance: none;
+  font: inherit;
+  font-weight: 600;
+  font-size: 0.9375rem;
+  color: var(--brand-ink);
+  background: var(--btn2-bg);
+  border: 1px solid var(--field-border);
+  border-radius: 999px;
+  padding: 0.45rem 0.95rem;
+  cursor: pointer;
+  min-height: 2.5rem;
+}
+.tab:hover { background: var(--accent-bg); }
+.tab[aria-selected="true"] {
+  background: var(--btn-bg);
+  color: var(--btn-fg);
+  border-color: var(--btn-bg);
+}
+.tab[aria-selected="true"]::before { content: "\2713\00a0"; }
+
+/* On narrow screens the tab bar wraps to three rows; sticking it would eat
+   most of a phone viewport, so it scrolls away instead. */
+@media (max-width: 47.99em) {
+  .tabs-bar { position: static; }
+}
+
+.panel { padding-top: 1.25rem; }
+.panel[hidden] { display: none; }
+
+/* ---------------------- Typography ---------------------- */
+h2 {
+  font-size: clamp(1.25rem, 3.2vw, 1.6rem);
+  margin: 0 0 0.75rem;
+  color: var(--brand-ink);
+}
+h3 {
+  font-size: 1.125rem;
+  margin: 1.75rem 0 0.5rem;
+}
+h4 {
+  font-size: 1rem;
+  margin: 1.25rem 0 0.35rem;
+}
+p { margin: 0 0 1rem; }
+ul, ol { margin: 0 0 1rem; padding-left: 1.35rem; }
+li { margin-bottom: 0.4rem; }
+strong { font-weight: 700; }
+code, .mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.9375em;
+}
+
+/* ---------------------- Boxes ---------------------- */
+.card {
+  background: var(--panel);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius);
+  padding: 1.1rem 1.15rem;
+  margin: 0 0 1.25rem;
+}
+.card > :last-child { margin-bottom: 0; }
+
+.callout {
+  border-left: 5px solid var(--brand);
+  background: var(--accent-bg);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding: 0.9rem 1.1rem;
+  margin: 0 0 1.25rem;
+}
+.callout > :last-child { margin-bottom: 0; }
+.callout h3 { margin-top: 0; }
+
+.callout--warn {
+  border-left-color: #b8860b;
+  background: var(--warn-bg);
+  color: var(--warn-ink);
+}
+.callout--warn h3 { color: inherit; }
+
+.two-col {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 46em) {
+  .two-col { grid-template-columns: 1fr 1fr; }
+}
+
+/* ---------------------- Steps ---------------------- */
+.steps { list-style: none; padding: 0; margin: 0; counter-reset: step; }
+.steps > li {
+  counter-increment: step;
+  position: relative;
+  padding-left: 3rem;
+  margin-bottom: 1.25rem;
+  min-height: 2.25rem;
+}
+.steps > li::before {
+  content: counter(step);
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 2.15rem;
+  height: 2.15rem;
+  border-radius: 50%;
+  background: var(--btn-bg);
+  color: var(--btn-fg);
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.steps h3 { margin: 0.15rem 0 0.3rem; font-size: 1.05rem; }
+
+/* ---------------------- Tables ---------------------- */
+.table-scroll { overflow-x: auto; margin: 0 0 1.25rem; }
+table {
+  border-collapse: collapse;
+  width: 100%;
+  min-width: 34rem;
+  background: var(--surface);
+}
+caption {
+  text-align: left;
+  font-weight: 700;
+  padding: 0 0 0.5rem;
+  color: var(--muted);
+}
+th, td {
+  border: 1px solid var(--border);
+  padding: 0.6rem 0.7rem;
+  text-align: left;
+  vertical-align: top;
+}
+thead th { background: var(--panel-2); }
+tbody th { background: var(--panel); font-weight: 700; }
+tfoot td, tfoot th { background: var(--panel-2); font-weight: 700; }
+
+/* ---------------------- Forms ---------------------- */
+fieldset {
+  border: 1px solid var(--field-border);
+  border-radius: var(--radius);
+  padding: 1rem 1.1rem 1.15rem;
+  margin: 0 0 1.25rem;
+  background: var(--surface);
+}
+legend {
+  font-weight: 700;
+  padding: 0 0.4rem;
+  color: var(--brand-ink);
+}
+.field { margin-bottom: 1.15rem; }
+.field:last-child { margin-bottom: 0; }
+label { display: block; font-weight: 600; margin-bottom: 0.2rem; }
+.hint {
+  display: block;
+  color: var(--muted);
+  font-size: 0.9rem;
+  margin-bottom: 0.4rem;
+}
+input[type="text"], textarea, select {
+  font: inherit;
+  color: var(--ink);
+  background: var(--surface);
+  width: 100%;
+  border: 1px solid var(--field-border);
+  border-radius: 8px;
+  padding: 0.55rem 0.65rem;
+  min-height: 2.75rem;
+}
+textarea { resize: vertical; min-height: 6rem; line-height: 1.55; }
+.counter {
+  font-size: 0.875rem;
+  color: var(--muted);
+  margin-top: 0.25rem;
+}
+.counter b { color: var(--ink); }
+
+.grid-3 {
+  display: grid;
+  gap: 0.85rem;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 38em) {
+  .grid-3 { grid-template-columns: repeat(3, 1fr); }
+}
+
+/* ---------------------- Buttons ---------------------- */
+.btn-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin: 0.5rem 0 0.75rem;
+}
+button {
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 8px;
+  padding: 0.6rem 1.1rem;
+  min-height: 2.75rem;
+  border: 1px solid var(--btn-bg);
+  background: var(--btn-bg);
+  color: var(--btn-fg);
+}
+button:hover { background: var(--btn-bg-hover); border-color: var(--btn-bg-hover); }
+button.secondary {
+  background: var(--btn2-bg);
+  color: var(--btn2-fg);
+  border-color: var(--field-border);
+}
+button.secondary:hover { background: var(--accent-bg); }
+
+/* ---------------------- Status region ---------------------- */
+.status {
+  min-height: 1.5rem;
+  font-weight: 600;
+  color: var(--ok);
+  background: var(--ok-bg);
+  border-radius: 8px;
+  padding: 0.35rem 0.6rem;
+  margin: 0.25rem 0 0;
+}
+.status:empty { background: transparent; padding: 0; min-height: 0; }
+
+/* ---------------------- Checklist ---------------------- */
+.checklist { list-style: none; padding: 0; margin: 0; }
+.checklist li {
+  border-bottom: 1px solid var(--border-soft);
+  padding: 0.55rem 0;
+  margin: 0;
+}
+.checklist li:last-child { border-bottom: none; }
+.check-row {
+  display: flex;
+  gap: 0.7rem;
+  align-items: flex-start;
+  font-weight: 400;
+  margin: 0;
+  cursor: pointer;
+}
+.check-row input[type="checkbox"] {
+  width: 1.35rem;
+  height: 1.35rem;
+  min-height: 0;
+  margin: 0.15rem 0 0;
+  flex: 0 0 auto;
+  accent-color: var(--brand);
+}
+.check-row input:checked ~ .check-text { color: var(--muted); }
+.check-text .tag {
+  display: inline-block;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--brand-ink);
+  background: var(--accent-bg);
+  border-radius: 999px;
+  padding: 0 0.55rem;
+  margin-left: 0.35rem;
+  white-space: nowrap;
+}
+
+.meter-wrap { margin-top: 1rem; }
+.meter {
+  height: 0.9rem;
+  background: var(--panel-2);
+  border: 1px solid var(--field-border);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.meter > span {
+  display: block;
+  height: 100%;
+  width: 0%;
+  background: var(--btn-bg);
+  transition: width 0.25s ease;
+}
+
+/* ---------------------- Example posts ---------------------- */
+.sample {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem 1.1rem;
+  margin: 0 0 1rem;
+}
+.sample p:last-child { margin-bottom: 0; }
+.sample-label {
+  display: inline-block;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  margin-bottom: 0.6rem;
+}
+.label-strong { background: var(--ok-bg); color: var(--ok); border: 1px solid currentColor; }
+.label-weak { background: var(--warn-bg); color: var(--warn-ink); border: 1px solid currentColor; }
+
+.starters li { margin-bottom: 0.55rem; }
+.starters em { color: var(--muted); font-style: normal; }
+
+.footnote {
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border-soft);
+  color: var(--muted);
+  font-size: 0.9375rem;
+}
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px; height: 1px;
+  margin: -1px; padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
+}
+
+@media print {
+  .tabs-bar, .btn-row, .skip-link { display: none !important; }
+  .panel[hidden] { display: block !important; }
+  body { background: #fff; color: #000; }
+  .card, .callout, fieldset, .sample { break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+
+<a class="skip-link" href="#main">Skip to assignment content</a>
+
+<header class="page-head">
+  <div class="wrap">
+    <p class="eyebrow">CSC 104 &middot; Week 1 &middot; Discussion</p>
+    <h1>Introductions: Meet Your Classmates</h1>
+    <p class="lede">Post a short introduction about yourself, then reply to two classmates. This is the first graded
+      assignment of the course and the easiest 25 points you will earn all semester — it just has to actually get done.</p>
+    <ul class="facts">
+      <li><span class="k">Points:</span> 25</li>
+      <li><span class="k">Post due:</span> Fri 9/4/2026, 11:59&nbsp;PM</li>
+      <li><span class="k">Replies due:</span> Sun 9/6/2026, 11:59&nbsp;PM</li>
+      <li><span class="k">Submit in:</span> the Canvas discussion board</li>
+    </ul>
+  </div>
+</header>
+
+<div class="tabs-bar">
+  <div class="tabs" role="tablist" aria-label="Assignment sections">
+    <button class="tab" id="tab-overview"  role="tab" aria-controls="panel-overview"  aria-selected="true"  type="button">Overview</button>
+    <button class="tab" id="tab-post"      role="tab" aria-controls="panel-post"      aria-selected="false" type="button" tabindex="-1">Write your post</button>
+    <button class="tab" id="tab-replies"   role="tab" aria-controls="panel-replies"   aria-selected="false" type="button" tabindex="-1">Reply to classmates</button>
+    <button class="tab" id="tab-rubric"    role="tab" aria-controls="panel-rubric"    aria-selected="false" type="button" tabindex="-1">Grading &amp; checklist</button>
+    <button class="tab" id="tab-examples"  role="tab" aria-controls="panel-examples"  aria-selected="false" type="button" tabindex="-1">Examples</button>
+  </div>
+</div>
+
+<main id="main" class="wrap" tabindex="-1">
+
+  <!-- ================= OVERVIEW ================= -->
+  <section class="panel" id="panel-overview" role="tabpanel" aria-labelledby="tab-overview" tabindex="0">
+    <h2>What you are doing and why</h2>
+
+    <p>This course is fully online and asynchronous, which means we will never all be in a room together. That makes it
+      very easy to spend fifteen weeks next to twenty-five people you never meet. This discussion is how we fix that.
+      It also gives me a first read on where everyone is starting from, so I can aim the weekly walkthroughs at the
+      right level.</p>
+
+    <div class="callout">
+      <h3>The assignment in one sentence</h3>
+      <p>Post one introduction of about 150–250 words answering the five prompts below, then write a substantive reply
+        of about 50 words or more to two different classmates.</p>
+    </div>
+
+    <h3>How to complete it</h3>
+    <ol class="steps">
+      <li>
+        <h3>Draft your introduction</h3>
+        <p>Use the <strong>Write your post</strong> tab. It walks you through the five prompts one at a time, counts your
+          words as you go, and assembles a finished post you can copy and paste into Canvas.</p>
+      </li>
+      <li>
+        <h3>Post it to the Canvas discussion by Friday 9/4</h3>
+        <p>In the Canvas discussion board for this assignment, choose <strong>Reply</strong> on the main discussion topic,
+          paste your introduction, and post it. Posting on Friday rather than Sunday matters — your classmates need
+          something to reply to.</p>
+      </li>
+      <li>
+        <h3>Read what other people wrote</h3>
+        <p>Come back Saturday or Sunday and read through the board. Look for people whose situation, goals, or worries
+          sound like yours, and for people whose experience is different from yours.</p>
+      </li>
+      <li>
+        <h3>Reply to two classmates by Sunday 9/6</h3>
+        <p>Use the <strong>Reply to classmates</strong> tab for what makes a reply count. Reply to two <em>different</em>
+          people, and reply directly beneath their post so they get the notification.</p>
+      </li>
+      <li>
+        <h3>Check your work against the checklist</h3>
+        <p>The <strong>Grading &amp; checklist</strong> tab has the exact rubric I grade with and a checklist you can tick
+          off before you close the tab.</p>
+      </li>
+    </ol>
+
+    <h3>What your post needs to cover</h3>
+    <p>Five things. Nothing here is personal beyond what you choose to share.</p>
+    <div class="table-scroll">
+      <table>
+        <caption>The five prompts</caption>
+        <thead>
+          <tr><th scope="col">#</th><th scope="col">Prompt</th><th scope="col">What I'm looking for</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">1</th>
+            <td>What should we call you?</td>
+            <td>The name you actually go by, and how to say it if it is often mispronounced.</td>
+          </tr>
+          <tr>
+            <th scope="row">2</th>
+            <td>Your program or major, and where you are headed</td>
+            <td>Degree, certificate, transfer plan, a job you are aiming at — or "still deciding," which is a real answer.</td>
+          </tr>
+          <tr>
+            <th scope="row">3</th>
+            <td>Why you are taking CSC 104 and what you want out of it</td>
+            <td>Required for your program? Job asked for it? One specific thing you want to be able to do by December.</td>
+          </tr>
+          <tr>
+            <th scope="row">4</th>
+            <td>Your experience with Word, Excel, and PowerPoint</td>
+            <td>An honest self-assessment of each. "I have never opened Excel" is a completely fine answer and more
+              useful to me than a polite overestimate.</td>
+          </tr>
+          <tr>
+            <th scope="row">5</th>
+            <td>Something about you outside of class</td>
+            <td>Work, family, hobby, where you live, a fun fact — one thing that gives someone a hook to reply to.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout callout--warn">
+      <h3>A note on AI for this assignment</h3>
+      <p>Per the course AI policy, write this one yourself. An introduction is your own voice by definition, and an
+        AI-written introduction to a class of people you are about to spend fifteen weeks with is an odd way to start.
+        Spell check and grammar check are ordinary application features and are always fine.</p>
+    </div>
+
+    <h3>If something goes wrong</h3>
+    <p>If you cannot get into the discussion, or the week has already gone sideways, message me through the Canvas
+      Inbox before the week closes. Reaching out early is never an imposition. Instructor email:
+      <span class="mono">dpai@mendocino.edu</span>.</p>
+  </section>
+
+  <!-- ================= WRITE YOUR POST ================= -->
+  <section class="panel" id="panel-post" role="tabpanel" aria-labelledby="tab-post" tabindex="0" hidden>
+    <h2>Draft your introduction</h2>
+    <p>Answer the five prompts below in your own words, then select <strong>Build my post</strong> at the bottom. Your
+      answers are assembled into one paste-ready introduction that you can edit before copying.</p>
+
+    <div class="callout">
+      <p><strong>Nothing here is submitted.</strong> This helper runs entirely in your browser and sends nothing to
+        anyone. Your assignment is not turned in until you paste the finished text into the Canvas discussion and post it.
+        Copy your draft somewhere safe before you close this page.</p>
+    </div>
+
+    <form id="post-form" novalidate>
+      <fieldset>
+        <legend>1. What should we call you?</legend>
+        <div class="field">
+          <label for="p-name">Name you go by</label>
+          <span class="hint" id="p-name-hint">If your Canvas name is different from what you go by, say so here.</span>
+          <input type="text" id="p-name" name="p-name" aria-describedby="p-name-hint" autocomplete="given-name">
+        </div>
+        <div class="field">
+          <label for="p-name-note">Pronunciation or nickname note <span class="hint" style="display:inline">(optional)</span></label>
+          <span class="hint" id="p-name-note-hint">Example: "Nguyen — sounds like 'win'." Leave blank if it does not apply.</span>
+          <input type="text" id="p-name-note" name="p-name-note" aria-describedby="p-name-note-hint">
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>2. Program or major, and where you are headed</legend>
+        <div class="field">
+          <label for="p-program">Your program and goal</label>
+          <span class="hint" id="p-program-hint">Two or three sentences. "Still deciding" is a real answer — say what you
+            are weighing.</span>
+          <textarea id="p-program" name="p-program" rows="4" aria-describedby="p-program-hint p-program-count"></textarea>
+          <p class="counter" id="p-program-count" data-count-for="p-program"><b>0</b> words</p>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>3. Why CSC 104, and what you want out of it</legend>
+        <div class="field">
+          <label for="p-why">Your reason and your goal for December</label>
+          <span class="hint" id="p-why-hint">Name one specific thing you want to be able to do by the end of the term —
+            build a budget spreadsheet, format a resume properly, stop fighting with page numbers.</span>
+          <textarea id="p-why" name="p-why" rows="4" aria-describedby="p-why-hint p-why-count"></textarea>
+          <p class="counter" id="p-why-count" data-count-for="p-why"><b>0</b> words</p>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>4. Your experience with the Office applications</legend>
+        <p class="hint" style="margin-top:-0.35rem">Pick your honest starting point for each. There is no wrong answer
+          and no points attached to the level you pick.</p>
+        <div class="grid-3">
+          <div class="field">
+            <label for="p-word">Microsoft Word</label>
+            <select id="p-word" name="p-word">
+              <option value="">— choose one —</option>
+              <option value="have never used {app}">never used it</option>
+              <option value="have used {app} a little">used it a little</option>
+              <option value="use {app} regularly">use it regularly</option>
+              <option value="am very comfortable with {app}">very comfortable with it</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="p-excel">Microsoft Excel</label>
+            <select id="p-excel" name="p-excel">
+              <option value="">— choose one —</option>
+              <option value="have never used {app}">never used it</option>
+              <option value="have used {app} a little">used it a little</option>
+              <option value="use {app} regularly">use it regularly</option>
+              <option value="am very comfortable with {app}">very comfortable with it</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="p-ppt">Microsoft PowerPoint</label>
+            <select id="p-ppt" name="p-ppt">
+              <option value="">— choose one —</option>
+              <option value="have never used {app}">never used it</option>
+              <option value="have used {app} a little">used it a little</option>
+              <option value="use {app} regularly">use it regularly</option>
+              <option value="am very comfortable with {app}">very comfortable with it</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label for="p-exp">Anything to add about your experience <span class="hint" style="display:inline">(optional)</span></label>
+          <span class="hint" id="p-exp-hint">Where you learned what you know, what you use these for now, or what part
+            you dread.</span>
+          <textarea id="p-exp" name="p-exp" rows="3" aria-describedby="p-exp-hint p-exp-count"></textarea>
+          <p class="counter" id="p-exp-count" data-count-for="p-exp"><b>0</b> words</p>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>5. Something about you outside of class</legend>
+        <div class="field">
+          <label for="p-personal">Work, family, hobby, where you live, a fun fact</label>
+          <span class="hint" id="p-personal-hint">Share only what you are comfortable posting to the whole class. Give
+            people a hook — a specific detail gets far better replies than "I like music."</span>
+          <textarea id="p-personal" name="p-personal" rows="4" aria-describedby="p-personal-hint p-personal-count"></textarea>
+          <p class="counter" id="p-personal-count" data-count-for="p-personal"><b>0</b> words</p>
+        </div>
+      </fieldset>
+
+      <div class="card">
+        <p class="counter" style="font-size:1rem">Draft length so far: <b><span id="total-words">0</span></b> words
+          (target: 150–250)</p>
+        <p id="total-status" class="status" role="status" aria-live="polite"></p>
+      </div>
+
+      <div class="btn-row">
+        <button type="button" id="build-btn">Build my post</button>
+        <button type="button" class="secondary" id="clear-btn">Clear the form</button>
+      </div>
+    </form>
+
+    <h3 id="output-heading">Your paste-ready introduction</h3>
+    <div class="field">
+      <label for="post-output">Finished draft — edit it here, then copy it into Canvas</label>
+      <span class="hint" id="post-output-hint">This box fills in when you select "Build my post." You can rewrite
+        anything in it; it is just text.</span>
+      <textarea id="post-output" rows="14" aria-describedby="post-output-hint"></textarea>
+    </div>
+    <div class="btn-row">
+      <button type="button" id="copy-post">Copy to clipboard</button>
+      <button type="button" class="secondary" id="select-post">Select all (then press Ctrl+C / &#8984;C)</button>
+    </div>
+    <p id="post-copy-status" class="status" role="status" aria-live="polite"></p>
+  </section>
+
+  <!-- ================= REPLIES ================= -->
+  <section class="panel" id="panel-replies" role="tabpanel" aria-labelledby="tab-replies" tabindex="0" hidden>
+    <h2>Replying to two classmates</h2>
+
+    <p>Ten of the twenty-five points are for your two replies, and they are the part students most often lose points on —
+      not because the replies are bad, but because "Welcome to the class!" is not a reply. Aim for about 50 words or more
+      each, to two <strong>different</strong> people, posted beneath their introduction so they are notified.</p>
+
+    <div class="two-col">
+      <div class="card">
+        <h3 style="margin-top:0">A reply that earns the points</h3>
+        <ul>
+          <li>Names something specific from <em>their</em> post.</li>
+          <li>Connects it to something real — your own experience, your program, a shared worry.</li>
+          <li>Ends with a question, an offer, or a genuinely useful piece of information.</li>
+          <li>Sounds like a person talking to a person.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3 style="margin-top:0">A reply that does not</h3>
+        <ul>
+          <li>"Nice to meet you, good luck this semester!"</li>
+          <li>A summary of what they already said, with nothing added.</li>
+          <li>A reply that would fit under literally anyone's post.</li>
+          <li>Two replies posted under the same person.</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3>Sentence starters, if you are stuck</h3>
+    <ul class="starters">
+      <li><em>Shared situation:</em> "You mentioned you are juggling this with a full-time job — I am too, and I am
+        planning to do my coursework on&hellip;"</li>
+      <li><em>Shared goal:</em> "We are both headed toward &hellip; Did you already take &hellip;?"</li>
+      <li><em>Different starting point:</em> "You said Excel is the one you are dreading. I use it at work for &hellip;,
+        and the thing that finally made it click for me was &hellip;"</li>
+      <li><em>Curiosity:</em> "You said you &hellip; — how did you get into that?"</li>
+      <li><em>Offer:</em> "I am also in the &hellip; program — if you want someone to compare notes with on the Word
+        Project in Week 6, I am in."</li>
+    </ul>
+
+    <h3>Draft your replies</h3>
+    <p>Optional, but it keeps you from staring at an empty Canvas reply box. Build and copy one reply at a time.</p>
+
+    <fieldset>
+      <legend>Reply 1</legend>
+      <div class="field">
+        <label for="r1-name">Classmate's name</label>
+        <input type="text" id="r1-name" name="r1-name">
+      </div>
+      <div class="field">
+        <label for="r1-connect">What in their post connected with you, and how</label>
+        <span class="hint" id="r1-connect-hint">Quote or name the specific detail, then say why it landed.</span>
+        <textarea id="r1-connect" rows="4" aria-describedby="r1-connect-hint r1-connect-count"></textarea>
+        <p class="counter" id="r1-connect-count" data-count-for="r1-connect"><b>0</b> words</p>
+      </div>
+      <div class="field">
+        <label for="r1-ask">Your question, offer, or useful tip for them</label>
+        <textarea id="r1-ask" rows="3" aria-describedby="r1-ask-count"></textarea>
+        <p class="counter" id="r1-ask-count" data-count-for="r1-ask"><b>0</b> words</p>
+      </div>
+      <div class="field">
+        <label for="r1-out">Reply 1 — paste-ready</label>
+        <textarea id="r1-out" rows="6"></textarea>
+      </div>
+      <div class="btn-row">
+        <button type="button" data-build-reply="1">Build reply 1</button>
+        <button type="button" class="secondary" data-copy="r1-out">Copy reply 1</button>
+      </div>
+      <p id="r1-status" class="status" role="status" aria-live="polite"></p>
+    </fieldset>
+
+    <fieldset>
+      <legend>Reply 2</legend>
+      <div class="field">
+        <label for="r2-name">Classmate's name</label>
+        <input type="text" id="r2-name" name="r2-name">
+      </div>
+      <div class="field">
+        <label for="r2-connect">What in their post connected with you, and how</label>
+        <span class="hint" id="r2-connect-hint">A different person from Reply 1.</span>
+        <textarea id="r2-connect" rows="4" aria-describedby="r2-connect-hint r2-connect-count"></textarea>
+        <p class="counter" id="r2-connect-count" data-count-for="r2-connect"><b>0</b> words</p>
+      </div>
+      <div class="field">
+        <label for="r2-ask">Your question, offer, or useful tip for them</label>
+        <textarea id="r2-ask" rows="3" aria-describedby="r2-ask-count"></textarea>
+        <p class="counter" id="r2-ask-count" data-count-for="r2-ask"><b>0</b> words</p>
+      </div>
+      <div class="field">
+        <label for="r2-out">Reply 2 — paste-ready</label>
+        <textarea id="r2-out" rows="6"></textarea>
+      </div>
+      <div class="btn-row">
+        <button type="button" data-build-reply="2">Build reply 2</button>
+        <button type="button" class="secondary" data-copy="r2-out">Copy reply 2</button>
+      </div>
+      <p id="r2-status" class="status" role="status" aria-live="polite"></p>
+    </fieldset>
+  </section>
+
+  <!-- ================= RUBRIC ================= -->
+  <section class="panel" id="panel-rubric" role="tabpanel" aria-labelledby="tab-rubric" tabindex="0" hidden>
+    <h2>How this is graded</h2>
+
+    <div class="table-scroll">
+      <table>
+        <caption>Introductions Discussion rubric — 25 points total</caption>
+        <thead>
+          <tr>
+            <th scope="col">What</th>
+            <th scope="col">Points</th>
+            <th scope="col">Full credit looks like</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">Original post</th>
+            <td>15</td>
+            <td>Posted by Friday 9/4. Answers all five prompts. Roughly 150–250 words. Written clearly enough to read
+              comfortably — proofread, but not graded as an essay.</td>
+          </tr>
+          <tr>
+            <th scope="row">Reply 1</th>
+            <td>5</td>
+            <td>Posted by Sunday 9/6, beneath a classmate's introduction. Around 50 words or more. Responds to something
+              specific in their post and adds something of your own.</td>
+          </tr>
+          <tr>
+            <th scope="row">Reply 2</th>
+            <td>5</td>
+            <td>Same standard, to a <strong>different</strong> classmate.</td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr><th scope="row">Total</th><td>25</td><td>Counts in the MindTap Trainings category. This is a droppable score
+            — but dropping it in Week 1 spends your safety net before you need it.</td></tr>
+        </tfoot>
+      </table>
+    </div>
+
+    <h3>Common point losses</h3>
+    <ul>
+      <li><strong>Skipping a prompt.</strong> Prompt 4 — your experience with the applications — is the one most often
+        left out, and it is the one I use to aim the course.</li>
+      <li><strong>Both replies under the same person.</strong> They must be two different classmates.</li>
+      <li><strong>One-line replies.</strong> "Welcome!" is friendly and earns nothing.</li>
+      <li><strong>Posting everything Sunday night.</strong> If nobody posts until Sunday, nobody has anything to reply to.</li>
+    </ul>
+
+    <div class="callout">
+      <h3>Late work</h3>
+      <p>This discussion follows the course late policy: accepted up to 7 days after the due date with a 15% deduction,
+        and closed after that. Everything in the course closes Friday 12/11/2026 at 11:59 PM regardless.</p>
+    </div>
+
+    <h2 id="checklist-heading">Before you close this tab</h2>
+    <p>Tick these off as you go. This checklist lives in your browser only — it is a tool for you, not a submission,
+      and nothing here is sent to me.</p>
+
+    <ul class="checklist" id="checklist">
+      <li><label class="check-row"><input type="checkbox"><span class="check-text">My post answers all five prompts <span class="tag">15 pts</span></span></label></li>
+      <li><label class="check-row"><input type="checkbox"><span class="check-text">My post is at least 150 words</span></label></li>
+      <li><label class="check-row"><input type="checkbox"><span class="check-text">I read it back once for spelling and clarity</span></label></li>
+      <li><label class="check-row"><input type="checkbox"><span class="check-text">I posted it to the Canvas discussion by Friday 9/4, 11:59 PM</span></label></li>
+      <li><label class="check-row"><input type="checkbox"><span class="check-text">I read through my classmates' introductions</span></label></li>
+      <li><label class="check-row"><input type="checkbox"><span class="check-text">I replied to classmate #1 with about 50+ words <span class="tag">5 pts</span></span></label></li>
+      <li><label class="check-row"><input type="checkbox"><span class="check-text">I replied to a <em>different</em> classmate #2 with about 50+ words <span class="tag">5 pts</span></span></label></li>
+      <li><label class="check-row"><input type="checkbox"><span class="check-text">Both replies were posted by Sunday 9/6, 11:59 PM</span></label></li>
+      <li><label class="check-row"><input type="checkbox"><span class="check-text">Not graded, but do it this week: Microsoft 365 desktop installed and MindTap access working</span></label></li>
+    </ul>
+
+    <div class="meter-wrap">
+      <div class="meter" role="img" aria-labelledby="checklist-progress"><span id="meter-fill"></span></div>
+      <p class="counter" id="checklist-progress" role="status" aria-live="polite"><b>0</b> of 9 checked</p>
+    </div>
+    <div class="btn-row">
+      <button type="button" class="secondary" id="reset-checklist">Reset checklist</button>
+    </div>
+  </section>
+
+  <!-- ================= EXAMPLES ================= -->
+  <section class="panel" id="panel-examples" role="tabpanel" aria-labelledby="tab-examples" tabindex="0" hidden>
+    <h2>What a full-credit post looks like</h2>
+    <p>These are made up, but they are the shape of what earns the points. Do not copy them — copy the structure.</p>
+
+    <div class="sample">
+      <p><span class="sample-label label-strong">Full credit &middot; 15 / 15</span></p>
+      <p>Hi everyone, I'm Marisol — most people call me Mari, and it rhymes with "starry."</p>
+      <p>I'm in my second year at Mendocino, working toward the Business Administration AS-T and planning to transfer to
+        Sonoma State in fall 2028. Long term I want to run the office side of my family's vineyard operation, which right
+        now runs on paper and my uncle's memory.</p>
+      <p>CSC 104 is required for my degree, but I would honestly be taking it anyway. The specific thing I want by
+        December is to be able to build a spreadsheet that adds itself up — right now I retype totals into a calculator
+        and then type them back in, and I know that is not how this is supposed to work.</p>
+      <p>Experience-wise: I use Word regularly for papers, though I suspect I do everything the slow way. Excel I have
+        used a little, mostly typing numbers into boxes. PowerPoint I have never really used beyond one high school
+        project.</p>
+      <p>Outside of class I work about 25 hours a week at a tasting room in Hopland, and I have a very opinionated
+        three-legged cat named Waffle. I do my coursework Tuesday and Thursday mornings, so if you are looking for
+        someone to compare notes with in that window, say hi.</p>
+    </div>
+
+    <p class="counter">That post is about 210 words and answers all five prompts. Notice how many hooks it leaves for
+      someone else to reply to: the vineyard, the transfer plan, the Excel worry, the tasting room, the cat.</p>
+
+    <h2>And what does not earn the points</h2>
+
+    <div class="sample">
+      <p><span class="sample-label label-weak">Partial credit &middot; about 6 / 15</span></p>
+      <p>Hi my name is Marisol and I am a business major. I am taking this class because it is required. I know computers
+        okay. Looking forward to the semester.</p>
+    </div>
+
+    <p class="counter">Thirty words, three of five prompts, nothing for anyone to reply to. It is not unfriendly — it is
+      just not an introduction.</p>
+
+    <h2>Replies, side by side</h2>
+
+    <div class="sample">
+      <p><span class="sample-label label-strong">Full credit &middot; 5 / 5</span></p>
+      <p>Mari — the "retype totals into a calculator and type them back in" line got me, because that is exactly what I
+        do at my job with our monthly hours. I am also in Business Admin, though I am one semester behind you. I looked
+        ahead at the schedule and the Excel weeks are 7 through 11, so it sounds like we get what we came for around
+        Halloween. Are you doing the Sonoma State transfer through the ADT pathway? I have been trying to figure out
+        whether that changes which math class I need.</p>
+    </div>
+
+    <div class="sample">
+      <p><span class="sample-label label-weak">No credit &middot; 0 / 5</span></p>
+      <p>Hi Mari! Nice to meet you. Good luck this semester!</p>
+    </div>
+
+    <h3>One more thing</h3>
+    <p>If your introduction gets no replies by Saturday, do not take it personally and do not wait — go reply to two
+      people whose posts are still empty of replies. The board balances itself out when people do that, and it is the
+      single kindest thing you can do in the first week of an online class.</p>
+  </section>
+
+  <p class="footnote">CSC 104 &middot; Computers and Computer Applications &middot; Fall 2026, Section 0840 &middot;
+    Mendocino College. Questions: message me through the Canvas Inbox, or email
+    <span class="mono">dpai@mendocino.edu</span>. This page is a helper — your assignment is submitted in the Canvas
+    discussion board.</p>
+</main>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ---- :focus-visible fallback -------------------------------------- */
+  try {
+    if (!CSS.supports("selector(:focus-visible)")) {
+      document.body.classList.add("no-fv");
+    }
+  } catch (e) {
+    document.body.classList.add("no-fv");
+  }
+
+  /* ---- Tabs (WAI-ARIA tabs pattern, manual activation on click,
+          arrow-key roving focus) ------------------------------------- */
+  var tabs = Array.prototype.slice.call(document.querySelectorAll('[role="tab"]'));
+
+  function selectTab(tab, setFocus) {
+    tabs.forEach(function (t) {
+      var selected = (t === tab);
+      t.setAttribute("aria-selected", selected ? "true" : "false");
+      t.tabIndex = selected ? 0 : -1;
+      var panel = document.getElementById(t.getAttribute("aria-controls"));
+      if (panel) { panel.hidden = !selected; }
+    });
+    if (setFocus) { tab.focus(); }
+  }
+
+  tabs.forEach(function (tab, i) {
+    tab.addEventListener("click", function () { selectTab(tab, false); });
+    tab.addEventListener("keydown", function (ev) {
+      var idx = null;
+      switch (ev.key) {
+        case "ArrowRight": case "ArrowDown": idx = (i + 1) % tabs.length; break;
+        case "ArrowLeft":  case "ArrowUp":   idx = (i - 1 + tabs.length) % tabs.length; break;
+        case "Home": idx = 0; break;
+        case "End":  idx = tabs.length - 1; break;
+        default: return;
+      }
+      ev.preventDefault();
+      selectTab(tabs[idx], true);
+    });
+  });
+
+  /* ---- Word counting ------------------------------------------------- */
+  function countWords(str) {
+    if (!str) { return 0; }
+    var parts = String(str).trim().split(/\s+/);
+    return (parts.length === 1 && parts[0] === "") ? 0 : parts.length;
+  }
+
+  var counters = Array.prototype.slice.call(document.querySelectorAll("[data-count-for]"));
+  var totalFields = ["p-program", "p-why", "p-exp", "p-personal"];
+  var totalOut = document.getElementById("total-words");
+  var totalStatus = document.getElementById("total-status");
+  var statusTimer = null;
+
+  function updateCounters() {
+    counters.forEach(function (el) {
+      var src = document.getElementById(el.getAttribute("data-count-for"));
+      if (!src) { return; }
+      var n = countWords(src.value);
+      el.innerHTML = "<b>" + n + "</b> word" + (n === 1 ? "" : "s");
+    });
+
+    if (!totalOut) { return; }
+    var answered = totalFields.some(function (id) {
+      var el = document.getElementById(id);
+      return el && el.value.trim();
+    });
+    var nameEl = document.getElementById("p-name");
+    if (nameEl && nameEl.value.trim()) { answered = true; }
+    // Count the post exactly as it will be assembled, greeting and closing included.
+    var total = answered ? countWords(buildPostText()) : 0;
+    totalOut.textContent = total;
+
+    if (statusTimer) { clearTimeout(statusTimer); }
+    statusTimer = setTimeout(function () {
+      if (!totalStatus) { return; }
+      if (total === 0) { totalStatus.textContent = ""; }
+      else if (total < 150) { totalStatus.textContent = "About " + (150 - total) + " more words to reach the 150-word target."; }
+      else if (total <= 260) { totalStatus.textContent = "Good length — you are in the 150 to 250 word range."; }
+      else { totalStatus.textContent = "Longer than the target. That is allowed, but trim it if it rambles."; }
+    }, 700);
+  }
+
+  document.addEventListener("input", function (ev) {
+    if (ev.target && (ev.target.tagName === "TEXTAREA" || ev.target.tagName === "INPUT")) {
+      updateCounters();
+    }
+  });
+  updateCounters();
+
+  /* ---- Status messages ----------------------------------------------- */
+  function say(el, msg) {
+    if (!el) { return; }
+    el.textContent = "";
+    setTimeout(function () { el.textContent = msg; }, 60);
+  }
+
+  /* ---- Build the introduction post ----------------------------------- */
+  function val(id) {
+    var el = document.getElementById(id);
+    return el ? el.value.trim() : "";
+  }
+
+  function softwareSentence() {
+    var map = [["Word", val("p-word")], ["Excel", val("p-excel")], ["PowerPoint", val("p-ppt")]];
+    var parts = map.filter(function (p) { return p[1]; })
+                   .map(function (p) { return p[1].replace("{app}", p[0]); });
+    if (!parts.length) { return ""; }
+    var joined;
+    if (parts.length === 1) { joined = parts[0]; }
+    else if (parts.length === 2) { joined = parts[0] + ", and " + parts[1]; }
+    else { joined = parts[0] + ", " + parts[1] + ", and " + parts[2]; }
+    return "As for the applications: I " + joined + ".";
+  }
+
+  function buildPostText() {
+    var name = val("p-name");
+    var note = val("p-name-note");
+    var lines = [];
+
+    var greeting = "Hi everyone,";
+    if (name) {
+      greeting = "Hi everyone — I'm " + name;
+      greeting += note ? " (" + note + ")." : ".";
+    }
+    lines.push(greeting);
+
+    if (val("p-program")) { lines.push(val("p-program")); }
+    if (val("p-why")) { lines.push(val("p-why")); }
+
+    var sw = softwareSentence();
+    var exp = val("p-exp");
+    if (sw || exp) { lines.push([sw, exp].filter(Boolean).join(" ")); }
+
+    if (val("p-personal")) { lines.push(val("p-personal")); }
+
+    lines.push("Looking forward to working with all of you this semester.");
+
+    return lines.join("\n\n");
+  }
+
+  var buildBtn = document.getElementById("build-btn");
+  var postOut = document.getElementById("post-output");
+  var postStatus = document.getElementById("post-copy-status");
+
+  if (buildBtn) {
+    buildBtn.addEventListener("click", function () {
+      var text = buildPostText();
+      if (postOut) {
+        postOut.value = text;
+      }
+
+      var words = countWords(text);
+      var msg = "Draft built — " + words + " words. ";
+      msg += (words < 150)
+        ? "That is under the 150-word target; add a little more detail before you post."
+        : "Read it through, edit anything that does not sound like you, then copy it into Canvas.";
+      say(postStatus, msg);
+
+      var heading = document.getElementById("output-heading");
+      if (heading && heading.scrollIntoView) { heading.scrollIntoView({ block: "start" }); }
+      if (postOut) { postOut.focus(); }
+    });
+  }
+
+  /* ---- Clear the form ------------------------------------------------ */
+  var clearBtn = document.getElementById("clear-btn");
+  var clearArmed = false;
+  if (clearBtn) {
+    clearBtn.addEventListener("click", function () {
+      if (!clearArmed) {
+        clearArmed = true;
+        clearBtn.textContent = "Select again to confirm — this erases your answers";
+        setTimeout(function () {
+          clearArmed = false;
+          clearBtn.textContent = "Clear the form";
+        }, 6000);
+        return;
+      }
+      var form = document.getElementById("post-form");
+      if (form) { form.reset(); }
+      if (postOut) { postOut.value = ""; }
+      clearArmed = false;
+      clearBtn.textContent = "Clear the form";
+      updateCounters();
+      say(postStatus, "Form cleared.");
+      var first = document.getElementById("p-name");
+      if (first) { first.focus(); }
+    });
+  }
+
+  /* ---- Build replies -------------------------------------------------- */
+  Array.prototype.slice.call(document.querySelectorAll("[data-build-reply]")).forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var n = btn.getAttribute("data-build-reply");
+      var name = val("r" + n + "-name");
+      var connect = val("r" + n + "-connect");
+      var ask = val("r" + n + "-ask");
+      var out = document.getElementById("r" + n + "-out");
+      var status = document.getElementById("r" + n + "-status");
+
+      var parts = [];
+      parts.push(name ? name + " —" : "Hi —");
+      if (connect) { parts.push(connect); }
+      if (ask) { parts.push(ask); }
+      var text = parts.length > 1 ? parts[0] + " " + parts.slice(1).join("\n\n") : "";
+
+      if (!text) {
+        say(status, "Fill in at least one of the boxes above, then select Build again.");
+        return;
+      }
+      if (out) { out.value = text; out.focus(); }
+      var words = countWords(text);
+      say(status, "Reply " + n + " built — " + words + " words. " +
+        (words < 45 ? "Aim for about 50; add one more specific detail." : "That is a solid length."));
+    });
+  });
+
+  /* ---- Copy / select helpers ------------------------------------------ */
+  function statusForTarget(id) {
+    if (id === "post-output") { return postStatus; }
+    if (id === "r1-out") { return document.getElementById("r1-status"); }
+    if (id === "r2-out") { return document.getElementById("r2-status"); }
+    return null;
+  }
+
+  function legacyCopy(el) {
+    try {
+      el.focus();
+      el.select();
+      el.setSelectionRange(0, el.value.length);
+      return document.execCommand("copy");
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function doCopy(id) {
+    var el = document.getElementById(id);
+    var status = statusForTarget(id);
+    if (!el || !el.value.trim()) {
+      say(status, "There is nothing to copy yet — build the text first.");
+      return;
+    }
+    var done = function (ok) {
+      say(status, ok
+        ? "Copied. Paste it into the Canvas discussion with Ctrl+V (Windows) or Command+V (Mac)."
+        : "Your browser blocked the copy. The text is selected — press Ctrl+C or Command+C to copy it.");
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(el.value).then(function () { done(true); }, function () {
+        done(legacyCopy(el));
+      });
+    } else {
+      done(legacyCopy(el));
+    }
+  }
+
+  var copyPost = document.getElementById("copy-post");
+  if (copyPost) { copyPost.addEventListener("click", function () { doCopy("post-output"); }); }
+
+  var selectPost = document.getElementById("select-post");
+  if (selectPost) {
+    selectPost.addEventListener("click", function () {
+      var el = document.getElementById("post-output");
+      if (!el || !el.value.trim()) { say(postStatus, "There is nothing to select yet — build your post first."); return; }
+      el.focus();
+      el.select();
+      say(postStatus, "Text selected. Press Ctrl+C (Windows) or Command+C (Mac) to copy it.");
+    });
+  }
+
+  Array.prototype.slice.call(document.querySelectorAll("[data-copy]")).forEach(function (btn) {
+    btn.addEventListener("click", function () { doCopy(btn.getAttribute("data-copy")); });
+  });
+
+  /* ---- Checklist ------------------------------------------------------- */
+  var list = document.getElementById("checklist");
+  if (list) {
+    var boxes = Array.prototype.slice.call(list.querySelectorAll('input[type="checkbox"]'));
+    var fill = document.getElementById("meter-fill");
+    var progress = document.getElementById("checklist-progress");
+
+    function updateChecklist() {
+      var done = boxes.filter(function (b) { return b.checked; }).length;
+      var pct = boxes.length ? Math.round((done / boxes.length) * 100) : 0;
+      if (fill) { fill.style.width = pct + "%"; }
+      if (progress) { progress.innerHTML = "<b>" + done + "</b> of " + boxes.length + " checked"; }
+    }
+
+    boxes.forEach(function (b) { b.addEventListener("change", updateChecklist); });
+
+    var reset = document.getElementById("reset-checklist");
+    if (reset) {
+      reset.addEventListener("click", function () {
+        boxes.forEach(function (b) { b.checked = false; });
+        updateChecklist();
+        if (boxes[0]) { boxes[0].focus(); }
+      });
+    }
+    updateChecklist();
+  }
+
+  /* ---- Optional: report height to a Canvas parent that listens for it.
+          Harmless if nothing is listening. -------------------------------- */
+  function postHeight() {
+    try {
+      if (window.parent && window.parent !== window) {
+        var h = Math.max(
+          document.body.scrollHeight,
+          document.documentElement.scrollHeight
+        );
+        window.parent.postMessage({ subject: "lti.frameResize", height: h }, "*");
+      }
+    } catch (e) { /* cross-origin parent — ignore */ }
+  }
+  window.addEventListener("load", postHeight);
+  if (window.ResizeObserver) {
+    var ro = new ResizeObserver(function () { postHeight(); });
+    ro.observe(document.body);
+  }
+})();
+</script>
+</body>
+</html>
