@@ -1,0 +1,1305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CSC 104 — Welcome and Course Introduction</title>
+<style>
+/* ============================================================
+   CSC 104 — Week 1 — Welcome and Course Introduction
+   Self-contained SPA for embedding in a Canvas iframe.
+   Vanilla CSS + vanilla JS, one file, no outbound links.
+   The only external resources are the YouTube player iframe and
+   the YouTube IFrame API (needed for click-to-seek); the page
+   degrades to a readable transcript and a plain topic list if
+   either is blocked.
+   ============================================================ */
+
+:root {
+  color-scheme: light dark;
+  --surface:      #ffffff;
+  --panel:        #f6f8fb;
+  --panel-2:      #eef2f8;
+  --accent-bg:    #e8f0fe;
+  --ink:          #16202f;
+  --muted:        #46536b;
+  --brand:        #1d4ed8;
+  --brand-ink:    #17399c;
+  --border:       #c3cddc;
+  --border-soft:  #dde4ee;
+  --field-border: #6b7a92;
+  --btn-bg:       #1d4ed8;
+  --btn-fg:       #ffffff;
+  --btn-bg-hover: #17399c;
+  --btn2-bg:      #ffffff;
+  --btn2-fg:      #17399c;
+  --ok:           #1a6b3c;
+  --ok-bg:        #e6f4ec;
+  --warn-ink:     #7a4a06;
+  --warn-bg:      #fdf3e0;
+  --warn-rule:    #b8860b;
+  --focus:        #b4530a;
+  --hit:          #fff2b8;
+  --hit-ink:      #3a2c00;
+  --radius:       10px;
+  --maxw:         70rem;
+  --readw:        46rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --surface:      #0f1726;
+    --panel:        #17223a;
+    --panel-2:      #1e2b45;
+    --accent-bg:    #1a2a4d;
+    --ink:          #e9eefa;
+    --muted:        #b6c3d8;
+    --brand:        #9dbcff;
+    --brand-ink:    #bcd2ff;
+    --border:       #3a4a68;
+    --border-soft:  #2b3a56;
+    --field-border: #7b89a3;
+    --btn-bg:       #9dbcff;
+    --btn-fg:       #0b1424;
+    --btn-bg-hover: #c3d6ff;
+    --btn2-bg:      #17223a;
+    --btn2-fg:      #bcd2ff;
+    --ok:           #8fe0b0;
+    --ok-bg:        #123328;
+    --warn-ink:     #f6d59a;
+    --warn-bg:      #3a2c11;
+    --warn-rule:    #d9a441;
+    --focus:        #ffb066;
+    --hit:          #5c4a10;
+    --hit-ink:      #ffeeb8;
+  }
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--surface);
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; border-radius: 4px; }
+.no-fv :focus { outline: 3px solid var(--focus); outline-offset: 2px; }
+
+.skip-link {
+  position: absolute; left: -9999px; top: 0; z-index: 60;
+  background: var(--btn-bg); color: var(--btn-fg);
+  padding: 0.6rem 1rem; font-weight: 700; border-radius: 0 0 var(--radius) 0;
+}
+.skip-link:focus { left: 0; outline: 3px solid var(--focus); outline-offset: 2px; }
+
+.wrap { max-width: var(--maxw); margin: 0 auto; padding: 1rem 1rem 3rem; }
+.read { max-width: var(--readw); }
+
+/* ---------------------- Header ---------------------- */
+.page-head { background: var(--panel); border-bottom: 3px solid var(--brand); }
+.page-head .wrap { padding-bottom: 1.25rem; }
+
+.eyebrow {
+  font-size: 0.8125rem; letter-spacing: 0.09em; text-transform: uppercase;
+  font-weight: 700; color: var(--brand-ink); margin: 0.75rem 0 0.35rem;
+}
+h1 { font-size: clamp(1.5rem, 4.2vw, 2.15rem); line-height: 1.22; margin: 0 0 0.6rem; }
+.lede { margin: 0; color: var(--muted); max-width: var(--readw); }
+
+.facts { list-style: none; display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 1rem 0 0; padding: 0; }
+.facts li {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 999px; padding: 0.3rem 0.85rem; font-size: 0.875rem;
+}
+.facts .k { font-weight: 700; color: var(--brand-ink); }
+
+/* ---------------------- Typography ---------------------- */
+h2 {
+  font-size: clamp(1.25rem, 3.2vw, 1.6rem);
+  margin: 2.5rem 0 0.75rem; color: var(--brand-ink);
+  padding-bottom: 0.35rem; border-bottom: 2px solid var(--border-soft);
+}
+h3 { font-size: 1.125rem; margin: 1.75rem 0 0.5rem; }
+p { margin: 0 0 1rem; max-width: var(--readw); }
+ul, ol { margin: 0 0 1rem; padding-left: 1.35rem; max-width: var(--readw); }
+li { margin-bottom: 0.4rem; }
+.mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.9375em; }
+
+.callout {
+  border-left: 5px solid var(--brand); background: var(--accent-bg);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding: 0.9rem 1.1rem; margin: 0 0 1.25rem; max-width: var(--readw);
+}
+.callout > :last-child { margin-bottom: 0; }
+.callout h3 { margin-top: 0; font-size: 1.05rem; }
+.callout--warn { border-left-color: var(--warn-rule); background: var(--warn-bg); color: var(--warn-ink); }
+.callout--wide { max-width: none; }
+
+/* ---------------------- Video + transcript ---------------------- */
+.video-row { display: flex; flex-wrap: wrap; gap: 1.25rem; margin: 0 0 1.5rem; }
+.video-col { flex: 1 1 32rem; min-width: min(100%, 20rem); }
+.transcript-col { flex: 1 1 20rem; min-width: min(100%, 17rem); display: flex; flex-direction: column; }
+
+.video-frame {
+  position: relative; width: 100%; padding-top: 56.25%;
+  background: #000; border-radius: var(--radius); overflow: hidden;
+  border: 1px solid var(--field-border);
+}
+.video-frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+.video-caption { font-size: 0.875rem; color: var(--muted); margin-top: 0.5rem; }
+
+.transcript-head { display: flex; flex-wrap: wrap; gap: 0.5rem 0.75rem; align-items: flex-end; margin-bottom: 0.5rem; }
+.transcript-head h3 { margin: 0 0 0.3rem; font-size: 1rem; flex: 0 1 auto; }
+.transcript-search { flex: 1 1 10rem; }
+.transcript-search label { display: block; font-size: 0.8125rem; font-weight: 600; color: var(--muted); }
+.transcript-search input {
+  font: inherit; width: 100%; min-height: 2.5rem; color: var(--ink);
+  background: var(--surface); border: 1px solid var(--field-border);
+  border-radius: 8px; padding: 0.35rem 0.55rem;
+}
+
+.transcript-panel {
+  height: 24rem; max-height: 24rem; overflow-y: auto;
+  border: 1px solid var(--field-border); border-radius: var(--radius);
+  background: var(--panel); padding: 0.4rem;
+}
+.transcript-line {
+  display: block; width: 100%; text-align: left; font: inherit;
+  font-size: 0.9375rem; line-height: 1.5; color: var(--ink);
+  background: transparent; border: 0; border-radius: 6px;
+  padding: 0.45rem 0.6rem; cursor: pointer;
+}
+.transcript-line:hover { background: var(--accent-bg); }
+.transcript-line .t {
+  display: inline-block; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.8125rem; font-weight: 700; color: var(--brand-ink); margin-right: 0.5rem;
+}
+.transcript-line.is-active {
+  background: var(--accent-bg);
+  box-shadow: inset 3px 0 0 0 var(--brand);
+  font-weight: 600;
+}
+.transcript-line[hidden] { display: none; }
+.transcript-line mark { background: var(--hit); color: var(--hit-ink); }
+.transcript-note { color: var(--muted); font-size: 0.875rem; padding: 0.6rem; margin: 0; }
+
+/* Static fallback when the player never loads */
+.no-player .transcript-line { cursor: default; }
+.no-player .transcript-line:hover { background: transparent; }
+
+/* ---------------------- Topic index ---------------------- */
+.topic-index { margin: 0 0 1.5rem; }
+.topic-index__group {
+  font-weight: 700; color: var(--brand-ink); margin: 1.25rem 0 0.4rem;
+  font-size: 0.9375rem; letter-spacing: 0.02em;
+}
+.topic-index__group:first-child { margin-top: 0; }
+.topic-index__list { list-style: none; padding: 0; margin: 0; max-width: none; }
+.topic-index__item {
+  display: flex; gap: 0.7rem; align-items: baseline;
+  padding: 0.28rem 0; margin: 0; border-bottom: 1px solid var(--border-soft);
+}
+.topic-index__list li:last-child { border-bottom: none; }
+.topic-index__time {
+  flex: 0 0 auto; font: inherit;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.875rem; font-weight: 700;
+  min-width: 4.25rem; min-height: 2rem; text-align: center;
+  color: var(--btn2-fg); background: var(--btn2-bg);
+  border: 1px solid var(--field-border); border-radius: 6px;
+  padding: 0.15rem 0.4rem; cursor: pointer;
+}
+.topic-index__time:hover { background: var(--accent-bg); }
+.topic-index__label { flex: 1 1 auto; }
+
+.topic-index--static .topic-index__time {
+  cursor: default; background: transparent; border-color: transparent;
+  color: var(--muted); text-align: left; padding-left: 0;
+}
+.topic-index--static .topic-index__time:hover { background: transparent; }
+
+@media (min-width: 52em) {
+  .topic-cols { column-count: 2; column-gap: 2.25rem; }
+  .topic-cols .topic-index__group { break-after: avoid; }
+  .topic-cols .topic-index__list { break-inside: avoid; }
+}
+
+/* ---------------------- To-do list ---------------------- */
+.todo { list-style: none; padding: 0; margin: 0 0 1.5rem; max-width: none; }
+.todo > li {
+  background: var(--panel); border: 1px solid var(--border-soft);
+  border-radius: var(--radius); padding: 0.85rem 1rem;
+  margin: 0 0 0.75rem;
+}
+.todo__top { display: flex; flex-wrap: wrap; gap: 0.6rem; align-items: baseline; }
+.todo__num {
+  flex: 0 0 auto; width: 1.9rem; height: 1.9rem; border-radius: 50%;
+  background: var(--btn-bg); color: var(--btn-fg); font-weight: 700; font-size: 0.9375rem;
+  display: flex; align-items: center; justify-content: center; align-self: flex-start;
+}
+.todo__title { flex: 1 1 14rem; font-weight: 700; margin: 0; }
+.todo__body { margin: 0.35rem 0 0 2.5rem; max-width: var(--readw); }
+.todo__body p { margin: 0 0 0.5rem; }
+.todo__body > :last-child { margin-bottom: 0; }
+.todo__meta { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0.5rem 0 0 2.5rem; }
+.pill {
+  font-size: 0.8125rem; font-weight: 700; border-radius: 999px;
+  padding: 0.1rem 0.6rem; border: 1px solid currentColor; white-space: nowrap;
+}
+.pill--graded { color: var(--ok); background: var(--ok-bg); }
+.pill--setup { color: var(--brand-ink); background: var(--accent-bg); }
+.pill--due { color: var(--warn-ink); background: var(--warn-bg); }
+.pill--time {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  color: var(--btn2-fg); background: var(--btn2-bg); border-color: var(--field-border);
+  cursor: pointer; font-size: 0.8125rem; min-height: 1.9rem;
+}
+.pill--time:hover { background: var(--accent-bg); }
+.no-player .pill--time { cursor: default; }
+
+/* ---------------------- Reference table ---------------------- */
+.table-scroll { overflow-x: auto; margin: 0 0 1.5rem; }
+table { border-collapse: collapse; width: 100%; min-width: 30rem; background: var(--surface); }
+caption { text-align: left; font-weight: 700; padding: 0 0 0.5rem; color: var(--muted); }
+th, td { border: 1px solid var(--border); padding: 0.6rem 0.7rem; text-align: left; vertical-align: top; }
+thead th { background: var(--panel-2); }
+tbody th { background: var(--panel); font-weight: 700; white-space: nowrap; }
+
+.status {
+  min-height: 1.4rem; font-weight: 600; color: var(--ok); background: var(--ok-bg);
+  border-radius: 8px; padding: 0.3rem 0.55rem; margin: 0.5rem 0 0;
+  max-width: var(--readw); font-size: 0.9375rem;
+}
+.status:empty { background: transparent; padding: 0; min-height: 0; }
+
+.footnote {
+  margin-top: 2.5rem; padding-top: 1rem; border-top: 1px solid var(--border-soft);
+  color: var(--muted); font-size: 0.9375rem; max-width: var(--readw);
+}
+
+.sr-only {
+  position: absolute !important; width: 1px; height: 1px; margin: -1px; padding: 0;
+  overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
+}
+
+@media print {
+  .skip-link, .video-frame, .transcript-search { display: none !important; }
+  .transcript-panel { height: auto !important; max-height: none !important; overflow: visible; border: none; }
+  .topic-index__time, .pill--time { border: none; }
+  body { background: #fff; color: #000; }
+  .todo > li, .callout, table { break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+
+<a class="skip-link" href="#main">Skip to page content</a>
+
+<header class="page-head">
+  <div class="wrap">
+    <p class="eyebrow">CSC 104 &middot; Week 1 &middot; Start Here</p>
+    <h1>Welcome and Course Introduction</h1>
+    <p class="lede">Watch the course introduction, then work through the list of what to do this week. Everything in
+      the video is written out below, so you can read it instead of watching if that suits you better.</p>
+    <ul class="facts">
+      <li><span class="k">Video:</span> 24 minutes</li>
+      <li><span class="k">Week 1:</span> 9/1/2026 &ndash; 9/6/2026</li>
+      <li><span class="k">Graded this week:</span> Introductions Discussion, 25 pts</li>
+      <li><span class="k">Post due:</span> Fri 9/4 &middot; <span class="k">Replies due:</span> Sun 9/6</li>
+    </ul>
+  </div>
+</header>
+
+<main id="main" class="wrap" tabindex="-1">
+
+  <!-- ============ Video + transcript ============ -->
+  <section aria-labelledby="video-heading">
+    <h2 id="video-heading" style="margin-top:1.25rem">Course introduction video</h2>
+    <p>This walks through the whole course: how the weekly rhythm works, the textbook and MindTap, how to reach me,
+      the policies, and what to do in Week 1. If you only have a few minutes, the topic index below lets you jump
+      straight to the part you need.</p>
+
+    <div class="video-row">
+      <div class="video-col">
+        <div class="video-frame" id="video-container">
+          <iframe id="youtube-player"
+                  src="https://www.youtube.com/embed/BVK8EAXTe6k?enablejsapi=1&amp;cc_load_policy=1&amp;iv_load_policy=3&amp;modestbranding=1&amp;rel=0"
+                  title="CSC 104 Welcome and Course Introduction"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  referrerpolicy="strict-origin-when-cross-origin"
+                  allowfullscreen loading="lazy"></iframe>
+        </div>
+        <p class="video-caption">Closed captions are on by default. Select any line of the transcript to jump the
+          video to that moment.</p>
+      </div>
+
+      <div class="transcript-col">
+        <div class="transcript-head">
+          <h3 id="transcript-heading">Transcript</h3>
+          <div class="transcript-search">
+            <label for="transcript-filter">Search the transcript</label>
+            <input type="search" id="transcript-filter" autocomplete="off" spellcheck="false"
+                   aria-describedby="transcript-filter-status">
+          </div>
+        </div>
+        <div class="transcript-panel" id="transcript-container" role="group" aria-labelledby="transcript-heading">
+          <p class="transcript-note">Loading transcript&hellip;</p>
+        </div>
+        <p class="sr-only" role="status" aria-live="polite" id="transcript-filter-status"></p>
+        <p class="sr-only" role="status" aria-live="polite" id="transcript-status"></p>
+        <p style="margin:0.5rem 0 0"><a href="#topic-index-heading">Skip past the transcript</a></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ Topic index ============ -->
+  <section aria-labelledby="topic-index-heading">
+    <h2 id="topic-index-heading">Find a topic in the video</h2>
+    <p><strong>Select any time below and the video jumps there.</strong> The video runs straight through in one take,
+      so when you need one specific answer &mdash; what the textbook is, how late work works, how to reach me &mdash;
+      jump to it rather than scrubbing.</p>
+
+    <p id="topic-index-fallback" class="status" hidden></p>
+
+    <div class="topic-index topic-cols" id="topic-index">
+
+      <div class="topic-index__group">Getting started</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="0">0:00</button><span class="topic-index__label">Welcome &mdash; a 15-week late-start section, 9/1 to 12/11</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="17">0:17</button><span class="topic-index__label">What this video covers</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="38">0:38</button><span class="topic-index__label">The Start Here page and the Week 1 module</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="55">0:55</button><span class="topic-index__label">Viewing the course the way you see it</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="67">1:07</button><span class="topic-index__label">After this week, Modules becomes the home page</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="76">1:16</button><span class="topic-index__label">Collapse a week's module when you finish it</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="89">1:29</button><span class="topic-index__label">How each video page is laid out</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="108">1:48</button><span class="topic-index__label">Why every video gets a table of contents</span></li>
+      </ul>
+
+      <div class="topic-index__group">If you don't have a Windows or Mac computer</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="141">2:21</button><span class="topic-index__label">Remote access using Splashtop</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="158">2:38</button><span class="topic-index__label">A Chromebook can't do everything this class needs</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="172">2:52</button><span class="topic-index__label">Contact me right away if you can't install Office</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="186">3:06</button><span class="topic-index__label">The lab computers already have Office</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="203">3:23</button><span class="topic-index__label">Message me through the Canvas Inbox</span></li>
+      </ul>
+
+      <div class="topic-index__group">The syllabus</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="218">3:38</button><span class="topic-index__label">Where the syllabus lives, and saving a PDF copy</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="235">3:55</button><span class="topic-index__label">Fully online, and 15 weeks instead of 17</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="248">4:08</button><span class="topic-index__label">Student learning outcomes</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="260">4:20</button><span class="topic-index__label">Why take this course &mdash; Microsoft is still what's used</span></li>
+      </ul>
+
+      <div class="topic-index__group">Reaching me</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="300">5:00</button><span class="topic-index__label">Instructor information</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="311">5:11</button><span class="topic-index__label">Student hours on Zoom, and asynchronous meeting</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="332">5:32</button><span class="topic-index__label">Scheduling an appointment on my calendar</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="365">6:05</button><span class="topic-index__label">Asking to meet in person instead</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="371">6:11</button><span class="topic-index__label">If you don't hear back within a day or two</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="384">6:24</button><span class="topic-index__label">Drop-in Zoom hours &mdash; give me a couple of minutes</span></li>
+      </ul>
+
+      <div class="topic-index__group">Textbook, MindTap and Office</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="414">6:54</button><span class="topic-index__label">The required textbook &mdash; Shelly Cashman, digital only</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="434">7:14</button><span class="topic-index__label">The rental fee</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="441">7:21</button><span class="topic-index__label">Cengage Unlimited, if you already have it</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="458">7:38</button><span class="topic-index__label">MindTap access is required</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="471">7:51</button><span class="topic-index__label">Microsoft 365 is free &mdash; install video coming</span></li>
+      </ul>
+
+      <div class="topic-index__group">Dates, assignments and grading</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="491">8:11</button><span class="topic-index__label">Add and drop deadlines &mdash; full-term dates for now</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="508">8:28</button><span class="topic-index__label">Where assignments live: MindTap vs. Canvas</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="526">8:46</button><span class="topic-index__label">The Word and Excel projects, submitted to Canvas</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="543">9:03</button><span class="topic-index__label">Grading turnaround: MindTap instant, mine slower</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="556">9:16</button><span class="topic-index__label">The weekly MindTap training</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="610">10:10</button><span class="topic-index__label">The MindTap project &mdash; the one you do on your own</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="629">10:29</button><span class="topic-index__label">Your lowest score in each category is dropped</span></li>
+      </ul>
+
+      <div class="topic-index__group">The semester, week by week</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="653">10:53</button><span class="topic-index__label">Week 1 &mdash; get everything set up</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="670">11:10</button><span class="topic-index__label">Week 2 &mdash; file management and Word</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="685">11:25</button><span class="topic-index__label">Five weeks of Word, plus the Word project</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="692">11:32</button><span class="topic-index__label">Excel, weeks 7 through 11</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="697">11:37</button><span class="topic-index__label">PowerPoint, then Outlook</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="707">11:47</button><span class="topic-index__label">Week 13 is short &mdash; Thanksgiving</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="712">11:52</button><span class="topic-index__label">Outlook ends with a quiz rather than a project</span></li>
+      </ul>
+
+      <div class="topic-index__group">Policies</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="720">12:00</button><span class="topic-index__label">Policies and resources</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="734">12:14</button><span class="topic-index__label">AI policy &mdash; learn with it, don't submit its work</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="751">12:31</button><span class="topic-index__label">"I'm not opposed to AI &mdash; use it responsibly"</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="764">12:44</button><span class="topic-index__label">Just because it can doesn't mean you should</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="777">12:57</button><span class="topic-index__label">Canvas, and the free self-enroll Canvas course</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="787">13:07</button><span class="topic-index__label">Course communication goes through the Canvas Inbox</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="824">13:44</button><span class="topic-index__label">Late work &mdash; MindTap stays open until the last day</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="843">14:03</button><span class="topic-index__label">The two Canvas projects must be on time</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="849">14:09</button><span class="topic-index__label">Disability Resource Center accommodations</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="894">14:54</button><span class="topic-index__label">Student conduct and academic honesty</span></li>
+      </ul>
+
+      <div class="topic-index__group">Resources for you</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="908">15:08</button><span class="topic-index__label">Financial aid &mdash; check even if you assume you don't qualify</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="925">15:25</button><span class="topic-index__label">Privacy &mdash; these pages don't track or save anything</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="942">15:42</button><span class="topic-index__label">The student resources guide from the deans</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="956">15:56</button><span class="topic-index__label">Food pantry, emergency funds, CalFresh, childcare, counseling, tutoring</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="998">16:38</button><span class="topic-index__label">English and Spanish; non-discrimination, Title IX, FERPA</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1023">17:03</button><span class="topic-index__label">Mental health and wellness</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1035">17:15</button><span class="topic-index__label">Tech support vs. "how do I do this in Word"</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1054">17:34</button><span class="topic-index__label">Semester dates are full-term &mdash; late-start dates to come</span></li>
+      </ul>
+
+      <div class="topic-index__group">Week 1: what to do</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1071">17:51</button><span class="topic-index__label">That's the syllabus &mdash; on to this week</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1085">18:05</button><span class="topic-index__label">Start Here, and the MindTap orientation material</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1103">18:23</button><span class="topic-index__label">Turning work in and seeing your grade</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1118">18:38</button><span class="topic-index__label">Check your MindTap score &mdash; and tell me if it looks wrong</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1134">18:54</button><span class="topic-index__label">Your assignment this week</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1171">19:31</button><span class="topic-index__label">The Introductions discussion</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1180">19:40</button><span class="topic-index__label">What the assignment page gives you</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1197">19:57</button><span class="topic-index__label">The "Build my post" form</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1229">20:29</button><span class="topic-index__label">Copying your post into the discussion</span></li>
+      </ul>
+
+      <div class="topic-index__group">Doing the discussion well</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1243">20:43</button><span class="topic-index__label">Replying to classmates</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1255">20:55</button><span class="topic-index__label">Due dates &mdash; post Friday, replies Sunday night</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1272">21:12</button><span class="topic-index__label">A real post vs. a minimal one</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1285">21:25</button><span class="topic-index__label">What makes a weak reply</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1301">21:41</button><span class="topic-index__label">Be specific &mdash; show you read their post</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1327">22:07</button><span class="topic-index__label">Spread your replies around</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1344">22:24</button><span class="topic-index__label">Post early and you'll get more replies</span></li>
+      </ul>
+
+      <div class="topic-index__group">Wrapping up</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1365">22:45</button><span class="topic-index__label">If you hit a problem, reach out</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1383">23:03</button><span class="topic-index__label">One-on-one appointments solve most things</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1404">23:24</button><span class="topic-index__label">Don't wait &mdash; get your book now</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1421">23:41</button><span class="topic-index__label">The Office installation video is coming this week</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1434">23:54</button><span class="topic-index__label">Web and phone apps aren't enough for this course</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1454">24:14</button><span class="topic-index__label">Closing</span></li>
+      </ul>
+
+    </div>
+  </section>
+
+  <!-- ============ What to do this week ============ -->
+  <section aria-labelledby="todo-heading">
+    <h2 id="todo-heading">What to do this week</h2>
+    <p>This is everything asked for in the video, in the order it makes sense to do it. Only one item is graded &mdash;
+      but the ungraded ones are what make Week 2 possible, so don't leave them.</p>
+
+    <div class="callout callout--warn">
+      <p style="margin:0"><strong>The theme of the whole video is "don't wait."</strong> Week 1 is short &mdash; the
+        section starts Tuesday 9/1 and the week closes Sunday 9/6. Getting the book and Office sorted out now is the
+        difference between a normal Week 2 and a bad one.</p>
+    </div>
+
+    <ol class="todo">
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">1</span>
+          <p class="todo__title">Watch this video and read through the Start Here page</p>
+        </div>
+        <div class="todo__body">
+          <p>You're doing it. When you finish Week 1, collapse the Week 1 module in Canvas so Week 2 is easy to find
+            next time.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="38">0:38</button>
+          <span class="pill pill--setup">Not graded</span>
+        </p>
+      </li>
+
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">2</span>
+          <p class="todo__title">Get the textbook and your MindTap access</p>
+        </div>
+        <div class="todo__body">
+          <p>The Shelly Cashman Series Collection, Microsoft 365 &amp; Office. It is <strong>digital only</strong>
+            &mdash; there is no paper copy &mdash; and it comes as a rental. MindTap access is required, and nearly
+            every graded assignment after this week runs through it.</p>
+          <p><strong>Check first:</strong> if you already have Cengage Unlimited for another course, this book and the
+            MindTap access are included. Log in and enter your Cengage Unlimited information rather than buying again.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="414">6:54</button>
+          <span class="pill pill--setup">Not graded</span>
+          <span class="pill pill--due">Do it now, not in Week 3</span>
+        </p>
+      </li>
+
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">3</span>
+          <p class="todo__title">Install the desktop version of Microsoft 365</p>
+        </div>
+        <div class="todo__body">
+          <p>It is free for all Mendocino College students. A step-by-step installation video is being posted later
+            this week &mdash; watch for the Canvas announcement.</p>
+          <p><strong>The web and phone versions are not enough.</strong> They are missing features this course asks you
+            to use, so install the desktop version on a Windows or Mac computer.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="471">7:51</button>
+          <button type="button" class="pill pill--time" data-seek="1434">23:54</button>
+          <span class="pill pill--setup">Not graded</span>
+        </p>
+      </li>
+
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">4</span>
+          <p class="todo__title">No Windows or Mac computer? Message me this week</p>
+        </div>
+        <div class="todo__body">
+          <p>If you're on a Chromebook, or on any machine you can't install software on, send me a message through the
+            Canvas Inbox <strong>as soon as possible</strong>. We'll set you up with Splashtop so you can remote into
+            the campus lab computers, which already have Office installed.</p>
+          <p>It adds a few steps &mdash; log in, remote in, copy your files up, copy them back down, log out &mdash;
+            but it works. What doesn't work is discovering the problem in Week 3.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="141">2:21</button>
+          <span class="pill pill--setup">Not graded</span>
+          <span class="pill pill--due">Only if this is you</span>
+        </p>
+      </li>
+
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">5</span>
+          <p class="todo__title">Read through the syllabus</p>
+        </div>
+        <div class="todo__body">
+          <p>It's under Course Information. It's long, but you only need to read it once. If you want your own copy,
+            use Download Syllabus and save the PDF.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="218">3:38</button>
+          <span class="pill pill--setup">Not graded</span>
+        </p>
+      </li>
+
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">6</span>
+          <p class="todo__title">New to MindTap? Do the orientation material</p>
+        </div>
+        <div class="todo__body">
+          <p>There's a reading and a video on the Start Here page covering how to turn assignments in and how to check
+            your grade. Either one is fine &mdash; you don't need both. <strong>If you've used MindTap before, skip
+            this entirely.</strong></p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="1085">18:05</button>
+          <span class="pill pill--setup">Not graded</span>
+        </p>
+      </li>
+
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">7</span>
+          <p class="todo__title">Shaky on Canvas? Take the free self-enroll course</p>
+        </div>
+        <div class="todo__body">
+          <p>Linked from the policies section. Optional, but worth an hour if Canvas itself is the part you're
+            worried about.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="777">12:57</button>
+          <span class="pill pill--setup">Optional</span>
+        </p>
+      </li>
+
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">8</span>
+          <p class="todo__title">Post your introduction to the Introductions discussion</p>
+        </div>
+        <div class="todo__body">
+          <p>This is the graded assignment for Week 1. The assignment page gives you the questions to answer and a form
+            that builds your post for you &mdash; fill in the boxes, select Build my post, then copy it and paste it
+            into the Canvas discussion.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="1134">18:54</button>
+          <span class="pill pill--graded">Graded &mdash; 15 of 25 pts</span>
+          <span class="pill pill--due">Due any time Friday 9/4</span>
+        </p>
+      </li>
+
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">9</span>
+          <p class="todo__title">Reply to two classmates' posts</p>
+        </div>
+        <div class="todo__body">
+          <p>Two different people. Be specific about why you're replying to <em>that</em> post &mdash; "hi, nice to meet
+            you, good luck" is not a reply. Show the other student you actually read what they wrote.</p>
+          <p><strong>Look for posts nobody has replied to yet</strong>, especially if you're doing this Sunday night.
+            Everybody should get a response. And the earlier you post your own introduction, the more replies you'll
+            get back.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="1255">20:55</button>
+          <button type="button" class="pill pill--time" data-seek="1327">22:07</button>
+          <span class="pill pill--graded">Graded &mdash; 10 of 25 pts</span>
+          <span class="pill pill--due">Due Sunday 9/6, 11:59 PM</span>
+        </p>
+      </li>
+    </ol>
+  </section>
+
+  <!-- ============ Corrections ============ -->
+  <section aria-labelledby="corrections-heading">
+    <h2 id="corrections-heading">Since this was recorded</h2>
+    <p>A few things in the video are being sorted out or have already changed. <strong>Where this page and the video
+      disagree, this page is right.</strong></p>
+
+    <div class="callout callout--warn callout--wide">
+      <ul style="margin:0; max-width:none">
+        <li><strong>Add, drop, refund and withdrawal dates.</strong> The video and the syllabus show the full-term
+          dates. This is a 15-week late-start section, so your deadlines may differ. They are being confirmed with
+          Admissions and Records and will be posted as soon as they are settled &mdash; check your Class Schedule in
+          the meantime. <em>(Video 8:11 and 17:34.)</em></li>
+        <li><strong>Student hours.</strong> The syllabus lists all student hours online via Zoom. In the recording I
+          mention that the Tuesday times may be in my office &mdash; go by the syllabus, and if you want to meet in
+          person, make an appointment on my calendar and say so in the notes. <em>(Video 5:11.)</em></li>
+        <li><strong>The Week 1 assignment.</strong> The wrong assignment was briefly linked in the module while I was
+          recording; you can watch me notice it and fix it. The correct assignment is the
+          <strong>Introductions</strong> discussion. <em>(Video 19:02.)</em></li>
+        <li><strong>Discussion due dates.</strong> The syllabus lists a single Sunday 9/6 deadline for this discussion.
+          The dates that count are the ones in the video and on this page: your post is due <strong>Friday 9/4</strong>
+          and your two replies are due <strong>Sunday 9/6</strong>, so there is something on the board to reply to.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ Quick reference ============ -->
+  <section aria-labelledby="reference-heading">
+    <h2 id="reference-heading">Quick reference</h2>
+    <div class="table-scroll">
+      <table>
+        <caption>The details from the video, in one place</caption>
+        <thead>
+          <tr><th scope="col">Thing</th><th scope="col">Details</th></tr>
+        </thead>
+        <tbody>
+          <tr><th scope="row">Section</th><td>CSC 104, Section 0840 &mdash; 15 weeks, 9/1/2026 to 12/11/2026. Fully online, no meetings.</td></tr>
+          <tr><th scope="row">Textbook</th><td>Shelly Cashman Series Collection, Microsoft 365 &amp; Office (Cengage). Digital rental only. Included in Cengage Unlimited.</td></tr>
+          <tr><th scope="row">MindTap</th><td>Required. Most weekly assignments are submitted there.</td></tr>
+          <tr><th scope="row">Software</th><td>Microsoft 365 desktop &mdash; free for students. Web and phone apps are not sufficient.</td></tr>
+          <tr><th scope="row">Weekly work</th><td>A MindTap training and a MindTap project most weeks, plus a Word project (Week 6) and an Excel project (Week 11) submitted to Canvas.</td></tr>
+          <tr><th scope="row">Dropped scores</th><td>Your lowest training score and your lowest MindTap project score are dropped. The Word and Excel projects are not droppable.</td></tr>
+          <tr><th scope="row">Late work</th><td>MindTap work is accepted late; the Word and Excel projects must be on time unless you arrange it beforehand. Everything closes 12/11.</td></tr>
+          <tr><th scope="row">AI</th><td>Use it to learn. Do not use it to produce the file you submit.</td></tr>
+          <tr><th scope="row">Reaching me</th><td>Canvas Inbox for anything course-related. Drop-in Zoom student hours, or book a one-on-one on my calendar (linked in the syllabus). Email: <span class="mono">dpai@mendocino.edu</span>.</td></tr>
+          <tr><th scope="row">Tech problems</th><td>Technology support handles connection, login and Splashtop issues. Questions about how to do something <em>in</em> Word, Excel or PowerPoint come to me.</td></tr>
+          <tr><th scope="row">Accommodations</th><td>Disability Resource Center. No doctor's note needed &mdash; talk to them and they'll send me what I should do.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <p class="footnote">CSC 104 &middot; Computers and Computer Applications &middot; Fall 2026, Section 0840 &middot;
+    Mendocino College &middot; Instructor: David Pai. Use the Canvas navigation outside this page to move on to the
+    Week 1 assignment.</p>
+</main>
+
+<script>
+(function () {
+  "use strict";
+
+  var VIDEO_ID = "BVK8EAXTe6k";
+
+  /* Transcript source: weeks/week01/csc104intro-corrected.vtt — the Whisper
+     output with its hallucinated passages removed, its repeated cues collapsed,
+     and its proper nouns and punctuation restored. Inlined rather than fetched
+     so this page stays self-contained inside the Canvas iframe. Keep the two
+     copies in step: if the YouTube captions are re-uploaded from the .vtt,
+     re-paste it here too. */
+  var vttContent = `WEBVTT
+
+NOTE
+CSC 104 — Welcome and Course Introduction (YouTube BVK8EAXTe6k)
+Corrected transcript. Source: csc104intro.vtt (Whisper output).
+Cleanup applied: hallucinated passages removed (the "podcast / comments down
+below" block at ~13:14, the "Chrysanthemum video" block at ~9:33, the garbled
+block at ~18:37, and the ~50 repeated "and" cues at 19:31–19:32); duplicated
+stutter cues collapsed; sentence casing and punctuation restored; proper nouns
+corrected (Splashtop, Cengage, MindTap, Canvas, Microsoft 365, Shelly Cashman,
+Zoom, CalFresh, Title IX, FERPA); short cues merged into readable lines;
+timestamps normalized to HH:MM:SS.mmm.
+
+00:00:00.040 --> 00:00:16.980
+Aloha, and welcome to CSC 104, Computers and Computer Applications. This is a late-start section — it starts September 1st and ends December 11th.
+
+00:00:16.980 --> 00:00:38.640
+So I'm going to give you a little introduction to the course. Every week I'll probably have a short introduction video for that week, but right now I want to go over the basic structure of the course, what we're going to do, and what you need to do this week.
+
+00:00:38.640 --> 00:00:54.500
+I have this Start Here page, and I want you to click Start Here to get to the page this video is on. But first I'm going to click on the Week 1 module.
+
+00:00:55.040 --> 00:01:06.920
+Let me view this as a student so you see it the same way. That takes me to the Modules page.
+
+00:01:06.920 --> 00:01:16.260
+After this first week, the Modules page is going to be the home page. I'm just going to have you jump directly into Modules.
+
+00:01:16.260 --> 00:01:29.280
+You can collapse and expand every one of these. Once we're done with Week 1 you should collapse it, so that next time you come back you can open Week 2 and go straight to it.
+
+00:01:29.280 --> 00:01:47.600
+From the Start Here page you get the list of videos, and you can click through to the page a video lives on. The title at the top of that page will be the title of the video.
+
+00:01:47.600 --> 00:02:08.020
+Basically what I want is for each video to have a table of contents with links to the times in the video where each thing happens — a pretty detailed table of contents, so you can jump to any section of the video.
+
+00:02:21.460 --> 00:02:37.760
+First things first. Let's go up to Remote Access Using Splashtop. If for whatever reason you don't have a Windows PC or a Mac — you might get away with Linux — but you're using a Chromebook for this course,
+
+00:02:38.000 --> 00:02:51.820
+you can't do everything on Chrome that this class wants you to do. So you need to find a different way.
+
+00:02:51.820 --> 00:03:05.640
+If you don't have a Windows or Mac computer that you can install software on, you need to contact me as soon as possible so we can make sure you can get into the lab computers using Splashtop.
+
+00:03:05.640 --> 00:03:23.400
+The lab computers already have Office on them, so you're safe there. It's just a few extra steps, because you have to log in to Splashtop, remote into the computers, copy your files up there, copy them back down, and then log out.
+
+00:03:23.400 --> 00:03:37.380
+But it's a workable solution if you're using a Chromebook or something like that. So let me know if that's you — send me an email through the Canvas Inbox as soon as possible so we can make sure you're good to go.
+
+00:03:37.740 --> 00:03:55.060
+Under Course Information I really just have the syllabus, so we'll quickly go over parts of it here. If you want a copy for yourself you can click Download Syllabus and save it as a PDF. It's kind of long, but you can save it.
+
+00:03:55.060 --> 00:04:07.500
+So this course is fully online — there are no meetings, everything is done online. It's 15 weeks rather than 17, so we're going to do a little bit more work per week than normal.
+
+00:04:07.740 --> 00:04:19.660
+Here are our student learning outcomes: you can use a word processing application, a presentation application, a spreadsheet, and email and scheduling applications. So we do all of those things this semester.
+
+00:04:19.660 --> 00:04:44.460
+And then, why take this course? Well, it's one of those things — you need to be able to use these kinds of tools. A lot of the government and the older establishment still use Microsoft. Some of the smaller, newer companies are using Google Sheets and Docs and that sort of thing.
+
+00:04:44.460 --> 00:04:58.620
+We're still doing Microsoft, because that's what we're told is used by the city, the county, and even the state. So that's what we're using.
+
+00:05:00.300 --> 00:05:11.260
+All right, instructor information. This is my information. Most of my student hours are on Zoom.
+
+00:05:11.260 --> 00:05:31.420
+We meet asynchronously in this course. My student hours are Mondays 4:30 to 5:30 and 6:50 to 7:50 on Zoom, and there are also Tuesdays, one to two and 3:20 to 4:20.
+
+00:05:31.980 --> 00:05:49.660
+You can also meet by appointment, and that's the easiest way: go to my calendar and schedule a time.
+
+00:05:49.660 --> 00:06:04.540
+So you pick any one of the days that are blue — those have availability — then you pick a time from the list of what's available, and it will schedule a meeting with me on Zoom.
+
+00:06:05.020 --> 00:06:11.340
+And if you do that but you want to meet in person, you can just add that into the notes.
+
+00:06:11.340 --> 00:06:24.060
+And then if you don't hear from me within a day or two, reach out and say, hey, I sent you a request to meet on Zoom, but we're supposed to be meeting in person and I haven't heard from you.
+
+00:06:24.060 --> 00:06:31.580
+So that's scheduling a meeting with me — that's the best way. But you can also come to the drop-in student hours on Zoom.
+
+00:06:34.300 --> 00:06:53.020
+Sometimes I'm not sitting on Zoom even though it's in my time frame, so it might take me a couple of minutes to get there. But usually I'm at my computer during those times, so I will get a notice that someone's in my room, and then I can reach out and get back to you real quick.
+
+00:06:54.140 --> 00:07:09.260
+Okay, our textbook. We do have a required textbook. It's in the bookstore, and it's also here. It is the Shelly Cashman Series Collection, Microsoft 365 and Office. Here's the ISBN. It is digital only — there are no paper copies.
+
+00:07:14.620 --> 00:07:21.740
+So you end up having to pay a rental fee, and unfortunately it's fairly expensive.
+
+00:07:21.740 --> 00:07:38.800
+But anyway, it's Cengage. So if you have any other courses that use Cengage — if you're a business major, for instance — you probably have Cengage Unlimited. This is part of Cengage Unlimited, so if you have Cengage Unlimited with MindTap, then you don't have to do anything except log in and put your Cengage Unlimited information in.
+
+00:07:38.800 --> 00:07:51.820
+And you're all good. MindTap access is required.
+
+00:07:51.820 --> 00:08:07.000
+Microsoft 365 is free — it's actually free for all college students — and I will have a separate video on how to get it and install it on your computer.
+
+00:08:11.280 --> 00:08:28.720
+Some important course dates. Obviously we start with the add and drop deadlines. Right now I only have the full-term dates. I have to see if the dates change for this class, and for my other class that starts in October, and once I find that out I'll post them as part of the syllabus and let you know.
+
+00:08:28.720 --> 00:08:46.600
+Most of the assignments are done in MindTap, except for the discussions. I don't know how many discussions I have — I think I just have the one.
+
+00:08:46.600 --> 00:09:03.520
+And then there is a special project due for Word and for Excel that are outside of MindTap. I'll provide you with a starting file, tell you what I want you to do, and then you'll submit it through Canvas as a file, and I will grade it.
+
+00:09:03.520 --> 00:09:16.740
+So when MindTap grades it, you get a response pretty much instantaneously. When I grade it, it's going to take me a while to get through them all, so you won't see it right away.
+
+00:09:16.740 --> 00:10:10.620
+All right, and then just the outline for the course. In general, each week once we get into Word, Excel and PowerPoint, you'll have a MindTap training. That's the guided walkthrough — it shows you what to do step by step, and I'll have a video on it as well. This is where you start doing things like creating a chart and changing the data behind it.
+
+00:10:10.620 --> 00:10:29.820
+And then in addition you'll have a MindTap project, which is very similar to the training, except this one you'll do on your own. And then, as I talked about, you have the Word project and the Excel project that are outside of that system.
+
+00:10:29.820 --> 00:10:53.040
+And then for categories one and two above, the lowest score over the semester for number one will be dropped, and the lowest score for number two will be dropped. So that's your grace, in terms of running out of time, or you just couldn't get to something that week, or whatever. You basically get one dropped, so if you don't do one, that's the one that's going to get dropped.
+
+00:10:53.060 --> 00:11:10.100
+All right, and then these are the weeks. Week 1 is just, let's get everything started — let's try to get all the software we need and the textbook all in line. And then next week we'll start with file management and Word.
+
+00:11:10.100 --> 00:11:25.520
+File management is just how do you organize files on your computer, and then Word is the start of using Word. So we'll start with Word, and we'll have five sections of Word plus the project.
+
+00:11:25.520 --> 00:11:41.880
+And then we'll go to Excel — seven, eight, nine, ten, eleven — so that's five weeks of Excel and the project. And then we'll do PowerPoint and Outlook. PowerPoint will have about three weeks, and then one week for Outlook.
+
+00:11:41.880 --> 00:12:00.580
+And one of these weeks is short: Week 13 is the short week, due to Thanksgiving. And then Outlook will go pretty fast. Outlook's just a little bit different because there is no project — there is an exam, so it does it through quizzing rather than having a physical project.
+
+00:12:00.580 --> 00:12:14.680
+All right, so that's kind of the plan for the semester. And then our policies and procedures — policies and resources — are here.
+
+00:12:14.680 --> 00:12:31.200
+The AI policy. Basically, you can use it to help you learn, but not to actually do the work for you.
+
+00:12:31.200 --> 00:12:44.560
+All right, that's what I'm going to say. I teach an AI literacy class on Monday nights, so I'm not opposed to AI — you just need to use it responsibly.
+
+00:12:44.680 --> 00:12:57.220
+And use it for how I ask you to use it. Just because it can do something doesn't mean you should do something.
+
+00:12:57.220 --> 00:13:14.560
+Canvas, the learning management system. If you're not very good at Canvas, maybe take the self-enroll course to help you get better. Course communication uses the Canvas Inbox — the college wants us to use that all the time, so that things get recorded in Canvas.
+
+00:13:44.420 --> 00:14:03.080
+Late work — that's your decision, those are your issues, but I'll accept MindTap work until the last day of the class. That's fine. If you want to turn them all in the last day of class, turn them all in the last day of class. That's fine with me.
+
+00:14:03.080 --> 00:14:08.860
+But those two other projects have to be turned in on time.
+
+00:14:08.860 --> 00:14:38.840
+If you have a disability — a learning disability, or anything else that requires you to get extra time on things — what you have to do is go to the Disability Resource Center and talk with them. You don't need a doctor's note; you just have to talk to them about what your issues are. They'll do a test and figure out what will help you.
+
+00:14:38.840 --> 00:14:54.560
+They will then send me a list of what I should do to help accommodate you.
+
+00:14:54.560 --> 00:15:08.180
+Student conduct: if you've never read the Student Conduct guidelines, definitely please read those. Same with the Academic Honesty procedure.
+
+00:15:08.180 --> 00:15:25.640
+Financial aid — don't miss out. If you've never checked, check. If you've checked and they say you can't get any, or you do get some, great. But if you've never checked, you should just check.
+
+00:15:25.640 --> 00:15:42.460
+Privacy and session tracking: I don't track anything. Sometimes it'll look like I'm tracking things, but what happens is you fill out a form, and the next time you come and open up that form in Canvas it'll be empty — because I don't save anything or track anything.
+
+00:15:42.460 --> 00:15:56.120
+Student Resources. So this is for you. This is a link to a guide that the deans publish every semester that says, hey, here's a bunch of information for you.
+
+00:15:56.120 --> 00:16:26.340
+Key websites and phone numbers. Financial and wellness support services, which include the food pantry and emergency funds for people in need. Behavioral health and wellness services, CalFresh, the financial aid office, childcare, counseling, tutoring.
+
+00:16:26.340 --> 00:16:38.580
+All of this stuff is for you, so you should review it and know that all these things are out there to help support you and make you successful.
+
+00:16:38.580 --> 00:17:03.540
+And that's provided both in English and in Spanish. The non-discrimination policy, the Title IX and sexual harassment policy, and the student privacy FERPA policy are all listed and linked. Feel free — please do read them.
+
+00:17:03.540 --> 00:17:15.560
+Mental health and wellness: if you have any issues, definitely check in with them. Tutoring, academic support, technology support.
+
+00:17:15.560 --> 00:17:34.420
+You can talk to technology support about things like internet issues or connection issues, or if you're using Splashtop and can't get it to work. But they're not going to answer your "how do I do this in Word" kind of questions. For those you have to contact me, because that's course content, not infrastructure support.
+
+00:17:34.420 --> 00:17:51.720
+And then these important semester dates are all going to be for the full term, so I have to contact Admissions and Records to see what these dates should be for a late-start class like this one.
+
+00:17:51.720 --> 00:18:05.520
+So that's just quick — that's the syllabus, the policies for the class.
+
+00:18:05.520 --> 00:18:23.960
+And then for this week, Week 1: Start Here — that's this video. I have a bunch of information here about MindTap. If you've used MindTap before, you can skip all of this. This is really for people who haven't used it before. There's a reading or a video — either one.
+
+00:18:23.960 --> 00:18:38.340
+This all has to do with Cengage: how do you turn assignments in, how do you see your grade, all that kind of stuff. The grades are linked to Canvas, so you can see them in Canvas.
+
+00:18:38.340 --> 00:18:54.800
+But you can also get a printout of your score from MindTap, and you can say, hey, wait, this looks wrong. And I've found it wrong several times in the past. So if you find it wrong, just write it up and send it to me, and I'll look at it and decide whether to give you the points.
+
+00:18:54.800 --> 00:19:31.620
+And then the last thing is just your assignment. Your assignment is a discussion.
+
+00:19:31.620 --> 00:19:40.940
+It's called Introductions.
+
+00:19:40.940 --> 00:19:57.000
+And when you look at it, it's just a basic — it's going to give you a basic rundown of what I'd like to see, and what questions you should answer.
+
+00:19:57.000 --> 00:20:29.740
+And then there's a "write your own post" section: the name you go by, and all the questions I ask there, you can pop your answers in. Your experience, something about you outside of class. And then you can select Build My Post, and it will build your post.
+
+00:20:29.740 --> 00:20:43.440
+And then you copy it at the bottom, and you can paste it in to reply in the discussion. So it's all there, so that you can actually build it off this form and then copy it at the bottom.
+
+00:20:43.440 --> 00:20:55.860
+Once you've posted, then you can see other people's posts and respond to them.
+
+00:20:55.860 --> 00:21:12.420
+So what you need to do is build your post — information about you. It's due by Friday, any time Friday. And then by Sunday night you need to reply to two of your classmates' posts.
+
+00:21:12.420 --> 00:21:25.840
+And then there are some examples. This is like your post about yourself, and then, hey, if you do something very minimal, you'll get a low score.
+
+00:21:25.840 --> 00:21:41.380
+And then replies, the same kind of thing. If you say "hi, nice to meet you, good luck," that's not a great reply.
+
+00:21:41.380 --> 00:22:07.200
+You want to be a little bit more specific about why you're replying to this post. Let that other student know you care a little bit about what they're doing, because hopefully that's what you want to see when someone replies to your post.
+
+00:22:07.200 --> 00:22:24.640
+When you reply to posts, don't always reply to the same post as everybody else. Try to make sure that everybody gets a reply to their original post. So if you're getting down there Sunday night, try to look for ones that don't have any replies, or only have one.
+
+00:22:24.640 --> 00:22:45.340
+You want to make everybody feel a part of the course. And obviously it also helps that the earlier you do your initial post, the more replies you're going to get, because it'll be there when people submit their initial post.
+
+00:22:45.340 --> 00:23:03.040
+So that's what I have for this week. Like I said, if you have any issues, just reach out through the Inbox in Canvas, or go to the syllabus and select My Calendar — the link to my calendar — and make an appointment.
+
+00:23:03.040 --> 00:23:24.640
+And we can take it from there. If you make an appointment it'll be one-on-one, so we could probably solve just about any issue you have. Not guaranteed, but usually we can work through any issue people have pretty fast.
+
+00:23:24.640 --> 00:23:41.700
+The big thing is, don't wait. Don't wait till the end of the week, don't wait till Week 2, don't wait till Week 3 to get your book. Try to get it as soon as possible.
+
+00:23:41.700 --> 00:23:54.640
+Same with downloading and installing Office. Like I said, there will be a specific installation video on how to do that posted later this week, and I'll send an announcement once I get it up. But again, don't wait until the end of the week on that one either.
+
+00:23:54.640 --> 00:24:14.860
+Make sure you have it. The web app and the phone apps are not fully featured, and so you can't do everything that you'll be asked to do in this class with those.
+
+00:24:14.860 --> 00:24:23.440
+All right, have a good week, welcome to class, and hopefully everything's going to go smooth for everybody. I'll talk to you soon. Thanks.`;
+
+  var player = null, timeUpdater = null, parsedTranscript = [], playerReady = false;
+
+  try {
+    if (!CSS.supports("selector(:focus-visible)")) { document.body.classList.add("no-fv"); }
+  } catch (e) { document.body.classList.add("no-fv"); }
+
+  /* ---------------- VTT parsing ---------------- */
+  function timeToSeconds(timeStr) {
+    if (!timeStr) { return 0; }
+    var parts = timeStr.trim().split(":");
+    if (parts.length === 2) {
+      return (parseInt(parts[0], 10) || 0) * 60 + (parseFloat(parts[1]) || 0);
+    }
+    if (parts.length === 3) {
+      return (parseInt(parts[0], 10) || 0) * 3600 + (parseInt(parts[1], 10) || 0) * 60 + (parseFloat(parts[2]) || 0);
+    }
+    return 0;
+  }
+
+  function formatTime(sec) {
+    sec = Math.max(0, Math.floor(sec));
+    var h = Math.floor(sec / 3600), m = Math.floor((sec % 3600) / 60), s = sec % 60;
+    var mm = (h > 0 && m < 10) ? "0" + m : String(m);
+    return (h > 0 ? h + ":" : "") + mm + ":" + (s < 10 ? "0" + s : s);
+  }
+
+  function parseVtt(vttText) {
+    var blocks = vttText.trim().split(/\n\n+/);
+    var cues = [];
+    blocks.forEach(function (block) {
+      var trimmed = block.trim();
+      if (!trimmed || trimmed.indexOf("WEBVTT") === 0 || trimmed.indexOf("NOTE") === 0) { return; }
+      var lines = trimmed.split("\n");
+      var timeLine = null, timeIndex = -1;
+      for (var i = 0; i < lines.length; i++) {
+        if (lines[i].indexOf("-->") !== -1) { timeLine = lines[i]; timeIndex = i; break; }
+      }
+      if (!timeLine) { return; }
+      var ends = timeLine.split("-->");
+      var text = lines.slice(timeIndex + 1).join(" ").trim();
+      if (!text) { return; }
+      cues.push({ start: timeToSeconds(ends[0]), end: timeToSeconds(ends[1]), text: text });
+    });
+    return cues;
+  }
+
+  /* ---------------- Transcript panel ---------------- */
+  function seek(seconds) {
+    if (!player || !player.seekTo) { return false; }
+    player.seekTo(seconds, true);
+    if (player.playVideo) { player.playVideo(); }
+    return true;
+  }
+
+  function scrollPlayerIntoView() {
+    var frame = document.getElementById("video-container");
+    if (frame && frame.scrollIntoView) { frame.scrollIntoView({ behavior: "smooth", block: "center" }); }
+  }
+
+  function populateTranscript() {
+    var container = document.getElementById("transcript-container");
+    if (!container) { return; }
+    container.innerHTML = "";
+    parsedTranscript.forEach(function (cue, i) {
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "transcript-line";
+      btn.dataset.start = cue.start;
+      btn.dataset.end = cue.end;
+      btn.dataset.index = i;
+
+      var stamp = document.createElement("span");
+      stamp.className = "t";
+      stamp.textContent = formatTime(cue.start);
+
+      var body = document.createElement("span");
+      body.className = "tx";
+      body.textContent = cue.text;
+
+      btn.appendChild(stamp);
+      btn.appendChild(body);
+      btn.setAttribute("aria-label", "Jump to " + formatTime(cue.start) + ". " + cue.text);
+
+      btn.addEventListener("click", function () {
+        if (seek(cue.start)) { scrollPlayerIntoView(); }
+      });
+      container.appendChild(btn);
+    });
+  }
+
+  /* ---------------- Active-line highlight ---------------- */
+  var lastAnnounced = null;
+  function announceLine(text) {
+    if (text === lastAnnounced) { return; }
+    lastAnnounced = text;
+    var s = document.getElementById("transcript-status");
+    if (s) { s.textContent = text || ""; }
+  }
+
+  function highlightCurrentLine() {
+    if (!player || !player.getCurrentTime) { return; }
+    var now = player.getCurrentTime();
+    var lines = document.querySelectorAll("#transcript-container .transcript-line");
+    var active = null;
+    Array.prototype.forEach.call(lines, function (line) {
+      var start = parseFloat(line.dataset.start), end = parseFloat(line.dataset.end);
+      if (now >= start && now < end) { active = line; }
+    });
+    var prev = document.querySelector("#transcript-container .is-active");
+    if (active === prev) { return; }
+    if (prev) { prev.classList.remove("is-active"); }
+    if (active) {
+      active.classList.add("is-active");
+      var body = active.querySelector(".tx");
+      announceLine(body ? body.textContent : active.textContent);
+      if (!active.hidden) { active.scrollIntoView({ behavior: "smooth", block: "center" }); }
+    }
+  }
+
+  /* ---------------- Panel height ---------------- */
+  function syncTranscriptHeight() {
+    var videoContainer = document.getElementById("video-container");
+    var panel = document.getElementById("transcript-container");
+    if (!videoContainer || !panel) { return; }
+    // Match the panel to the video only when the two columns actually sit side
+    // by side. Compared by rendered position rather than a viewport-width test,
+    // because in a Canvas iframe a media query measures the iframe, not the
+    // browser window, and can disagree with the flex-wrap result.
+    var videoCol = videoContainer.parentNode;
+    var transcriptCol = panel.parentNode;
+    var sideBySide = Math.abs(
+      transcriptCol.getBoundingClientRect().top - videoCol.getBoundingClientRect().top) < 40
+      && transcriptCol.getBoundingClientRect().left !== videoCol.getBoundingClientRect().left;
+    // Side by side, the panel should end level with the video, so subtract the
+    // heading/search row that sits above it inside the transcript column.
+    var head = transcriptCol.querySelector(".transcript-head");
+    var headH = head ? head.offsetHeight + 8 : 0;
+    var h = sideBySide ? Math.max(240, videoContainer.offsetHeight - headH) + "px" : "24rem";
+    panel.style.height = h;
+    panel.style.maxHeight = h;
+  }
+
+  /* ---------------- Transcript search ---------------- */
+  function escapeRe(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); }
+
+  function runFilter(term) {
+    var lines = document.querySelectorAll("#transcript-container .transcript-line");
+    var status = document.getElementById("transcript-filter-status");
+    var q = term.trim().toLowerCase();
+    var shown = 0;
+
+    Array.prototype.forEach.call(lines, function (line) {
+      var body = line.querySelector(".tx");
+      var cue = parsedTranscript[parseInt(line.dataset.index, 10)];
+      if (!body || !cue) { return; }
+      if (!q) {
+        body.textContent = cue.text;
+        line.hidden = false;
+        shown++;
+        return;
+      }
+      if (cue.text.toLowerCase().indexOf(q) === -1) {
+        body.textContent = cue.text;
+        line.hidden = true;
+        return;
+      }
+      line.hidden = false;
+      shown++;
+      // Rebuild with <mark> around the matches, without using innerHTML on
+      // user-supplied text.
+      body.textContent = "";
+      var re = new RegExp(escapeRe(term.trim()), "ig");
+      var last = 0, m;
+      while ((m = re.exec(cue.text)) !== null) {
+        if (m.index > last) { body.appendChild(document.createTextNode(cue.text.slice(last, m.index))); }
+        var mk = document.createElement("mark");
+        mk.textContent = m[0];
+        body.appendChild(mk);
+        last = m.index + m[0].length;
+        if (m[0].length === 0) { re.lastIndex++; }
+      }
+      if (last < cue.text.length) { body.appendChild(document.createTextNode(cue.text.slice(last))); }
+    });
+
+    if (status) {
+      status.textContent = q
+        ? (shown === 0 ? "No transcript lines match " + term : shown + " transcript line" + (shown === 1 ? "" : "s") + " match " + term)
+        : "Showing the whole transcript.";
+    }
+  }
+
+  function wireSearch() {
+    var input = document.getElementById("transcript-filter");
+    if (!input) { return; }
+    var t = null;
+    input.addEventListener("input", function () {
+      clearTimeout(t);
+      t = setTimeout(function () { runFilter(input.value); }, 250);
+    });
+  }
+
+  /* ---------------- Seek buttons (topic index + to-do pills) ----------------
+     Buttons wired to the embedded player, never youtu.be?t= links: a time link
+     would navigate the Canvas iframe away from this page. If the player never
+     comes up, the buttons are turned back into plain text so the index reads
+     as a reference list rather than as controls that silently do nothing. */
+  function wireSeekButtons() {
+    var btns = document.querySelectorAll("[data-seek]");
+    Array.prototype.forEach.call(btns, function (btn) {
+      var t = parseInt(btn.getAttribute("data-seek"), 10) || 0;
+      var item = btn.closest(".topic-index__item") || btn.closest(".todo > li");
+      var text = item ? item.querySelector(".topic-index__label, .todo__title") : null;
+      btn.setAttribute("aria-label", "Jump to " + formatTime(t) + (text ? " — " + text.textContent : "") + " in the video");
+      btn.addEventListener("click", function () {
+        if (seek(t)) { scrollPlayerIntoView(); }
+      });
+    });
+  }
+
+  function degradeToStatic(message) {
+    if (playerReady) { return; }
+    document.body.classList.add("no-player");
+    var idx = document.getElementById("topic-index");
+    if (idx) { idx.classList.add("topic-index--static"); }
+    Array.prototype.forEach.call(document.querySelectorAll("[data-seek]"), function (btn) {
+      btn.disabled = true;
+      btn.removeAttribute("aria-label");
+    });
+    var note = document.getElementById("topic-index-fallback");
+    if (note) { note.hidden = false; note.textContent = message; }
+  }
+
+  /* ---------------- YouTube player ---------------- */
+  window.onYouTubeIframeAPIReady = function () {
+    if (!VIDEO_ID || !document.getElementById("youtube-player")) { return; }
+    player = new YT.Player("youtube-player", {
+      events: {
+        onReady: function () {
+          playerReady = true;
+          syncTranscriptHeight();
+        },
+        onStateChange: function (event) {
+          clearInterval(timeUpdater);
+          if (event.data === YT.PlayerState.PLAYING) {
+            timeUpdater = setInterval(highlightCurrentLine, 300);
+          } else {
+            highlightCurrentLine();
+          }
+        }
+      }
+    });
+  };
+
+  document.addEventListener("DOMContentLoaded", function () {
+    parsedTranscript = parseVtt(vttContent);
+    populateTranscript();
+    wireSearch();
+    wireSeekButtons();
+    setTimeout(syncTranscriptHeight, 100);
+
+    if (typeof YT === "undefined" || typeof YT.Player === "undefined") {
+      var tag = document.createElement("script");
+      tag.src = "https://www.youtube.com/iframe_api";
+      tag.onerror = function () {
+        degradeToStatic("The video player could not load, so the times below are listed for reference rather than as buttons. The full transcript is above.");
+      };
+      document.head.appendChild(tag);
+    } else {
+      window.onYouTubeIframeAPIReady();
+    }
+
+    // If the API never reports ready — blocked script, offline, restrictive
+    // network — fall back rather than leaving dead buttons on the page.
+    setTimeout(function () {
+      degradeToStatic("The video player did not load, so the times below are listed for reference rather than as buttons. The full transcript is above.");
+    }, 8000);
+  });
+
+  var resizeTimeout;
+  window.addEventListener("resize", function () {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(syncTranscriptHeight, 250);
+  });
+
+  /* Report height to a Canvas parent that listens for it. Harmless otherwise. */
+  function postHeight() {
+    try {
+      if (window.parent && window.parent !== window) {
+        var h = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
+        window.parent.postMessage({ subject: "lti.frameResize", height: h }, "*");
+      }
+    } catch (e) { /* cross-origin parent — ignore */ }
+  }
+  window.addEventListener("load", postHeight);
+  if (window.ResizeObserver) { new ResizeObserver(postHeight).observe(document.body); }
+})();
+</script>
+</body>
+</html>
