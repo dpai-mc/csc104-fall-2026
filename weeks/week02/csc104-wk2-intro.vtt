@@ -1,0 +1,281 @@
+WEBVTT
+
+00:00.060 --> 00:05.820
+Aloha and welcome to week two. So this week we're going to talk about file management
+
+00:05.820 --> 00:15.420
+and I do have a little page up here where you're already on but basically I'm replacing the video
+
+00:15.420 --> 00:22.000
+here with one this one that I just created and talk a little bit about why bother with file
+
+00:22.000 --> 00:30.960
+management. Okay for me it saves me time so I can find stuff easier. There are AI tools out there
+
+00:30.960 --> 00:37.520
+now where you can get have them do things like organize all your photos and all that's doing
+
+00:37.520 --> 00:43.620
+is managing your photos and grouping them in such a way to make it easier for you to find them.
+
+00:44.580 --> 00:49.100
+Okay and that's all that I believe the most important part of file management is.
+
+00:49.340 --> 00:51.900
+Now you might think well I never have
+
+00:52.000 --> 00:59.000
+more than a couple hundred files that kind of stuff. Well I'm here to tell you that can change
+
+00:59.000 --> 01:06.320
+and so you need good habits now just in case. For example let's look at this
+
+01:06.320 --> 01:13.600
+printout here and let me grab the magnifying glass. I'm gonna blow it up a little bit so you
+
+01:13.600 --> 01:19.800
+can see it. So this is a program for a Windows program it's called WinDirStat and what it does
+
+01:19.800 --> 01:21.980
+is it cycles through all your files.
+
+01:22.000 --> 01:30.440
+On your hard drive okay so here's my hard drive it's a C drive it has 48% free it's a 2 gig 2
+
+01:30.440 --> 01:40.740
+terabyte drive 48% free and if you look over here I have 1.6 million files on this drive
+
+01:40.740 --> 01:51.100
+okay of which a million of them are in my user directory and if we look in there
+
+01:52.000 --> 01:55.960
+you can see that my main user is the first one under the line is essentially
+
+01:55.960 --> 02:00.640
+the whole all million of those are in that directory. So now I have a million
+
+02:00.640 --> 02:06.640
+files in my user directory. How do I find anything? I can search but sometimes
+
+02:06.640 --> 02:11.860
+search takes a long time. All right and so if I have them organized in a
+
+02:11.860 --> 02:16.780
+structured way I can narrow down the search parameters faster like only
+
+02:16.780 --> 02:21.980
+search this directory or only search half of this directory or that
+
+02:22.000 --> 02:27.040
+kind of thing. So and the reason why I say that is because when I look at my
+
+02:27.040 --> 02:35.560
+drive okay my computer I have a C drive a D drive which is another terabyte an E
+
+02:35.560 --> 02:44.620
+drive which is 3 terabytes an F drive which is 500 gigs a G drive which is 250
+
+02:44.620 --> 02:51.280
+gigs and an H drive which is a terabyte. So I have all those have varying number
+
+02:51.280 --> 02:52.000
+of different files.
+
+02:52.000 --> 02:57.900
+on them. If I try to search all those for something it does take quite a while
+
+02:57.900 --> 03:02.980
+okay for a search to work and then I don't even know if I'm getting the right
+
+03:02.980 --> 03:08.800
+answer or finding the file I'm actually looking for. Alright so to me file
+
+03:08.800 --> 03:15.000
+management is an important concept and that's why we're gonna go over it first.
+
+03:15.000 --> 03:20.940
+Okay one key here is archive don't hoard. I'm a little bit of a hoarder. I'll just
+
+03:20.940 --> 03:27.780
+be honest with you i'm a little bit of order but you need to get rid of things you don't need in
+
+03:27.780 --> 03:32.080
+the future now sometimes you don't know if you don't need it so you may want to keep it or may
+
+03:32.080 --> 03:38.960
+not want to all right and then there's a little bit about windows so everything in this book
+
+03:38.960 --> 03:46.300
+is on windows and mac has a similar thing to file explorer it's called finder on your mac
+
+03:46.300 --> 03:51.800
+and you can do pretty much all the same things okay it's just slightly different in terms of
+
+03:51.800 --> 03:55.360
+where they're at and how you do them but essentially you can do the same thing
+
+03:55.360 --> 03:58.600
+all right so that's um
+
+03:59.600 --> 04:04.260
+kind of the introduction to why i think
+
+04:04.260 --> 04:12.860
+when file management is important file and folder management so what i want you to do
+
+04:12.860 --> 04:16.280
+regardless of whether you're mac or pc i would like you to read this section
+
+04:16.280 --> 04:25.020
+of the textbook and you don't have to read everything in it but i think this section does
+
+04:25.280 --> 04:29.460
+a decent job of going over the basics of file management
+
+04:29.460 --> 04:37.360
+okay so there's a little bit of getting started managing your files saving a file to your pc
+
+04:37.360 --> 04:44.500
+or to one drive or to google drive or to some other cloud storage how to create a folder how
+
+04:44.500 --> 04:45.380
+to rename a folder
+
+04:45.380 --> 04:46.100
+how to save a folder
+
+04:46.100 --> 04:46.260
+how to save a folder
+
+04:46.260 --> 04:52.020
+movie movie move and copy files in folders okay so it's all the basics of
+
+04:52.020 --> 04:58.700
+working with file management and all this stuff you can do on a Mac as well
+
+04:58.700 --> 05:11.020
+okay using finder all right so I don't want this to be really a long video here
+
+05:11.020 --> 05:15.840
+but just wanted you to say that file management to me is important and then
+
+05:15.840 --> 05:22.800
+you have a file management assignment to do and basically what I want you to do
+
+05:22.800 --> 05:27.660
+is create a structure that looks like this you have a documents folder on both
+
+05:27.660 --> 05:32.760
+a Mac and a PC and then within that make a schoolwork folder and then within that
+
+05:32.760 --> 05:38.940
+make a C to C 104 folder and then within that make an assignments folder okay so
+
+05:38.940 --> 05:45.440
+you have one four folders okay all nested inside each other
+
+05:45.440 --> 05:45.500
+you
+
+05:45.840 --> 05:51.660
+okay so if I were to go to documents and I'm looking for an assignment from this
+
+05:51.660 --> 05:56.460
+class I would drill down and go into my schoolwork and then go into this
+
+05:56.460 --> 06:02.260
+specific class okay so if you ever look at my folders I have this is my folders
+
+06:02.260 --> 06:08.100
+I have College folder I have courses I have all the courses and then with each
+
+06:08.100 --> 06:12.540
+course have things broken down by semester sometimes and by type of thing
+
+06:12.540 --> 06:13.840
+so I can find stuff okay and then you'd be able to do each of those and then you
+
+06:13.840 --> 06:14.320
+would be able to run your F hatch and you don't need to do the same thing over and
+
+06:14.320 --> 06:14.460
+over again a place where you can simply prepare theuctric test kingdom hacemos
+
+06:14.460 --> 06:15.480
+find content I think you would get down to the tables when you're doing the test
+
+06:15.480 --> 06:15.600
+it's you couldn't sign up online that's your key I would take the documents you
+
+06:15.600 --> 06:18.120
+you'd have assignments and you might have readings you might have other
+
+06:18.120 --> 06:24.500
+stuff in there and then all you do is you build it and you take a screenshot
+
+06:24.500 --> 06:33.120
+okay if you're using a PC I suggest you use it's called snipping tool if you
+
+06:33.120 --> 06:36.840
+don't know what it is you just go in here and just search for snipping tool
+
+06:36.840 --> 06:44.820
+okay bring it up you click new it grays out your screen you click and drag what
+
+06:44.820 --> 06:51.840
+you want there's your thing you save it and then you upload that file on a Mac
+
+06:51.840 --> 07:00.600
+it's a command shift 4 for partial so if you want to I mean it's shift command 4
+
+07:00.600 --> 07:05.200
+so all three of those keys shift command and then hit the 4 and then you just
+
+07:05.200 --> 07:08.880
+click and drag your mouse click on one corner drag your mouse the other corner
+
+07:08.880 --> 07:12.220
+of the picture you want to take it saves it to your desktop and then you just
+
+07:12.220 --> 07:13.620
+upload that to the file
+
+07:14.820 --> 07:26.000
+all right and that's all you have to do for this week and then just as a prep
+
+07:26.000 --> 07:31.420
+that next week we're going to start and I don't have it set up properly yet
+
+07:31.420 --> 07:40.880
+we're gonna start introduction a word okay and there'll be another start here
+
+07:40.880 --> 07:44.820
+but it'll be about that assignment and you'll have two assignments
+
+07:44.820 --> 07:52.820
+to do next week and I'll explain it next week and that should show up earlier
+
+07:52.820 --> 07:57.400
+than this one probably like Thursday Friday of this week I decide when I'm
+
+07:57.400 --> 08:04.060
+gonna have them posted but they're all well from now on starting with week 3
+
+08:04.060 --> 08:08.700
+they won't show up on Monday they should show up before the weekend before the
+
+08:08.700 --> 08:14.040
+weekend before that week okay so like Thursday or Friday they'll show week 3 we'll show up this week.
+
+08:14.820 --> 08:20.760
+Thursday or Friday week four will show up the following Thursday or Friday for
+
+08:20.760 --> 08:25.220
+anybody that wants to that's feeling like they want to work ahead a little
+
+08:25.220 --> 08:32.280
+bit all right okay thanks and good luck this week and let me know if you have
+
+08:32.280 --> 08:37.320
+any questions or issues bye
+
