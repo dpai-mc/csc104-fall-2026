@@ -1,0 +1,1762 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CSC 104 — Word Module 1 Guided Assignment</title>
+<style>
+/* ============================================================
+   CSC 104 — Week 3 — Word Module 1 Guided Assignment
+   Self-contained SPA for embedding in a Canvas iframe.
+   Vanilla CSS + vanilla JS, one file, no outbound links.
+   The only external resources are the YouTube player iframe and
+   the YouTube IFrame API (needed for click-to-seek); the page
+   degrades to a readable transcript and a plain topic list if
+   either is blocked.
+   ============================================================ */
+
+:root {
+  color-scheme: light dark;
+  --surface:      #ffffff;
+  --panel:        #f6f8fb;
+  --panel-2:      #eef2f8;
+  --accent-bg:    #e8f0fe;
+  --ink:          #16202f;
+  --muted:        #46536b;
+  --brand:        #1d4ed8;
+  --brand-ink:    #17399c;
+  --border:       #c3cddc;
+  --border-soft:  #dde4ee;
+  --field-border: #6b7a92;
+  --btn-bg:       #1d4ed8;
+  --btn-fg:       #ffffff;
+  --btn-bg-hover: #17399c;
+  --btn2-bg:      #ffffff;
+  --btn2-fg:      #17399c;
+  --ok:           #1a6b3c;
+  --ok-bg:        #e6f4ec;
+  --warn-ink:     #7a4a06;
+  --warn-bg:      #fdf3e0;
+  --warn-rule:    #b8860b;
+  --focus:        #b4530a;
+  --hit:          #fff2b8;
+  --hit-ink:      #3a2c00;
+  --radius:       10px;
+  --maxw:         70rem;
+  --readw:        46rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --surface:      #0f1726;
+    --panel:        #17223a;
+    --panel-2:      #1e2b45;
+    --accent-bg:    #1a2a4d;
+    --ink:          #e9eefa;
+    --muted:        #b6c3d8;
+    --brand:        #9dbcff;
+    --brand-ink:    #bcd2ff;
+    --border:       #3a4a68;
+    --border-soft:  #2b3a56;
+    --field-border: #7b89a3;
+    --btn-bg:       #9dbcff;
+    --btn-fg:       #0b1424;
+    --btn-bg-hover: #c3d6ff;
+    --btn2-bg:      #17223a;
+    --btn2-fg:      #bcd2ff;
+    --ok:           #8fe0b0;
+    --ok-bg:        #123328;
+    --warn-ink:     #f6d59a;
+    --warn-bg:      #3a2c11;
+    --warn-rule:    #d9a441;
+    --focus:        #ffb066;
+    --hit:          #5c4a10;
+    --hit-ink:      #ffeeb8;
+  }
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--surface);
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; border-radius: 4px; }
+.no-fv :focus { outline: 3px solid var(--focus); outline-offset: 2px; }
+
+.skip-link {
+  position: absolute; left: -9999px; top: 0; z-index: 60;
+  background: var(--btn-bg); color: var(--btn-fg);
+  padding: 0.6rem 1rem; font-weight: 700; border-radius: 0 0 var(--radius) 0;
+}
+.skip-link:focus { left: 0; outline: 3px solid var(--focus); outline-offset: 2px; }
+
+.wrap { max-width: var(--maxw); margin: 0 auto; padding: 1rem 1rem 3rem; }
+.read { max-width: var(--readw); }
+
+/* ---------------------- Header ---------------------- */
+.page-head { background: var(--panel); border-bottom: 3px solid var(--brand); }
+.page-head .wrap { padding-bottom: 1.25rem; }
+
+.eyebrow {
+  font-size: 0.8125rem; letter-spacing: 0.09em; text-transform: uppercase;
+  font-weight: 700; color: var(--brand-ink); margin: 0.75rem 0 0.35rem;
+}
+h1 { font-size: clamp(1.5rem, 4.2vw, 2.15rem); line-height: 1.22; margin: 0 0 0.6rem; }
+.lede { margin: 0; color: var(--muted); max-width: var(--readw); }
+
+.facts { list-style: none; display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 1rem 0 0; padding: 0; }
+.facts li {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 999px; padding: 0.3rem 0.85rem; font-size: 0.875rem;
+}
+.facts .k { font-weight: 700; color: var(--brand-ink); }
+
+/* ---------------------- Typography ---------------------- */
+h2 {
+  font-size: clamp(1.25rem, 3.2vw, 1.6rem);
+  margin: 2.5rem 0 0.75rem; color: var(--brand-ink);
+  padding-bottom: 0.35rem; border-bottom: 2px solid var(--border-soft);
+}
+h3 { font-size: 1.125rem; margin: 1.75rem 0 0.5rem; }
+p { margin: 0 0 1rem; max-width: var(--readw); }
+ul, ol { margin: 0 0 1rem; padding-left: 1.35rem; max-width: var(--readw); }
+li { margin-bottom: 0.4rem; }
+.mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.9375em; }
+.ui { font-weight: 700; }
+
+.callout {
+  border-left: 5px solid var(--brand); background: var(--accent-bg);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding: 0.9rem 1.1rem; margin: 0 0 1.25rem; max-width: var(--readw);
+}
+.callout > :last-child { margin-bottom: 0; }
+.callout h3 { margin-top: 0; font-size: 1.05rem; }
+.callout--warn { border-left-color: var(--warn-rule); background: var(--warn-bg); color: var(--warn-ink); }
+.callout--wide { max-width: none; }
+
+/* ---------------------- Video + transcript ---------------------- */
+.video-row { display: flex; flex-wrap: wrap; gap: 1.25rem; margin: 0 0 1.5rem; }
+.video-col { flex: 1 1 32rem; min-width: min(100%, 20rem); }
+.transcript-col { flex: 1 1 20rem; min-width: min(100%, 17rem); display: flex; flex-direction: column; }
+
+.video-frame {
+  position: relative; width: 100%; padding-top: 56.25%;
+  background: #000; border-radius: var(--radius); overflow: hidden;
+  border: 1px solid var(--field-border);
+}
+.video-frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+.video-caption { font-size: 0.875rem; color: var(--muted); margin-top: 0.5rem; }
+
+.transcript-head { display: flex; flex-wrap: wrap; gap: 0.5rem 0.75rem; align-items: flex-end; margin-bottom: 0.5rem; }
+.transcript-head h3 { margin: 0 0 0.3rem; font-size: 1rem; flex: 0 1 auto; }
+.transcript-search { flex: 1 1 10rem; }
+.transcript-search label { display: block; font-size: 0.8125rem; font-weight: 600; color: var(--muted); }
+.transcript-search input {
+  font: inherit; width: 100%; min-height: 2.5rem; color: var(--ink);
+  background: var(--surface); border: 1px solid var(--field-border);
+  border-radius: 8px; padding: 0.35rem 0.55rem;
+}
+
+.transcript-panel {
+  height: 24rem; max-height: 24rem; overflow-y: auto;
+  border: 1px solid var(--field-border); border-radius: var(--radius);
+  background: var(--panel); padding: 0.4rem;
+}
+.transcript-line {
+  display: block; width: 100%; text-align: left; font: inherit;
+  font-size: 0.9375rem; line-height: 1.5; color: var(--ink);
+  background: transparent; border: 0; border-radius: 6px;
+  padding: 0.45rem 0.6rem; cursor: pointer;
+}
+.transcript-line:hover { background: var(--accent-bg); }
+.transcript-line .t {
+  display: inline-block; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.8125rem; font-weight: 700; color: var(--brand-ink); margin-right: 0.5rem;
+}
+.transcript-line.is-active {
+  background: var(--accent-bg);
+  box-shadow: inset 3px 0 0 0 var(--brand);
+  font-weight: 600;
+}
+.transcript-line[hidden] { display: none; }
+.transcript-line mark { background: var(--hit); color: var(--hit-ink); }
+.transcript-note { color: var(--muted); font-size: 0.875rem; padding: 0.6rem; margin: 0; }
+
+/* Static fallback when the player never loads */
+.no-player .transcript-line { cursor: default; }
+.no-player .transcript-line:hover { background: transparent; }
+
+/* ---------------------- Topic index ---------------------- */
+.topic-index { margin: 0 0 1.5rem; }
+.topic-index__group {
+  font-weight: 700; color: var(--brand-ink); margin: 1.25rem 0 0.4rem;
+  font-size: 0.9375rem; letter-spacing: 0.02em;
+}
+.topic-index__group:first-child { margin-top: 0; }
+.topic-index__list { list-style: none; padding: 0; margin: 0; max-width: none; }
+.topic-index__item {
+  display: flex; gap: 0.7rem; align-items: baseline;
+  padding: 0.28rem 0; margin: 0; border-bottom: 1px solid var(--border-soft);
+}
+.topic-index__list li:last-child { border-bottom: none; }
+.topic-index__time {
+  flex: 0 0 auto; font: inherit;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.875rem; font-weight: 700;
+  min-width: 4.25rem; min-height: 2rem; text-align: center;
+  color: var(--btn2-fg); background: var(--btn2-bg);
+  border: 1px solid var(--field-border); border-radius: 6px;
+  padding: 0.15rem 0.4rem; cursor: pointer;
+}
+.topic-index__time:hover { background: var(--accent-bg); }
+.topic-index__label { flex: 1 1 auto; }
+
+.topic-index--static .topic-index__time {
+  cursor: default; background: transparent; border-color: transparent;
+  color: var(--muted); text-align: left; padding-left: 0;
+}
+.topic-index--static .topic-index__time:hover { background: transparent; }
+
+@media (min-width: 52em) {
+  .topic-cols { column-count: 2; column-gap: 2.25rem; }
+  .topic-cols .topic-index__group { break-after: avoid; }
+  .topic-cols .topic-index__list { break-inside: avoid; }
+}
+
+/* ---------------------- To-do / step lists ---------------------- */
+.todo { list-style: none; padding: 0; margin: 0 0 1.5rem; max-width: none; }
+.todo > li {
+  background: var(--panel); border: 1px solid var(--border-soft);
+  border-radius: var(--radius); padding: 0.85rem 1rem;
+  margin: 0 0 0.75rem;
+}
+.todo__top { display: flex; flex-wrap: wrap; gap: 0.6rem; align-items: baseline; }
+.todo__num {
+  flex: 0 0 auto; min-width: 1.9rem; height: 1.9rem; padding: 0 0.4rem; border-radius: 999px;
+  background: var(--btn-bg); color: var(--btn-fg); font-weight: 700; font-size: 0.9375rem;
+  display: flex; align-items: center; justify-content: center; align-self: flex-start;
+}
+.todo__num--setup { background: var(--btn2-bg); color: var(--btn2-fg); border: 1px solid var(--field-border); }
+.todo__title { flex: 1 1 14rem; font-weight: 700; margin: 0; }
+.todo__body { margin: 0.35rem 0 0 2.5rem; max-width: var(--readw); }
+.todo__body p { margin: 0 0 0.5rem; }
+.todo__body ul { margin: 0 0 0.5rem; }
+.todo__body > :last-child { margin-bottom: 0; }
+.todo__meta { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0.5rem 0 0 2.5rem; }
+.pill {
+  font-size: 0.8125rem; font-weight: 700; border-radius: 999px;
+  padding: 0.1rem 0.6rem; border: 1px solid currentColor; white-space: nowrap;
+}
+.pill--graded { color: var(--ok); background: var(--ok-bg); }
+.pill--setup { color: var(--brand-ink); background: var(--accent-bg); }
+.pill--due { color: var(--warn-ink); background: var(--warn-bg); }
+.pill--time {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  color: var(--btn2-fg); background: var(--btn2-bg); border-color: var(--field-border);
+  cursor: pointer; font-size: 0.8125rem; min-height: 1.9rem;
+}
+.pill--time:hover { background: var(--accent-bg); }
+.no-player .pill--time { cursor: default; }
+
+/* ---------------------- Platform tabs ---------------------- */
+.tabs { margin: 0 0 1.5rem; }
+.tablist { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0 0 -1px; padding: 0; }
+.tab {
+  font: inherit; font-weight: 700; cursor: pointer;
+  color: var(--btn2-fg); background: var(--btn2-bg);
+  border: 1px solid var(--field-border); border-bottom-color: transparent;
+  border-radius: var(--radius) var(--radius) 0 0;
+  padding: 0.5rem 1rem; min-height: 2.5rem;
+}
+.tab[aria-selected="true"] { background: var(--accent-bg); border-bottom-color: var(--accent-bg); }
+.tab:hover { background: var(--accent-bg); }
+.tabpanel {
+  border: 1px solid var(--field-border); border-radius: 0 var(--radius) var(--radius) var(--radius);
+  background: var(--panel); padding: 1rem 1.1rem;
+}
+.tabpanel > :last-child { margin-bottom: 0; }
+.tabpanel h3:first-child { margin-top: 0; }
+
+/* ---------------------- Reference table ---------------------- */
+.table-scroll { overflow-x: auto; margin: 0 0 1.5rem; }
+table { border-collapse: collapse; width: 100%; min-width: 30rem; background: var(--surface); }
+caption { text-align: left; font-weight: 700; padding: 0 0 0.5rem; color: var(--muted); }
+th, td { border: 1px solid var(--border); padding: 0.6rem 0.7rem; text-align: left; vertical-align: top; }
+thead th { background: var(--panel-2); }
+tbody th { background: var(--panel); font-weight: 700; white-space: nowrap; }
+
+.status {
+  min-height: 1.4rem; font-weight: 600; color: var(--ok); background: var(--ok-bg);
+  border-radius: 8px; padding: 0.3rem 0.55rem; margin: 0.5rem 0 0;
+  max-width: var(--readw); font-size: 0.9375rem;
+}
+.status:empty { background: transparent; padding: 0; min-height: 0; }
+
+.footnote {
+  margin-top: 2.5rem; padding-top: 1rem; border-top: 1px solid var(--border-soft);
+  color: var(--muted); font-size: 0.9375rem; max-width: var(--readw);
+}
+
+.sr-only {
+  position: absolute !important; width: 1px; height: 1px; margin: -1px; padding: 0;
+  overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
+}
+
+@media print {
+  .skip-link, .video-frame, .transcript-search, .tablist { display: none !important; }
+  .transcript-panel { height: auto !important; max-height: none !important; overflow: visible; border: none; }
+  .topic-index__time, .pill--time { border: none; }
+  .tabpanel { display: block !important; border-radius: var(--radius); margin-bottom: 1rem; }
+  body { background: #fff; color: #000; }
+  .todo > li, .callout, table { break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+
+<a class="skip-link" href="#main">Skip to page content</a>
+
+<header class="page-head">
+  <div class="wrap">
+    <p class="eyebrow">CSC 104 &middot; Week 3 &middot; Guided Assignment</p>
+    <h1>Word Module 1 &mdash; Guided Assignment Walkthrough</h1>
+    <p class="lede">This is the first of the two assignments you do every week. We do the guided one together: the video
+      below walks through all thirteen steps of the Ardmore State Bank flyer, and this page lists every step with a
+      button that jumps the video straight to it. The whole video is written out here too, so you can read it instead
+      of watching.</p>
+    <ul class="facts">
+      <li><span class="k">Video:</span> 31 minutes</li>
+      <li><span class="k">Week 3:</span> 9/14/2026 &ndash; 9/20/2026</li>
+      <li><span class="k">This assignment:</span> 25 pts in MindTap</li>
+      <li><span class="k">Attempts:</span> up to 10</li>
+      <li><span class="k">Due:</span> Sun 9/20, 11:59 PM</li>
+    </ul>
+  </div>
+</header>
+
+<main id="main" class="wrap" tabindex="-1">
+
+  <!-- ============ What to do this week ============ -->
+  <section aria-labelledby="todo-heading">
+    <h2 id="todo-heading" style="margin-top:1.25rem">What to do this week</h2>
+    <p>Week 3 is where Word starts, and it sets the pattern for the rest of the semester: a <strong>guided</strong>
+      assignment we walk through together, then a <strong>project</strong> you do on your own. Do them in that order
+      &mdash; the guided one teaches you what the project asks for. Each time stamp below jumps the video to the part
+      that explains it.</p>
+
+    <div class="callout">
+      <p style="margin:0"><strong>You get ten attempts at the guided assignment.</strong> If a step comes back wrong,
+        fix it in your Word file, upload it again and resubmit. There is no reason to settle for a partial score on
+        this one.</p>
+    </div>
+
+    <ol class="todo">
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">1</span>
+          <p class="todo__title">Watch the walkthrough with Word open beside it</p>
+        </div>
+        <div class="todo__body">
+          <p>Pause after each step and do it in your own file. That's what "guided" means &mdash; you're not meant to
+            watch it straight through and then try to remember thirteen steps.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="0">0:00</button>
+          <span class="pill pill--setup">Not graded</span>
+        </p>
+      </li>
+
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">2</span>
+          <p class="todo__title">Download the assignment files from MindTap</p>
+        </div>
+        <div class="todo__body">
+          <p>An instruction file, a start file with your name on it, and one support file (the image that ends in
+            <span class="mono">Bank.png</span>). Use <span class="ui">Download All</span> &mdash; say yes if your
+            browser asks about downloading multiple files.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="81">1:21</button>
+          <span class="pill pill--setup">Not graded</span>
+        </p>
+      </li>
+
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">3</span>
+          <p class="todo__title">Do the thirteen steps and submit the guided assignment</p>
+        </div>
+        <div class="todo__body">
+          <p>Every step is written out further down this page. Save as the <span class="mono">_2</span> version first,
+            work through the steps, then upload the file and select <span class="ui">Submit</span>. Check the
+            <span class="ui">Graded Summary Report</span> afterwards &mdash; it tells you exactly which steps earned
+            points.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="308">5:08</button>
+          <button type="button" class="pill pill--time" data-seek="1744">29:04</button>
+          <span class="pill pill--graded">Graded &mdash; 25 pts</span>
+          <span class="pill pill--due">Due Sun 9/20, 11:59 PM</span>
+        </p>
+      </li>
+
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">4</span>
+          <p class="todo__title">Do the Word Module 1 project on your own</p>
+        </div>
+        <div class="todo__body">
+          <p>The second assignment in MindTap this week. Same kind of work, no walkthrough &mdash; that's the point.
+            Start it after the guided one is submitted, while the commands are still fresh.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="14">0:14</button>
+          <span class="pill pill--graded">Graded &mdash; 100 pts</span>
+          <span class="pill pill--due">Due Sun 9/20, 11:59 PM</span>
+        </p>
+      </li>
+
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">5</span>
+          <p class="todo__title">Do the module reading</p>
+        </div>
+        <div class="todo__body">
+          <p>The Word Module 1 chapter in the Shelly Cashman text, covering creating and formatting a flyer. Not
+            graded, but it's the reference you'll want open while you work.</p>
+        </div>
+        <p class="todo__meta">
+          <span class="pill pill--setup">Not graded</span>
+        </p>
+      </li>
+    </ol>
+  </section>
+
+  <!-- ============ Video + transcript ============ -->
+  <section aria-labelledby="video-heading">
+    <h2 id="video-heading">The walkthrough video</h2>
+    <p>Thirty-one minutes, start to finish: downloading the files, saving your copy, all thirteen formatting steps,
+      then uploading and reading your graded report. If you're stuck on one step, use the topic index below rather
+      than scrubbing through.</p>
+
+    <div class="video-row">
+      <div class="video-col">
+        <div class="video-frame" id="video-container">
+          <iframe id="youtube-player"
+                  src="https://www.youtube.com/embed/cvhzV1OmqUY?enablejsapi=1&amp;cc_load_policy=1&amp;iv_load_policy=3&amp;modestbranding=1&amp;rel=0"
+                  title="CSC 104 Word Module 1 Guided Assignment Walkthrough"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  referrerpolicy="strict-origin-when-cross-origin"
+                  allowfullscreen loading="lazy"></iframe>
+        </div>
+        <p class="video-caption">Closed captions are on by default. Select any line of the transcript to jump the
+          video to that moment.</p>
+      </div>
+
+      <div class="transcript-col">
+        <div class="transcript-head">
+          <h3 id="transcript-heading">Transcript</h3>
+          <div class="transcript-search">
+            <label for="transcript-filter">Search the transcript</label>
+            <input type="search" id="transcript-filter" autocomplete="off" spellcheck="false"
+                   aria-describedby="transcript-filter-status">
+          </div>
+        </div>
+        <div class="transcript-panel" id="transcript-container" role="group" aria-labelledby="transcript-heading">
+          <p class="transcript-note">Loading transcript&hellip;</p>
+        </div>
+        <p class="sr-only" role="status" aria-live="polite" id="transcript-filter-status"></p>
+        <p class="sr-only" role="status" aria-live="polite" id="transcript-status"></p>
+        <p style="margin:0.5rem 0 0"><a href="#topic-index-heading">Skip past the transcript</a></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ Topic index ============ -->
+  <section aria-labelledby="topic-index-heading">
+    <h2 id="topic-index-heading">Find a moment in the video</h2>
+    <p><strong>Select any time below and the video jumps there.</strong> This is the detailed contents of the
+      walkthrough &mdash; if one step isn't working, come here, find it, and watch just that minute.</p>
+
+    <p id="topic-index-fallback" class="status" hidden></p>
+
+    <div class="topic-index topic-cols" id="topic-index">
+
+      <div class="topic-index__group">How the weekly assignments work</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="0">0:00</button><span class="topic-index__label">Two assignments every week: guided and homework</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="14">0:14</button><span class="topic-index__label">The guided one we do together; the homework you do alone</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="36">0:36</button><span class="topic-index__label">Launching the module &mdash; the checks MindTap shows first</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="54">0:54</button><span class="topic-index__label">You get ten attempts &mdash; fix it and resubmit</span></li>
+      </ul>
+
+      <div class="topic-index__group">Getting your files</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="63">1:03</button><span class="topic-index__label">Clicking Start</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="81">1:21</button><span class="topic-index__label">The three files: instructions, start file, support file</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="89">1:29</button><span class="topic-index__label">Some weeks have several support files, some have none</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="102">1:42</button><span class="topic-index__label">Download All &mdash; it drops everything into Downloads</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="114">1:54</button><span class="topic-index__label">Saved Files is empty until your first submission</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="128">2:08</button><span class="topic-index__label">Telling the three downloaded files apart</span></li>
+      </ul>
+
+      <div class="topic-index__group">Before you start formatting</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="156">2:36</button><span class="topic-index__label">Opening the instruction file; View &rsaquo; Page Width</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="174">2:54</button><span class="topic-index__label">The instructions say to save it as the _2 version</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="191">3:11</button><span class="topic-index__label">Opening the start file and clicking Enable Editing</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="204">3:24</button><span class="topic-index__label">File &rsaquo; Save As, staying in Downloads</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="218">3:38</button><span class="topic-index__label">Changing the 1 to a 2 and saving</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="259">4:19</button><span class="topic-index__label">You'll also need the Bank.png support file</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="270">4:30</button><span class="topic-index__label">Check the bottom of the page for your own name</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="295">4:55</button><span class="topic-index__label">If it isn't your file, delete it and re-download</span></li>
+      </ul>
+
+      <div class="topic-index__group">Step 1 &mdash; theme colors</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="308">5:08</button><span class="topic-index__label">The scenario: an Ardmore State Bank workshop flyer</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="324">5:24</button><span class="topic-index__label">Why the colors should match the picture</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="341">5:41</button><span class="topic-index__label">Design &rsaquo; Colors, not Design &rsaquo; Themes</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="354">5:54</button><span class="topic-index__label">Choosing Blue II</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="367">6:07</button><span class="topic-index__label">Nothing looks different &mdash; but the color menus change</span></li>
+      </ul>
+
+      <div class="topic-index__group">Step 2 &mdash; the headline</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="381">6:21</button><span class="topic-index__label">What step 2 asks for, taken one piece at a time</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="395">6:35</button><span class="topic-index__label">Don't retype the capitals by hand</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="407">6:47</button><span class="topic-index__label">Turning on Show/Hide &para; (worth doing every time)</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="423">7:03</button><span class="topic-index__label">What paragraph marks and space dots look like</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="452">7:32</button><span class="topic-index__label">The little black square means formatting is applied</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="490">8:10</button><span class="topic-index__label">Selecting the headline paragraph</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="507">8:27</button><span class="topic-index__label">Change Case lives in Font, not Paragraph</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="522">8:42</button><span class="topic-index__label">The five case options; picking Capitalize Each Word</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="563">9:23</button><span class="topic-index__label">Setting the font size to 36 point</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="579">9:39</button><span class="topic-index__label">A common mistake: only part of the text was selected</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="589">9:49</button><span class="topic-index__label">Ctrl+Z to undo, select everything, try again</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="605">10:05</button><span class="topic-index__label">Applying the Fill: Turquoise, Accent 1, Shadow text effect</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="647">10:47</button><span class="topic-index__label">Finding the right tile in the Text Effects gallery</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="676">11:16</button><span class="topic-index__label">Centering the paragraph</span></li>
+      </ul>
+
+      <div class="topic-index__group">Step 3 &mdash; the banking picture</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="689">11:29</button><span class="topic-index__label">What step 3 asks for</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="706">11:46</button><span class="topic-index__label">The Picture Format tab only appears when a picture is selected</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="722">12:02</button><span class="topic-index__label">Can't see the ribbon? Turn on Always Show Ribbon</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="748">12:28</button><span class="topic-index__label">Setting the width to 3 inches</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="765">12:45</button><span class="topic-index__label">The height follows &mdash; Word keeps it proportional</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="775">12:55</button><span class="topic-index__label">Opening the full Picture Styles gallery</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="790">13:10</button><span class="topic-index__label">Metal Oval and Bevel Oval are the wrong ones</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="810">13:30</button><span class="topic-index__label">Soft Edge Oval, and what it looks like</span></li>
+      </ul>
+
+      <div class="topic-index__group">Steps 4&ndash;7 &mdash; text formatting</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="824">13:44</button><span class="topic-index__label">Step 4: underline "four-hour session"</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="838">13:58</button><span class="topic-index__label">Counting down to the fourth paragraph</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="868">14:28</button><span class="topic-index__label">Step 5: italicize "ideal for new bankers"</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="883">14:43</button><span class="topic-index__label">Selecting the phrase and using Italic</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="903">15:03</button><span class="topic-index__label">Step 6: bullet the four paragraphs above the signature line</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="918">15:18</button><span class="topic-index__label">Identifying the signature line and the four paragraphs</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="941">15:41</button><span class="topic-index__label">Use the default dot, not Define New Bullet</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="973">16:13</button><span class="topic-index__label">Step 7: Callisto MT at 14 point</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="989">16:29</button><span class="topic-index__label">Type the font name instead of scrolling for it</span></li>
+      </ul>
+
+      <div class="topic-index__group">Steps 8&ndash;10 &mdash; color and spacing</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1026">17:06</button><span class="topic-index__label">Step 8: Turquoise, Accent 1, Darker 25% on the bold text</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1044">17:24</button><span class="topic-index__label">Do not color the colons &mdash; the grader marks it wrong</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1075">17:55</button><span class="topic-index__label">Reading the Darker / Lighter column in the color menu</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1116">18:36</button><span class="topic-index__label">Reusing the color on the next heading</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1146">19:06</button><span class="topic-index__label">Ctrl+Y repeats the last command</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1165">19:25</button><span class="topic-index__label">Step 9: shade the signature paragraph, Lighter 60%</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1179">19:39</button><span class="topic-index__label">Click anywhere in the paragraph &mdash; no selection needed</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1191">19:51</button><span class="topic-index__label">Shading is in the Paragraph group, not Font</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1223">20:23</button><span class="topic-index__label">Step 10: spacing before 18 pt, spacing after 6 pt</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1277">21:17</button><span class="topic-index__label">Using the Paragraph Settings dialog launcher</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1292">21:32</button><span class="topic-index__label">Six point, not the eight it defaults to</span></li>
+      </ul>
+
+      <div class="topic-index__group">Steps 11&ndash;13 &mdash; logo, border, spell check</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1314">21:54</button><span class="topic-index__label">Step 11: insert the bank logo on the blank line</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1324">22:04</button><span class="topic-index__label">Insert &rsaquo; Pictures &rsaquo; This Device</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1362">22:42</button><span class="topic-index__label">Resizing the logo to 0.8 inches high</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1398">23:18</button><span class="topic-index__label">Step 12: a 1&frac12; pt dotted page border</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1434">23:54</button><span class="topic-index__label">Design &rsaquo; Page Borders, on the right of the ribbon</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1449">24:09</button><span class="topic-index__label">Box, applied to the whole document</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1464">24:24</button><span class="topic-index__label">Setting color, width and the dotted style</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1481">24:41</button><span class="topic-index__label">Getting the width wrong, and fixing it</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1524">25:24</button><span class="topic-index__label">View &rsaquo; One Page to check the whole flyer</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1544">25:44</button><span class="topic-index__label">Step 13: Review &rsaquo; Spelling &amp; Grammar</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1556">25:56</button><span class="topic-index__label">Correcting the misspelled word</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1583">26:23</button><span class="topic-index__label">Skip the "created specifically for" line and your own name</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1628">27:08</button><span class="topic-index__label">What the finished flyer should look like</span></li>
+      </ul>
+
+      <div class="topic-index__group">Submitting and your score</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1646">27:26</button><span class="topic-index__label">Turning the paragraph marks back off</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1664">27:44</button><span class="topic-index__label">Save, close and exit Word before you upload</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1681">28:01</button><span class="topic-index__label">Finding the file: Details view, sorted by Date Modified</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1724">28:44</button><span class="topic-index__label">Drag and drop the _2 file into MindTap</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1744">29:04</button><span class="topic-index__label">Selecting Submit</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1754">29:14</button><span class="topic-index__label">Downloading the Graded Summary Report</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1784">29:44</button><span class="topic-index__label">Opening the report and reading your score</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1805">30:05</button><span class="topic-index__label">The report is step by step &mdash; it shows what you missed</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1837">30:37</button><span class="topic-index__label">Lost your file? Re-download it from MindTap</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1867">31:07</button><span class="topic-index__label">Closing</span></li>
+      </ul>
+
+    </div>
+  </section>
+
+  <!-- ============ The steps ============ -->
+  <section aria-labelledby="steps-heading">
+    <h2 id="steps-heading">The assignment, step by step</h2>
+    <p>Four setup items, then the thirteen graded steps, then submitting. Each one says <em>what</em> to change; the
+      time button next to it shows you <em>how</em>. <strong>Always go by the instruction file MindTap gave you</strong>
+      &mdash; the wording below is a summary, and MindTap grades against its own file.</p>
+
+    <h3>Before you start</h3>
+    <ol class="todo">
+      <li>
+        <div class="todo__top">
+          <span class="todo__num todo__num--setup" aria-hidden="true">A</span>
+          <p class="todo__title">Download all three files</p>
+        </div>
+        <div class="todo__body">
+          <p>Instruction file, start file (your name, ending in <span class="mono">_1</span>), and the support image
+            ending in <span class="mono">Bank.png</span>. They land in your Downloads folder.</p>
+        </div>
+        <p class="todo__meta"><button type="button" class="pill pill--time" data-seek="81">1:21</button></p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num todo__num--setup" aria-hidden="true">B</span>
+          <p class="todo__title">Open the instruction file and read it</p>
+        </div>
+        <div class="todo__body">
+          <p>It opens in Word. <span class="ui">View &rsaquo; Page Width</span> makes it readable. Keep it open in a
+            second window while you work.</p>
+        </div>
+        <p class="todo__meta"><button type="button" class="pill pill--time" data-seek="156">2:36</button></p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num todo__num--setup" aria-hidden="true">C</span>
+          <p class="todo__title">Open the start file and save it as the _2 version</p>
+        </div>
+        <div class="todo__body">
+          <p>Select <span class="ui">Enable Editing</span>, then <span class="ui">File &rsaquo; Save As</span>. Leave it
+            in Downloads, click just after the <span class="mono">1</span> in the file name, backspace, type
+            <span class="mono">2</span>, and save. <strong>Everything you do from here goes in the
+            <span class="mono">_2</span> file</strong> &mdash; that's the one you submit.</p>
+        </div>
+        <p class="todo__meta"><button type="button" class="pill pill--time" data-seek="191">3:11</button></p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num todo__num--setup" aria-hidden="true">D</span>
+          <p class="todo__title">Check that it's your file</p>
+        </div>
+        <div class="todo__body">
+          <p>Scroll to the bottom of the page. It should say the file was created specifically for <em>you</em>, by
+            name. If it doesn't, delete it and download it again &mdash; a file with someone else's name won't grade
+            as yours.</p>
+        </div>
+        <p class="todo__meta"><button type="button" class="pill pill--time" data-seek="270">4:30</button></p>
+      </li>
+    </ol>
+
+    <h3>The thirteen graded steps</h3>
+    <ol class="todo">
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">1</span>
+          <p class="todo__title">Change the document theme colors to Blue II</p>
+        </div>
+        <div class="todo__body">
+          <p><span class="ui">Design &rsaquo; Colors &rsaquo; Blue II</span>. Not Themes &mdash; Colors. Nothing on the
+            page appears to change; what changes is the set of colors offered in every color menu from here on, which
+            is how the later turquoise steps find their color.</p>
+        </div>
+        <p class="todo__meta"><button type="button" class="pill pill--time" data-seek="308">5:08</button></p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">2</span>
+          <p class="todo__title">Format the headline paragraph &mdash; four things</p>
+        </div>
+        <div class="todo__body">
+          <p>Select the whole headline paragraph, then:</p>
+          <ul>
+            <li><span class="ui">Home &rsaquo; Font &rsaquo; Change Case &rsaquo; Capitalize Each Word</span> (it's in
+              the Font group, not Paragraph)</li>
+            <li>Font size <strong>36 pt</strong></li>
+            <li><span class="ui">Text Effects</span> &rsaquo; <strong>Fill: Turquoise, Accent 1; Shadow</strong>
+              &mdash; the first tile in that row</li>
+            <li><span class="ui">Center</span> the paragraph</li>
+          </ul>
+          <p><strong>Watch the selection.</strong> In the video the 36 pt lands on a single letter because only that
+            letter was selected. If that happens, Ctrl+Z, reselect the whole paragraph, and redo it.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="381">6:21</button>
+          <button type="button" class="pill pill--time" data-seek="563">9:23</button>
+          <button type="button" class="pill pill--time" data-seek="605">10:05</button>
+        </p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">3</span>
+          <p class="todo__title">Resize the banking picture to 3" wide and apply Soft Edge Oval</p>
+        </div>
+        <div class="todo__body">
+          <p>Click the picture, then <span class="ui">Picture Format</span> &rsaquo; set <strong>Width</strong> to
+            <span class="mono">3"</span> (the height follows on its own). Then open the full
+            <span class="ui">Picture Styles</span> gallery and choose <strong>Soft Edge Oval</strong> &mdash; not
+            Metal Oval, not Bevel Oval. Hover to read the names.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="689">11:29</button>
+          <button type="button" class="pill pill--time" data-seek="775">12:55</button>
+        </p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">4</span>
+          <p class="todo__title">Underline "four-hour session"</p>
+        </div>
+        <div class="todo__body">
+          <p>It's in the fourth paragraph below the picture. Underline just that phrase, so it matches the
+            "two-hour session" already formatted that way.</p>
+        </div>
+        <p class="todo__meta"><button type="button" class="pill pill--time" data-seek="824">13:44</button></p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">5</span>
+          <p class="todo__title">Italicize "ideal for new bankers"</p>
+        </div>
+        <div class="todo__body">
+          <p>Select the phrase, then <span class="ui">Home &rsaquo; Italic</span>. Just the phrase &mdash; not the
+            whole sentence.</p>
+        </div>
+        <p class="todo__meta"><button type="button" class="pill pill--time" data-seek="868">14:28</button></p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">6</span>
+          <p class="todo__title">Bullet the four paragraphs above the signature line</p>
+        </div>
+        <div class="todo__body">
+          <p>The signature line is the last paragraph of text in the document. The four paragraphs above it are the
+            ones that begin with bold words. Select all four and click the
+            <span class="ui">Bullets</span> button &mdash; the plain default dot, not one from Define New Bullet.</p>
+        </div>
+        <p class="todo__meta"><button type="button" class="pill pill--time" data-seek="903">15:03</button></p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">7</span>
+          <p class="todo__title">Set the bulleted list to Callisto MT, 14 pt</p>
+        </div>
+        <div class="todo__body">
+          <p>With all four bullets selected, click into the font name box and type
+            <span class="mono">Calisto</span> &mdash; far faster than scrolling the list. Then set the size to
+            <strong>14</strong>.</p>
+        </div>
+        <p class="todo__meta"><button type="button" class="pill pill--time" data-seek="973">16:13</button></p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">8</span>
+          <p class="todo__title">Color the bold text Turquoise, Accent 1, Darker 25%</p>
+        </div>
+        <div class="todo__body">
+          <p>Only the bold words at the start of each bullet. <strong>Do not include the colons.</strong> If the colon
+            changes color, the grader marks that step wrong.</p>
+          <p>Do the first one from <span class="ui">Font Color</span>, then for the rest either click the Font Color
+            button (it keeps the last color) or select the text and press <span class="mono">Ctrl+Y</span>, which
+            repeats the last command.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="1026">17:06</button>
+          <button type="button" class="pill pill--time" data-seek="1146">19:06</button>
+        </p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">9</span>
+          <p class="todo__title">Shade the signature-line paragraph Turquoise, Accent 1, Lighter 60%</p>
+        </div>
+        <div class="todo__body">
+          <p>Click anywhere inside that paragraph &mdash; you don't need to select it. Then use the
+            <strong>Shading</strong> (paint bucket) button in the <span class="ui">Paragraph</span> group, not the
+            Font group. Shading applies to the whole paragraph.</p>
+        </div>
+        <p class="todo__meta"><button type="button" class="pill pill--time" data-seek="1165">19:25</button></p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">10</span>
+          <p class="todo__title">Same paragraph: spacing before 18 pt, spacing after 6 pt</p>
+        </div>
+        <div class="todo__body">
+          <p>Open the <span class="ui">Paragraph Settings</span> dialog (the small arrow at the corner of the Paragraph
+            group). Set <strong>Before</strong> to <span class="mono">18 pt</span> and <strong>After</strong> to
+            <span class="mono">6 pt</span> &mdash; the arrows step in sixes, and After starts at 8, so take it
+            <em>down</em> to 6.</p>
+        </div>
+        <p class="todo__meta"><button type="button" class="pill pill--time" data-seek="1223">20:23</button></p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">11</span>
+          <p class="todo__title">Insert the bank logo and resize it to 0.8" high</p>
+        </div>
+        <div class="todo__body">
+          <p>Click the blank line at the bottom of the page, then
+            <span class="ui">Insert &rsaquo; Pictures &rsaquo; This Device</span> and pick the support file ending in
+            <span class="mono">Bank.png</span> from Downloads. Then <span class="ui">Picture Format</span> &rsaquo;
+            <strong>Height</strong> <span class="mono">0.8"</span>, which is what brings the flyer back onto one
+            page.</p>
+        </div>
+        <p class="todo__meta"><button type="button" class="pill pill--time" data-seek="1314">21:54</button></p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">12</span>
+          <p class="todo__title">Add a 1&frac12; pt dotted page border in Turquoise, Accent 1</p>
+        </div>
+        <div class="todo__body">
+          <p><span class="ui">Design &rsaquo; Page Borders</span> (far right of the ribbon). In the dialog choose
+            <strong>Box</strong>, set <strong>Color</strong> to Turquoise, Accent 1, <strong>Width</strong> to
+            <span class="mono">1&frac12; pt</span>, and <strong>Style</strong> to the dotted line (second in the list).
+            Apply to <strong>Whole document</strong>.</p>
+          <p><strong>Check the width after you click OK.</strong> In the video it comes out at &frac12; pt the first
+            time. Reopen the dialog and confirm it really says 1&frac12;.</p>
+        </div>
+        <p class="todo__meta"><button type="button" class="pill pill--time" data-seek="1398">23:18</button></p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">13</span>
+          <p class="todo__title">Run Spelling &amp; Grammar and fix the spelling error</p>
+        </div>
+        <div class="todo__body">
+          <p><span class="ui">Review &rsaquo; Spelling &amp; Grammar</span>. Accept the correction it offers for the
+            misspelled word. <strong>Ignore your own name</strong>, and ignore the "this file was created specifically
+            for" line at the bottom &mdash; leave that text alone.</p>
+        </div>
+        <p class="todo__meta"><button type="button" class="pill pill--time" data-seek="1544">25:44</button></p>
+      </li>
+    </ol>
+
+    <h3>Submitting</h3>
+    <ol class="todo">
+      <li>
+        <div class="todo__top">
+          <span class="todo__num todo__num--setup" aria-hidden="true">E</span>
+          <p class="todo__title">Save, close, and exit Word</p>
+        </div>
+        <div class="todo__body">
+          <p>Do this before uploading. A file still open in Word can upload incomplete.</p>
+        </div>
+        <p class="todo__meta"><button type="button" class="pill pill--time" data-seek="1664">27:44</button></p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num todo__num--setup" aria-hidden="true">F</span>
+          <p class="todo__title">Upload the _2 file and select Submit</p>
+        </div>
+        <div class="todo__body">
+          <p>Drag and drop it into MindTap. Sorting your Downloads folder by <strong>Date Modified</strong> in
+            <strong>Details</strong> view puts the file you just saved at the top.</p>
+        </div>
+        <p class="todo__meta"><button type="button" class="pill pill--time" data-seek="1724">28:44</button></p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num todo__num--setup" aria-hidden="true">G</span>
+          <p class="todo__title">Open the Graded Summary Report</p>
+        </div>
+        <div class="todo__body">
+          <p>It downloads to the same folder and lists every step with the points it earned. <strong>Read it even if
+            you got 25 out of 25</strong> &mdash; and if you didn't, it tells you exactly which step to fix before your
+            next attempt.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="1754">29:14</button>
+          <button type="button" class="pill pill--time" data-seek="1805">30:05</button>
+        </p>
+      </li>
+    </ol>
+  </section>
+
+  <!-- ============ Platform tabs ============ -->
+  <section aria-labelledby="platform-heading">
+    <h2 id="platform-heading">Windows and Mac differences</h2>
+    <p>The steps are the same on both, but a few buttons live in different places. Pick your platform.</p>
+
+    <div class="tabs">
+      <div class="tablist" role="tablist" aria-label="Choose your platform">
+        <button type="button" class="tab" role="tab" id="tab-win" aria-controls="panel-win" aria-selected="true">Windows</button>
+        <button type="button" class="tab" role="tab" id="tab-mac" aria-controls="panel-mac" aria-selected="false" tabindex="-1">Mac</button>
+      </div>
+
+      <div class="tabpanel" role="tabpanel" id="panel-win" aria-labelledby="tab-win" tabindex="0">
+        <h3>On Windows</h3>
+        <ul style="max-width:none">
+          <li><strong>Enable Editing.</strong> Downloaded files open in Protected View with a yellow bar across the
+            top. You must select <span class="ui">Enable Editing</span> before anything works.</li>
+          <li><strong>Ribbon collapsed?</strong> Right-click the ribbon or use the arrow at its right end and choose
+            <span class="ui">Always Show Ribbon</span>, so the tabs stay visible as you click around.
+            <button type="button" class="pill pill--time" data-seek="722">12:02</button></li>
+          <li><strong>Repeat the last command:</strong> <span class="mono">Ctrl+Y</span>. Undo is
+            <span class="mono">Ctrl+Z</span>.</li>
+          <li><strong>Finding your file:</strong> File Explorer, <span class="ui">View &rsaquo; Details</span>, then
+            click the <span class="ui">Date modified</span> heading to sort newest first.</li>
+        </ul>
+      </div>
+
+      <div class="tabpanel" role="tabpanel" id="panel-mac" aria-labelledby="tab-mac" tabindex="0" hidden>
+        <h3>On Mac</h3>
+        <ul style="max-width:none">
+          <li><strong>No Protected View.</strong> There's no Enable Editing bar &mdash; the file opens ready to edit.
+            Everything else in the walkthrough still applies.</li>
+          <li><strong>Ribbon:</strong> if it's hidden, use the <span class="ui">v</span> chevron at the right end of
+            the tab row, or <span class="ui">View &rsaquo; Ribbon</span>, to keep it showing.</li>
+          <li><strong>Repeat the last command:</strong> <span class="mono">&#8984;+Y</span>. Undo is
+            <span class="mono">&#8984;+Z</span>.</li>
+          <li><strong>Page Borders</strong> is on the <span class="ui">Design</span> tab, same as Windows. The dialog
+            looks slightly different but has the same Style, Color, Width and Apply&nbsp;to controls.</li>
+          <li><strong>Finding your file:</strong> Finder &rsaquo; Downloads, switch to
+            <span class="ui">List</span> view, then click <span class="ui">Date Modified</span> to sort newest
+            first.</li>
+          <li><strong>Callisto MT</strong> ships with Office on Mac too. If it's genuinely missing, message me through
+            the Canvas Inbox rather than substituting a different font.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ Corrections ============ -->
+  <section aria-labelledby="corrections-heading">
+    <h2 id="corrections-heading">Since this was recorded</h2>
+    <p>A few things will look different on your screen than they do on mine. <strong>Where this page and the video
+      disagree, this page is right.</strong></p>
+
+    <div class="callout callout--warn callout--wide">
+      <ul style="margin:0; max-width:none">
+        <li><strong>My file list isn't yours.</strong> I had already done this assignment once when I recorded, so my
+          Saved Files list and my Downloads folder have extra copies in them. Yours will be emptier the first time
+          through &mdash; that's normal, not a sign you did something wrong. <em>(Video 1:54 and 28:44.)</em></li>
+        <li><strong>The support file name.</strong> I say it out loud at 4:19 and it's a mouthful. Don't try to match
+          it character for character &mdash; it's the one file that starts with <span class="mono">Support</span> and
+          ends in <span class="mono">Bank.png</span>, and it's the only image in the download.</li>
+        <li><strong>Attempts.</strong> Ten is what this assignment allows. Other weeks may differ, so go by the number
+          shown on your own MindTap page rather than by the video. <em>(Video 0:54.)</em></li>
+        <li><strong>Module release.</strong> Starting this week, modules post on the <strong>Thursday or Friday of the
+          week before</strong>, not Monday morning &mdash; so you can start early if you want to.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ AI policy ============ -->
+  <section aria-labelledby="ai-heading">
+    <h2 id="ai-heading">Using AI on this assignment</h2>
+    <p>The course AI policy is <strong>Limited</strong>, and this assignment is exactly the kind of place it matters.
+      You can ask an AI tool to explain what a command does, to tell you where something lives on the Mac ribbon when
+      the video shows Windows, to troubleshoot an error, or to quiz you afterward. <strong>You build the Word file
+      yourself.</strong> Spell check and grammar check are ordinary Word features and are always allowed &mdash; step
+      13 is literally asking you to use one.</p>
+    <p>The practical reason: the Word project later this week and the 200-point Word Project in Week 6 assume you can
+      do these operations from memory. Watching someone else's file get formatted is not the same as formatting one.</p>
+  </section>
+
+  <!-- ============ What's next ============ -->
+  <section aria-labelledby="next-heading">
+    <h2 id="next-heading">What's next</h2>
+    <p>Once the guided assignment is submitted, go straight to the <strong>Word Module 1 project</strong> in MindTap
+      &mdash; same skills, no walkthrough, 100 points. Week 4 continues with Word, and the pattern repeats: guided
+      first, project second.</p>
+    <p>Stuck on a step after re-watching it? Send me a message in the Canvas Inbox and say which step number and what
+      you tried. That's faster than burning attempts.</p>
+  </section>
+
+  <!-- ============ Quick reference ============ -->
+  <section aria-labelledby="reference-heading">
+    <h2 id="reference-heading">Quick reference</h2>
+    <div class="table-scroll" tabindex="0" role="region" aria-label="Quick reference table, scrollable">
+      <table>
+        <caption>Every value this assignment asks for, in one place</caption>
+        <thead>
+          <tr><th scope="col">Step</th><th scope="col">Where it lives</th><th scope="col">Exact setting</th></tr>
+        </thead>
+        <tbody>
+          <tr><th scope="row">1. Theme colors</th><td>Design &rsaquo; Colors</td><td>Blue II</td></tr>
+          <tr><th scope="row">2. Headline case</th><td>Home &rsaquo; Font &rsaquo; Change Case</td><td>Capitalize Each Word</td></tr>
+          <tr><th scope="row">2. Headline size</th><td>Home &rsaquo; Font</td><td>36 pt</td></tr>
+          <tr><th scope="row">2. Headline effect</th><td>Home &rsaquo; Font &rsaquo; Text Effects</td><td>Fill: Turquoise, Accent 1; Shadow</td></tr>
+          <tr><th scope="row">2. Headline alignment</th><td>Home &rsaquo; Paragraph</td><td>Center</td></tr>
+          <tr><th scope="row">3. Picture size</th><td>Picture Format &rsaquo; Size</td><td>Width 3"</td></tr>
+          <tr><th scope="row">3. Picture style</th><td>Picture Format &rsaquo; Picture Styles</td><td>Soft Edge Oval</td></tr>
+          <tr><th scope="row">4. "four-hour session"</th><td>Home &rsaquo; Font</td><td>Underline</td></tr>
+          <tr><th scope="row">5. "ideal for new bankers"</th><td>Home &rsaquo; Font</td><td>Italic</td></tr>
+          <tr><th scope="row">6. Four topic paragraphs</th><td>Home &rsaquo; Paragraph &rsaquo; Bullets</td><td>Default dot bullet</td></tr>
+          <tr><th scope="row">7. Bulleted list font</th><td>Home &rsaquo; Font</td><td>Callisto MT, 14 pt</td></tr>
+          <tr><th scope="row">8. Bold text color</th><td>Home &rsaquo; Font &rsaquo; Font Color</td><td>Turquoise, Accent 1, Darker 25% &mdash; <strong>not the colons</strong></td></tr>
+          <tr><th scope="row">9. Signature shading</th><td>Home &rsaquo; Paragraph &rsaquo; Shading</td><td>Turquoise, Accent 1, Lighter 60%</td></tr>
+          <tr><th scope="row">10. Signature spacing</th><td>Home &rsaquo; Paragraph settings</td><td>Before 18 pt, After 6 pt</td></tr>
+          <tr><th scope="row">11. Logo</th><td>Insert &rsaquo; Pictures &rsaquo; This Device</td><td>The <span class="mono">&hellip;Bank.png</span> support file, Height 0.8"</td></tr>
+          <tr><th scope="row">12. Page border</th><td>Design &rsaquo; Page Borders</td><td>Box, Turquoise Accent 1, 1&frac12; pt, dotted, whole document</td></tr>
+          <tr><th scope="row">13. Spell check</th><td>Review &rsaquo; Spelling &amp; Grammar</td><td>Fix the misspelling; ignore names</td></tr>
+          <tr><th scope="row">File name</th><td>File &rsaquo; Save As</td><td>The <span class="mono">_2</span> version, in Downloads</td></tr>
+          <tr><th scope="row">Submission</th><td>MindTap</td><td>Upload the <span class="mono">_2</span> file, select Submit, read the Graded Summary Report</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <p class="footnote">CSC 104 &middot; Computers and Computer Applications &middot; Fall 2026, Section 0840 &middot;
+    Mendocino College &middot; Instructor: David Pai &middot; <span class="mono">dpai@mendocino.edu</span>.
+    Nothing you type on this page is saved or submitted. Use the Canvas navigation outside this page to get back to
+    the Week 3 module.</p>
+</main>
+
+<script>
+(function () {
+  "use strict";
+
+  var VIDEO_ID = "cvhzV1OmqUY";
+
+  /* Transcript source: weeks/week03/csc104-word-1-guided-corrected.vtt — the
+     Whisper output with its hallucinated passages removed, its repeated cues
+     collapsed, and its Word command names, proper nouns and punctuation
+     restored. Inlined rather than fetched so this page stays self-contained
+     inside the Canvas iframe. Keep the two copies in step: if the YouTube
+     captions are re-uploaded from the .vtt, re-paste it here too. */
+  var vttContent = `WEBVTT
+
+NOTE
+CSC 104 — Week 3 — Word Module 1 Guided Assignment Walkthrough (YouTube cvhzV1OmqUY)
+Corrected transcript. Source: csc104-word-1-guided.vtt (Whisper output).
+Cleanup applied: hallucinated/garbled blocks removed (the multilingual word-salad
+block at ~21:03, the misplaced "I'll see you next time" insert at ~31:06, and the
+stray "and"/"you"/"okay" filler cues at 9:49, 16:08, 16:11 and 24:46–24:47);
+stutter duplicates collapsed (0:54, 4:23, 4:54, 11:45, 14:13, 28:14, 30:14);
+sentence casing and punctuation restored; Word command names and proper nouns
+corrected (Blue II, Turquoise / Accent 1, Soft Edge Oval, Callisto MT, Picture
+Format, Page Borders, Show/Hide, Ctrl+Y, Ctrl+Z, MindTap, Canvas, Ardmore State
+Bank); short cues merged into readable 1–2 sentence lines; timestamps normalized
+to HH:MM:SS.mmm. The instructor's voice and hedges are preserved.
+
+00:00:00.040 --> 00:00:14.340
+Aloha. So what I want to do here is — each week we have these guided assignments. Every week you have two assignments, basically: you have this guided assignment and the homework.
+
+00:00:14.340 --> 00:00:36.760
+The guided one we'll do together, or I'll walk through it, so you'll have all the steps you need. The homework you do on your own. Okay, so we're going to launch this module.
+
+00:00:36.760 --> 00:00:54.520
+When it comes up, the first thing it does is let you check things: not sure how to do it, do you have the right version of Office, common mistakes that may affect your grade. And notice here — you can do this ten times.
+
+00:00:54.820 --> 00:01:03.400
+So if you don't do it right the first time, you can fix it and resubmit it. You have ten attempts to do that.
+
+00:01:03.400 --> 00:01:21.500
+So what you want to do is click Start. And the first thing you need to do — let me delete all these files first.
+
+00:01:21.500 --> 00:01:29.840
+So the first thing you need to do is download these files. One's the instruction file, one's the start file, and we have a support file.
+
+00:01:29.840 --> 00:01:42.080
+Sometimes you will have one or more support files, sometimes you'll have none. But you almost always will have a start file and an instruction file.
+
+00:01:42.080 --> 00:01:54.500
+So we're going to Download All, and it automatically drops them into Downloads. You might get a pop-up asking if it's okay to download multiple things — say yes.
+
+00:01:54.500 --> 00:02:08.260
+I did this once already, so you can see I have an extra file. Typically Saved Files will be empty the first time; after you've done it once you'll have one here.
+
+00:02:08.260 --> 00:02:24.180
+So let's see. I have this one with my name — that's the file to work on. The one that starts with Support is an image file.
+
+00:02:24.180 --> 00:02:36.420
+This is the file that I need, and these instructions are the instructions. So I'm going to open the instructions first. Open it in Word, and I'm going to expand it.
+
+00:02:36.420 --> 00:02:54.180
+I'm going to go to View, Page Width. So I'm teaching you something in Word that we haven't talked about — Page Width — so that I can blow it up and see the whole page. And these are your instructions for this assignment.
+
+00:02:54.180 --> 00:03:11.460
+So the first thing it says: to get started, save the file. It's a file with my name on it, first-last underscore 1. Save it as first-last underscore 2.
+
+00:03:11.460 --> 00:03:24.180
+So what I'm going to do is open it, click Enable Editing, and then I get the default view I just mentioned — Page Width.
+
+00:03:24.180 --> 00:03:38.960
+And I'm going to go to File, Save As. I'm in the Downloads folder when I open it, so that's the default location — I'm just going to save it in that same place.
+
+00:03:38.960 --> 00:03:54.180
+So I'm going to click right next to the 1, backspace, change it to 2, and click Save.
+
+00:03:54.180 --> 00:04:19.780
+So now you can see up here, and down here, this is underscore 2. Now I have that. Let's go back to the instructions.
+
+00:04:19.780 --> 00:04:30.400
+You'll also need that support file — the one that starts with Support and ends in Bank.png.
+
+00:04:30.400 --> 00:04:42.700
+So once you have your file open, scroll down to the bottom and make sure it says the file was created specifically for — and has your name in it.
+
+00:04:42.700 --> 00:04:55.160
+This is all linked. Once you have your textbook linked to Canvas, it should open up after the first time you log in — it should automatically open every time you're logged in.
+
+00:04:55.160 --> 00:05:08.140
+So verify it's yours. If it's not, delete it and start over, or re-download that file. All right, so let's get started. Step one.
+
+00:05:08.140 --> 00:05:24.160
+You work for the training department of Ardmore State Bank and are creating a flyer about upcoming workshops on the fundamentals of banking. Start by changing the document theme colors to Blue II, to coordinate with the colors in the banking picture.
+
+00:05:24.160 --> 00:05:41.240
+So let's go back up. We have this picture with a bunch of blue in it, and right now the page is just black and white with gray. So we're going to have some color on our page.
+
+00:05:41.240 --> 00:05:54.160
+But we want to add colors that make sense, right? So I'm going to go to Design. Design has Themes — we're not changing our theme. What we want to do is change our colors for our flyer.
+
+00:05:54.160 --> 00:06:07.280
+So we're going to go down here and choose Blue II. If you look at it, it's a bunch of blues. So we choose Blue II — that's all we do.
+
+00:06:07.280 --> 00:06:21.820
+We don't see anything else change, but what happens is that when we go to pick a color, we get a different set of color options based on the color scheme you picked.
+
+00:06:21.820 --> 00:06:35.140
+Okay, Blue II. Step two: change the case of the flyer's headline paragraph to Capitalize Each Word, which is more suitable for a headline — and then do some other things. So let's do it one at a time.
+
+00:06:35.140 --> 00:06:47.560
+Capitalize each word. Right now I could go in here and change this to a capital B, and change this to a capital B — but that's not what we want to do.
+
+00:06:47.560 --> 00:07:03.220
+So before I do that, let me go to Home. I'm going to do something that isn't in the instructions: I'm going to click this little Show/Hide button — it looks like a paragraph mark. So I'm going to show my paragraph marks.
+
+00:07:03.220 --> 00:07:19.860
+Now when I look at this, I get a bunch of these things. Those are paragraph marks — that means I hit Enter, so it goes to the next line. And these little dots...
+
+00:07:19.860 --> 00:07:32.820
+I hate this font, because it makes it hard to see the little dots between the T and the 1. Those are spaces. So if you have a bunch of spaces, you'll see a bunch of dots.
+
+00:07:32.820 --> 00:07:51.820
+So that's a basic fundamental — these show all the characters that control what everything looks like. And you see there's a little black square: that means some formatting has been applied to that paragraph.
+
+00:07:51.820 --> 00:08:10.660
+You know, like Keep With Next, meaning keep it with the stuff below it, don't split it, stuff like that. So I'm always going to turn those on, personally.
+
+00:08:10.660 --> 00:08:27.160
+All right, so: change the case of the headline paragraph to Capitalize Each Word. So we're going to go to the headline paragraph, and I'm going to select the paragraph.
+
+00:08:27.160 --> 00:08:42.480
+And then, up in the ribbon, you see Font and Paragraph. You would think it would be in Paragraph, but it's actually in Font. This one makes it bigger, this one makes it smaller, this one changes the style, and this one changes the case.
+
+00:08:42.480 --> 00:08:59.740
+So I can make it Sentence case, meaning the first word is capitalized right after every period. I can make it all lowercase, all uppercase, toggle case, or Capitalize Each Word — and we want Capitalize Each Word. So it automatically fixes it.
+
+00:08:59.740 --> 00:09:23.500
+One thing to notice: it fixes the text that's there, but it doesn't set anything going forward, so if you add a word later you have to reset it.
+
+00:09:23.500 --> 00:09:39.520
+Anyway — Capitalize Each Word. Then, change the font size to 36 point. To change the font size you have to select all the text you want to change. Up here is the font you're using, and this is the size of it.
+
+00:09:39.520 --> 00:09:49.720
+So there's a drop-down list, and I can pick 36 point. Oops — see, it only applied to the B.
+
+00:09:49.960 --> 00:10:05.100
+So I'll hit Ctrl+Z to undo that, highlight the whole thing, and change it to 36. Okay, so it's all 36.
+
+00:10:05.100 --> 00:10:19.720
+And apply the Fill: Turquoise, Accent 1, Shadow text effect. So what that means is Text Effects — I'm going to choose...
+
+00:10:19.720 --> 00:10:47.660
+Turquoise, Accent color 1, Shadow, which is what I want. This is Text Effects. This one says Turquoise, Accent color 1, Shadow.
+
+00:10:47.660 --> 00:11:05.220
+Okay, so I want this first one here — that's Turquoise, Accent color 1, Shadow.
+
+00:11:05.220 --> 00:11:16.620
+All right, so you can see it looks different now — it's colored, and it's got a little shadow. Next: center the paragraph.
+
+00:11:16.620 --> 00:11:29.820
+For the paragraph — this is left justified, this is standard, right justified, and justified on both sides. So I'm going to pick the centered one, and now it's in the middle of the page.
+
+00:11:29.820 --> 00:11:45.620
+All right, step three: resize the banking picture to a width of three inches and then apply the Soft Edge Oval picture style. So first let's fix the width to three inches. Typically you click on the picture.
+
+00:11:46.600 --> 00:12:02.600
+There's a Picture Format tab — a new menu just for the picture. Now some of you, when you start, won't see this. Show Ribbon.
+
+00:12:02.600 --> 00:12:16.600
+Typically it's collapsed like this, and then you have to click on things to get that ribbon. That drives me crazy — I'm old school — so I go in here and I click Always Show Ribbon.
+
+00:12:16.600 --> 00:12:28.840
+So now it's always there, and every time I click a different thing it's already there. When you click the picture it adds a new tab, so if I click outside the picture it goes away.
+
+00:12:28.840 --> 00:12:45.760
+I click on the picture, there's Picture Format. I'm going to select it, and I have a Height and a Width. So I'm just going to change this from 4 inches to 3, and then I'll click somewhere else.
+
+00:12:45.760 --> 00:12:55.880
+Click on the picture again, Picture Format — and notice the height changed as well. So it keeps it proportional.
+
+00:12:55.880 --> 00:13:10.380
+All right, so on step three: resize it to a width of 3 and apply the Soft Edge Oval picture style. With the picture selected, we have Picture Styles in the middle. I can click the little arrow to show all the styles.
+
+00:13:10.380 --> 00:13:30.000
+And then what we can do is pick an oval. If we hover over them, that one says Metal Oval — that's not what we want. This one says Bevel Oval. We want Soft Edge Oval.
+
+00:13:30.000 --> 00:13:44.760
+So, Soft Edge Oval. And you notice now it's oval and the edges are kind of fading out to white. So there's a kind of transition from the solid color to white.
+
+00:13:44.760 --> 00:13:58.840
+All right, step four: underline the text "four-hour session" in the fourth paragraph below the banking picture, to match the format of "two-hour session."
+
+00:13:58.840 --> 00:14:13.380
+So if I look here — here's my picture, here's paragraph one, two, three, here's paragraph four. So I want to take this "four-hour session" and I want to underline it.
+
+00:14:14.760 --> 00:14:28.980
+So I select it, click on Underline, and it adds the underline.
+
+00:14:28.980 --> 00:14:43.680
+All right, step five: italicize the text "ideal for new bankers" in the paragraph that says "ideal for new bankers... the following topics," to draw attention to that text.
+
+00:14:43.680 --> 00:15:03.100
+So here's the paragraph, and we want to italicize "ideal for new bankers." Select it, and then up in our Font group it's the Italic option, and it will italicize it.
+
+00:15:03.100 --> 00:15:18.620
+All right, step six: bullet the four paragraphs of text above the signature line — which is the last paragraph of text in the document — using the default dot bullet, to clarify that the topics belong together in a list.
+
+00:15:18.620 --> 00:15:41.580
+So here's the last line in our document — this is our signature line. So the four paragraphs above it are these four that start with the bold words. Here's paragraph one, two, three and four.
+
+00:15:41.580 --> 00:15:53.300
+And then all we want to do is bullet them. The default bullet — just click on the bullet button. You could click the drop-down and change it; the default is this dot.
+
+00:15:53.300 --> 00:16:13.580
+You could make it a different kind of bullet. You can even Define New Bullet using a picture if you want. But we just want the default one.
+
+00:16:13.580 --> 00:16:29.600
+Step seven: change the font of the text in the bulleted list to Callisto MT at 14 point. So I have everything selected — make sure everything is selected — and I'm going to change the font style.
+
+00:16:29.600 --> 00:16:48.440
+The easiest way to find it is just start typing the name: C-A-L-I-S-T-O. It's right here at the top because I used it already. If I hadn't, you could scroll down too — it's in alphabetical order.
+
+00:16:48.440 --> 00:17:06.280
+So grab Callisto MT, and then I want to change the font size to 14, to make it a little bit bigger.
+
+00:17:06.280 --> 00:17:24.600
+Okay, step eight: change the font color of the bold text in the list to Turquoise, Accent 1, Darker 25%.
+
+00:17:24.600 --> 00:17:40.900
+Do not change the color of the colons. If you change the color of the colons, the grader will mark you wrong. So: Turquoise, Accent 1, Darker 25%. What I'm going to do is highlight this...
+
+00:17:40.900 --> 00:17:55.100
+...not the colon, though. And then that's no longer selected — highlight this one, it's selected.
+
+00:17:55.100 --> 00:18:23.740
+And then I'm going to go to the font colors, and I want to choose Turquoise, Accent 1, Darker 25%. So this direction is darker, this direction is lighter — Lighter 40, Darker 25.
+
+00:18:23.740 --> 00:18:36.720
+So that's what I want. Okay, so that changed that color. And now we want to do the same thing for "products and services."
+
+00:18:36.720 --> 00:18:55.720
+An easy way to do that: you just go up here, and the last color selected is what the button shows, so just click on it. That's the one you just did — the color you selected is the default color now.
+
+00:18:55.720 --> 00:19:06.700
+Then you highlight "customer relationships" and click up here. The shortcut key is: you highlight this and you do Ctrl+Y.
+
+00:19:06.700 --> 00:19:25.020
+And it does the last command — it repeats the last command. Ctrl+Y repeats the last command, and since the last command was change the color, Ctrl+Y will change the color.
+
+00:19:25.020 --> 00:19:39.960
+Step nine: shade the paragraph containing the signature line to Turquoise, Accent 1, Lighter 60%. So this is the paragraph — here's the signature line.
+
+00:19:39.960 --> 00:19:51.720
+And we can click anywhere in that paragraph, it doesn't matter — we don't need to select the whole paragraph. Click anywhere in the paragraph.
+
+00:19:51.720 --> 00:20:06.700
+And then what we want to do is, up in our ribbon we have a Font section, and between those two vertical lines we have a Paragraph section. So we're going to apply this to the paragraph, not to the font, and we're going to select the shading bucket tool.
+
+00:20:06.700 --> 00:20:23.900
+To add Turquoise, Accent 1 — was it Lighter 60? I think so.
+
+00:20:23.900 --> 00:20:37.860
+Okay, so that applies to the whole paragraph. I didn't have to select it, I just picked one place. All right, step ten: in the same paragraph, change the spacing before to 18 point and the spacing after to 6 point, to separate the signature line from the rest of the flyer.
+
+00:20:37.860 --> 00:20:59.200
+All right, so what we're going to do is just make sure we're selected anywhere in here, and then we're going to go to the Paragraph group.
+
+00:21:03.220 --> 00:21:17.680
+What I like to do for this one is use this little Paragraph Settings icon. So you click on it and it'll bring up some settings that you can choose.
+
+00:21:17.680 --> 00:21:32.860
+And we want Spacing Before to be 18 point, so it goes up by 6, 12, 18. And After — six point, not eight point — so I'll take it down to six.
+
+00:21:32.860 --> 00:21:53.420
+So, 18 before, 6 after. I'll click OK, and it moved the text a little bit, because it's basically creating a little room around that paragraph.
+
+00:21:54.420 --> 00:22:04.500
+Step eleven: insert the support picture file — the one ending in Bank.png — in the blank line at the bottom of the page, to include the bank's logo.
+
+00:22:04.500 --> 00:22:23.020
+So here's the blank line. We want to insert a picture From This Device, because we downloaded it onto our computer.
+
+00:22:24.420 --> 00:22:42.420
+I'm using Downloads — that's the default location — so I just pick this one, the Bank.png, and say Insert. And it pops it onto my page.
+
+00:22:42.420 --> 00:22:54.420
+It says resize the picture to a height of 0.8 inches, so everything is on my page. So I'll click on this, go to Picture Format, go to Height...
+
+00:22:54.420 --> 00:23:18.140
+...and make it 0.8 here. And now you can see it's all on that one page, because it made it much smaller.
+
+00:23:18.140 --> 00:23:33.940
+All right, now step twelve — we're almost done, it's only 13 steps. Step twelve: add a one-and-a-half-point page border using Turquoise, Accent 1, and the dotted style.
+
+00:23:33.940 --> 00:23:54.040
+All right, so we're going to go to Design — and let me throw the magnifier up here.
+
+00:23:54.040 --> 00:24:09.220
+We're going to go into Design, and on the right-hand side of Design there's Page Borders. We're going to click on Page Borders to bring up a dialog box.
+
+00:24:09.220 --> 00:24:24.720
+Obviously we want a Box, and we want it to apply to the whole document. These are page borders.
+
+00:24:24.720 --> 00:24:41.180
+We want the color to be Turquoise, Accent 1, we want the width to be one and a half point, and we want the style to be the second one, which is the dotted style.
+
+00:24:41.180 --> 00:24:49.980
+All right, then we say OK. Hmm — it didn't create the right one.
+
+00:24:52.940 --> 00:25:06.700
+Page Borders, color, width — sorry, one and a half point.
+
+00:25:06.700 --> 00:25:13.020
+Okay, so then it will look like this. I don't know how I got a half point instead of one and a half.
+
+00:25:13.020 --> 00:25:24.460
+So, one and a half, it'll look like this, and it'll apply to the whole page. And if you want to see the whole page, you can go to View.
+
+00:25:24.460 --> 00:25:44.540
+One Page — you can see the whole page. I like using Page Width so I can read the page, but if you want to see the whole page you can use that.
+
+00:25:44.540 --> 00:25:56.860
+All right, step thirteen: check the spelling and grammar in the document to identify and correct any spelling errors. Hint: ignore names — so if your name came up, you should ignore that. This is in Review.
+
+00:25:56.860 --> 00:26:14.940
+And we want to go to Spelling and Grammar — just click on Spelling and Grammar. It pops up, it's reading the document, and it says this word "consumer" is probably not a good word, and you can choose these options.
+
+00:26:14.940 --> 00:26:23.020
+And I want the first one, "consumer," so I'll select it. And it says it's finished.
+
+00:26:23.020 --> 00:26:46.060
+It didn't give many suggestions, and that's because I did it once already. I remember it came up and asked me — down here at the bottom, where it says "this file was created specifically for" — it wanted to change a word in there. You don't need to; just skip that.
+
+00:26:46.060 --> 00:26:58.460
+And if your name comes up, because it doesn't understand your name, obviously just skip that, because it's your name.
+
+00:26:58.460 --> 00:27:08.060
+Okay, so then you can close the editor — you don't need to keep it, because we finished all our spelling and grammar.
+
+00:27:08.060 --> 00:27:26.780
+And your final page should look like this page, which, when we did our whole blow-up, looked just like that page, except I'm still showing everything.
+
+00:27:26.780 --> 00:27:44.780
+Back to the View, and let's pick the whole page, One Page. And then let me go back to Home and I can turn all the paragraph marks off, and this is how it would look if I printed it.
+
+00:27:44.780 --> 00:28:01.020
+So this is my file. Save our changes, close, and exit Word. So what I have to do before I can submit it for grading: I want to save it — File, Save; it's already renamed to 2 — and I need to close it.
+
+00:28:01.020 --> 00:28:14.680
+Then I need to go here and find it. I like to just sort by Date Modified, and I always use the Details view.
+
+00:28:14.760 --> 00:28:24.380
+I hate icons — this view drives me crazy, I can't read it, I don't know what it says. I always like Details, because I want to see the date, the size, things like that.
+
+00:28:24.380 --> 00:28:44.660
+So I can sort by Name, or by Date Modified, or by Type, or by Size — you can sort by any of the headings. I want dates, because the newest stuff is at the top.
+
+00:28:44.660 --> 00:29:04.480
+Okay, so here's my David Pai underscore 2. Ignore that I already have one — if you have a new one it works the same way: just drag and drop it there and it uploads.
+
+00:29:04.480 --> 00:29:14.560
+So load up the new one, and now you can submit for grading. Click on Submit and it's going to grade it.
+
+00:29:14.560 --> 00:29:31.160
+And so if you've done it multiple times, you'll have multiple attempts with different grades potentially. You just click Graded Summary Report — it takes a little bit — and it downloads.
+
+00:29:31.160 --> 00:29:44.560
+It downloaded it to the same folder, which was this one. I'm going to bring it back to the top here — it says Report.
+
+00:29:44.560 --> 00:30:05.780
+Okay, so it says Report 2, because it's my second one. And then you click on that and it'll bring up a graded report for you, and it gives you your score. This one's out of 25, so I got 25 out of 25.
+
+00:30:05.780 --> 00:30:19.960
+If you followed along and did it just like that, you should get 25 out of 25. And it gives you a report for each item: did you change the document theme colors — yes, got one for that.
+
+00:30:19.960 --> 00:30:37.200
+Did you change the font case, the size, apply the text effects, align the paragraph to the middle — yes, two out of two. So it'll check all these things and give you your score. And if you don't like your score, you can do it again.
+
+00:30:37.200 --> 00:30:51.900
+All right, now the only other thing I wanted to say is about this interface. If I lose my file and I don't know where it is, and I want to update it because I want to resubmit it, you can always download it from this interface.
+
+00:30:51.900 --> 00:31:07.200
+Click on it and download it, and then use that as your starting point. All right, so that's really all I had to say about this.
+
+00:31:07.200 --> 00:31:21.120
+So follow along, or don't follow along — however you want to do it. But if you follow along, hopefully we'll get a hundred percent every week. Hopefully.
+
+00:31:21.120 --> 00:31:24.640
+All right, so see you next week. Thanks.`;
+
+  var player = null, timeUpdater = null, parsedTranscript = [], playerReady = false;
+
+  try {
+    if (!CSS.supports("selector(:focus-visible)")) { document.body.classList.add("no-fv"); }
+  } catch (e) { document.body.classList.add("no-fv"); }
+
+  /* ---------------- VTT parsing ---------------- */
+  function timeToSeconds(timeStr) {
+    if (!timeStr) { return 0; }
+    var parts = timeStr.trim().split(":");
+    if (parts.length === 2) {
+      return (parseInt(parts[0], 10) || 0) * 60 + (parseFloat(parts[1]) || 0);
+    }
+    if (parts.length === 3) {
+      return (parseInt(parts[0], 10) || 0) * 3600 + (parseInt(parts[1], 10) || 0) * 60 + (parseFloat(parts[2]) || 0);
+    }
+    return 0;
+  }
+
+  function formatTime(sec) {
+    sec = Math.max(0, Math.floor(sec));
+    var h = Math.floor(sec / 3600), m = Math.floor((sec % 3600) / 60), s = sec % 60;
+    var mm = (h > 0 && m < 10) ? "0" + m : String(m);
+    return (h > 0 ? h + ":" : "") + mm + ":" + (s < 10 ? "0" + s : s);
+  }
+
+  function parseVtt(vttText) {
+    var blocks = vttText.trim().split(/\n\n+/);
+    var cues = [];
+    blocks.forEach(function (block) {
+      var trimmed = block.trim();
+      if (!trimmed || trimmed.indexOf("WEBVTT") === 0 || trimmed.indexOf("NOTE") === 0) { return; }
+      var lines = trimmed.split("\n");
+      var timeLine = null, timeIndex = -1;
+      for (var i = 0; i < lines.length; i++) {
+        if (lines[i].indexOf("-->") !== -1) { timeLine = lines[i]; timeIndex = i; break; }
+      }
+      if (!timeLine) { return; }
+      var ends = timeLine.split("-->");
+      var text = lines.slice(timeIndex + 1).join(" ").trim();
+      if (!text) { return; }
+      cues.push({ start: timeToSeconds(ends[0]), end: timeToSeconds(ends[1]), text: text });
+    });
+    return cues;
+  }
+
+  /* ---------------- Transcript panel ---------------- */
+  function seek(seconds) {
+    if (!player || !player.seekTo) { return false; }
+    player.seekTo(seconds, true);
+    if (player.playVideo) { player.playVideo(); }
+    return true;
+  }
+
+  function scrollPlayerIntoView() {
+    var frame = document.getElementById("video-container");
+    if (frame && frame.scrollIntoView) { frame.scrollIntoView({ behavior: "smooth", block: "center" }); }
+  }
+
+  function populateTranscript() {
+    var container = document.getElementById("transcript-container");
+    if (!container) { return; }
+    container.innerHTML = "";
+    parsedTranscript.forEach(function (cue, i) {
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "transcript-line";
+      btn.dataset.start = cue.start;
+      btn.dataset.end = cue.end;
+      btn.dataset.index = i;
+
+      var stamp = document.createElement("span");
+      stamp.className = "t";
+      stamp.textContent = formatTime(cue.start);
+
+      var body = document.createElement("span");
+      body.className = "tx";
+      body.textContent = cue.text;
+
+      btn.appendChild(stamp);
+      btn.appendChild(body);
+      btn.setAttribute("aria-label", "Jump to " + formatTime(cue.start) + ". " + cue.text);
+
+      btn.addEventListener("click", function () {
+        if (seek(cue.start)) { scrollPlayerIntoView(); }
+      });
+      container.appendChild(btn);
+    });
+  }
+
+  /* ---------------- Active-line highlight ---------------- */
+  var lastAnnounced = null;
+  function announceLine(text) {
+    if (text === lastAnnounced) { return; }
+    lastAnnounced = text;
+    var s = document.getElementById("transcript-status");
+    if (s) { s.textContent = text || ""; }
+  }
+
+  function highlightCurrentLine() {
+    if (!player || !player.getCurrentTime) { return; }
+    var now = player.getCurrentTime();
+    var lines = document.querySelectorAll("#transcript-container .transcript-line");
+    var active = null;
+    Array.prototype.forEach.call(lines, function (line) {
+      var start = parseFloat(line.dataset.start), end = parseFloat(line.dataset.end);
+      if (now >= start && now < end) { active = line; }
+    });
+    var prev = document.querySelector("#transcript-container .is-active");
+    if (active === prev) { return; }
+    if (prev) { prev.classList.remove("is-active"); }
+    if (active) {
+      active.classList.add("is-active");
+      var body = active.querySelector(".tx");
+      announceLine(body ? body.textContent : active.textContent);
+      if (!active.hidden) { active.scrollIntoView({ behavior: "smooth", block: "center" }); }
+    }
+  }
+
+  /* ---------------- Panel height ---------------- */
+  function syncTranscriptHeight() {
+    var videoContainer = document.getElementById("video-container");
+    var panel = document.getElementById("transcript-container");
+    if (!videoContainer || !panel) { return; }
+    // Match the panel to the video only when the two columns actually sit side
+    // by side. Compared by rendered position rather than a viewport-width test,
+    // because in a Canvas iframe a media query measures the iframe, not the
+    // browser window, and can disagree with the flex-wrap result.
+    var videoCol = videoContainer.parentNode;
+    var transcriptCol = panel.parentNode;
+    var sideBySide = Math.abs(
+      transcriptCol.getBoundingClientRect().top - videoCol.getBoundingClientRect().top) < 40
+      && transcriptCol.getBoundingClientRect().left !== videoCol.getBoundingClientRect().left;
+    // Side by side, the panel should end level with the video, so subtract the
+    // heading/search row that sits above it inside the transcript column.
+    var head = transcriptCol.querySelector(".transcript-head");
+    var headH = head ? head.offsetHeight + 8 : 0;
+    var h = sideBySide ? Math.max(240, videoContainer.offsetHeight - headH) + "px" : "24rem";
+    panel.style.height = h;
+    panel.style.maxHeight = h;
+  }
+
+  /* ---------------- Transcript search ---------------- */
+  function escapeRe(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); }
+
+  function runFilter(term) {
+    var lines = document.querySelectorAll("#transcript-container .transcript-line");
+    var status = document.getElementById("transcript-filter-status");
+    var q = term.trim().toLowerCase();
+    var shown = 0;
+
+    Array.prototype.forEach.call(lines, function (line) {
+      var body = line.querySelector(".tx");
+      var cue = parsedTranscript[parseInt(line.dataset.index, 10)];
+      if (!body || !cue) { return; }
+      if (!q) {
+        body.textContent = cue.text;
+        line.hidden = false;
+        shown++;
+        return;
+      }
+      if (cue.text.toLowerCase().indexOf(q) === -1) {
+        body.textContent = cue.text;
+        line.hidden = true;
+        return;
+      }
+      line.hidden = false;
+      shown++;
+      // Rebuild with <mark> around the matches, without using innerHTML on
+      // user-supplied text.
+      body.textContent = "";
+      var re = new RegExp(escapeRe(term.trim()), "ig");
+      var last = 0, m;
+      while ((m = re.exec(cue.text)) !== null) {
+        if (m.index > last) { body.appendChild(document.createTextNode(cue.text.slice(last, m.index))); }
+        var mk = document.createElement("mark");
+        mk.textContent = m[0];
+        body.appendChild(mk);
+        last = m.index + m[0].length;
+        if (m[0].length === 0) { re.lastIndex++; }
+      }
+      if (last < cue.text.length) { body.appendChild(document.createTextNode(cue.text.slice(last))); }
+    });
+
+    if (status) {
+      status.textContent = q
+        ? (shown === 0 ? "No transcript lines match " + term : shown + " transcript line" + (shown === 1 ? "" : "s") + " match " + term)
+        : "Showing the whole transcript.";
+    }
+  }
+
+  function wireSearch() {
+    var input = document.getElementById("transcript-filter");
+    if (!input) { return; }
+    var t = null;
+    input.addEventListener("input", function () {
+      clearTimeout(t);
+      t = setTimeout(function () { runFilter(input.value); }, 250);
+    });
+  }
+
+  /* ---------------- Seek buttons (topic index + step pills) ----------------
+     Buttons wired to the embedded player, never youtu.be?t= links: a time link
+     would navigate the Canvas iframe away from this page. If the player never
+     comes up, the buttons are turned back into plain text so the index reads
+     as a reference list rather than as controls that silently do nothing. */
+  function wireSeekButtons() {
+    var btns = document.querySelectorAll("[data-seek]");
+    Array.prototype.forEach.call(btns, function (btn) {
+      var t = parseInt(btn.getAttribute("data-seek"), 10) || 0;
+      var item = btn.closest(".topic-index__item") || btn.closest(".todo > li");
+      var text = item ? item.querySelector(".topic-index__label, .todo__title") : null;
+      btn.setAttribute("aria-label", "Jump to " + formatTime(t) + (text ? " — " + text.textContent : "") + " in the video");
+      btn.addEventListener("click", function () {
+        if (seek(t)) { scrollPlayerIntoView(); }
+      });
+    });
+  }
+
+  function degradeToStatic(message) {
+    if (playerReady) { return; }
+    document.body.classList.add("no-player");
+    var idx = document.getElementById("topic-index");
+    if (idx) { idx.classList.add("topic-index--static"); }
+    Array.prototype.forEach.call(document.querySelectorAll("[data-seek]"), function (btn) {
+      btn.disabled = true;
+      btn.removeAttribute("aria-label");
+    });
+    var note = document.getElementById("topic-index-fallback");
+    if (note) { note.hidden = false; note.textContent = message; }
+  }
+
+  /* ---------------- Platform tabs ---------------- */
+  function wireTabs() {
+    var tablist = document.querySelector(".tablist");
+    if (!tablist) { return; }
+    var tabs = Array.prototype.slice.call(tablist.querySelectorAll('[role="tab"]'));
+
+    function select(tab, focus) {
+      tabs.forEach(function (t) {
+        var selected = t === tab;
+        t.setAttribute("aria-selected", selected ? "true" : "false");
+        t.tabIndex = selected ? 0 : -1;
+        var panel = document.getElementById(t.getAttribute("aria-controls"));
+        if (panel) { panel.hidden = !selected; }
+      });
+      if (focus) { tab.focus(); }
+    }
+
+    tabs.forEach(function (tab, i) {
+      tab.addEventListener("click", function () { select(tab, false); });
+      tab.addEventListener("keydown", function (e) {
+        var next = null;
+        if (e.key === "ArrowRight") { next = tabs[(i + 1) % tabs.length]; }
+        else if (e.key === "ArrowLeft") { next = tabs[(i - 1 + tabs.length) % tabs.length]; }
+        else if (e.key === "Home") { next = tabs[0]; }
+        else if (e.key === "End") { next = tabs[tabs.length - 1]; }
+        if (next) { e.preventDefault(); select(next, true); }
+      });
+    });
+  }
+
+  /* ---------------- YouTube player ---------------- */
+  window.onYouTubeIframeAPIReady = function () {
+    if (!VIDEO_ID || !document.getElementById("youtube-player")) { return; }
+    player = new YT.Player("youtube-player", {
+      events: {
+        onReady: function () {
+          playerReady = true;
+          syncTranscriptHeight();
+        },
+        onStateChange: function (event) {
+          clearInterval(timeUpdater);
+          if (event.data === YT.PlayerState.PLAYING) {
+            timeUpdater = setInterval(highlightCurrentLine, 300);
+          } else {
+            highlightCurrentLine();
+          }
+        }
+      }
+    });
+  };
+
+  document.addEventListener("DOMContentLoaded", function () {
+    parsedTranscript = parseVtt(vttContent);
+    populateTranscript();
+    wireSearch();
+    wireSeekButtons();
+    wireTabs();
+    setTimeout(syncTranscriptHeight, 100);
+
+    if (typeof YT === "undefined" || typeof YT.Player === "undefined") {
+      var tag = document.createElement("script");
+      tag.src = "https://www.youtube.com/iframe_api";
+      tag.onerror = function () {
+        degradeToStatic("The video player could not load, so the times below are listed for reference rather than as buttons. The full transcript is above.");
+      };
+      document.head.appendChild(tag);
+    } else {
+      window.onYouTubeIframeAPIReady();
+    }
+
+    // If the API never reports ready — blocked script, offline, restrictive
+    // network — fall back rather than leaving dead buttons on the page.
+    setTimeout(function () {
+      degradeToStatic("The video player did not load, so the times below are listed for reference rather than as buttons. The full transcript is above.");
+    }, 8000);
+  });
+
+  var resizeTimeout;
+  window.addEventListener("resize", function () {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(syncTranscriptHeight, 250);
+  });
+
+  /* Report height to a Canvas parent that listens for it. Harmless otherwise. */
+  function postHeight() {
+    try {
+      if (window.parent && window.parent !== window) {
+        var h = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
+        window.parent.postMessage({ subject: "lti.frameResize", height: h }, "*");
+      }
+    } catch (e) { /* cross-origin parent — ignore */ }
+  }
+  window.addEventListener("load", postHeight);
+  if (window.ResizeObserver) { new ResizeObserver(postHeight).observe(document.body); }
+})();
+</script>
+</body>
+</html>
