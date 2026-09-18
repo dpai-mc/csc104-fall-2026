@@ -1,0 +1,1760 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CSC 104 — Word Module 2 Guided Assignment</title>
+<style>
+/* ============================================================
+   CSC 104 — Week 4 — Word Module 2 Guided Assignment
+   Self-contained SPA for embedding in a Canvas iframe.
+   Vanilla CSS + vanilla JS, one file, no outbound links.
+   The only external resources are the YouTube player iframe and
+   the YouTube IFrame API (needed for click-to-seek); the page
+   degrades to a readable transcript and a plain topic list if
+   either is blocked.
+   Token block and layout match weeks/week03/01-guided-assign-word-1.html.
+   ============================================================ */
+
+:root {
+  color-scheme: light dark;
+  --surface:      #ffffff;
+  --panel:        #f6f8fb;
+  --panel-2:      #eef2f8;
+  --accent-bg:    #e8f0fe;
+  --ink:          #16202f;
+  --muted:        #46536b;
+  --brand:        #1d4ed8;
+  --brand-ink:    #17399c;
+  --border:       #c3cddc;
+  --border-soft:  #dde4ee;
+  --field-border: #6b7a92;
+  --btn-bg:       #1d4ed8;
+  --btn-fg:       #ffffff;
+  --btn-bg-hover: #17399c;
+  --btn2-bg:      #ffffff;
+  --btn2-fg:      #17399c;
+  --ok:           #1a6b3c;
+  --ok-bg:        #e6f4ec;
+  --warn-ink:     #7a4a06;
+  --warn-bg:      #fdf3e0;
+  --warn-rule:    #b8860b;
+  --focus:        #b4530a;
+  --hit:          #fff2b8;
+  --hit-ink:      #3a2c00;
+  --radius:       10px;
+  --maxw:         70rem;
+  --readw:        46rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --surface:      #0f1726;
+    --panel:        #17223a;
+    --panel-2:      #1e2b45;
+    --accent-bg:    #1a2a4d;
+    --ink:          #e9eefa;
+    --muted:        #b6c3d8;
+    --brand:        #9dbcff;
+    --brand-ink:    #bcd2ff;
+    --border:       #3a4a68;
+    --border-soft:  #2b3a56;
+    --field-border: #7b89a3;
+    --btn-bg:       #9dbcff;
+    --btn-fg:       #0b1424;
+    --btn-bg-hover: #c3d6ff;
+    --btn2-bg:      #17223a;
+    --btn2-fg:      #bcd2ff;
+    --ok:           #8fe0b0;
+    --ok-bg:        #123328;
+    --warn-ink:     #f6d59a;
+    --warn-bg:      #3a2c11;
+    --warn-rule:    #d9a441;
+    --focus:        #ffb066;
+    --hit:          #5c4a10;
+    --hit-ink:      #ffeeb8;
+  }
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--surface);
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; border-radius: 4px; }
+.no-fv :focus { outline: 3px solid var(--focus); outline-offset: 2px; }
+
+.skip-link {
+  position: absolute; left: -9999px; top: 0; z-index: 60;
+  background: var(--btn-bg); color: var(--btn-fg);
+  padding: 0.6rem 1rem; font-weight: 700; border-radius: 0 0 var(--radius) 0;
+}
+.skip-link:focus { left: 0; outline: 3px solid var(--focus); outline-offset: 2px; }
+
+.wrap { max-width: var(--maxw); margin: 0 auto; padding: 1rem 1rem 3rem; }
+.read { max-width: var(--readw); }
+
+/* ---------------------- Header ---------------------- */
+.page-head { background: var(--panel); border-bottom: 3px solid var(--brand); }
+.page-head .wrap { padding-bottom: 1.25rem; }
+
+.eyebrow {
+  font-size: 0.8125rem; letter-spacing: 0.09em; text-transform: uppercase;
+  font-weight: 700; color: var(--brand-ink); margin: 0.75rem 0 0.35rem;
+}
+h1 { font-size: clamp(1.5rem, 4.2vw, 2.15rem); line-height: 1.22; margin: 0 0 0.6rem; }
+.lede { margin: 0; color: var(--muted); max-width: var(--readw); }
+
+.facts { list-style: none; display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 1rem 0 0; padding: 0; }
+.facts li {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 999px; padding: 0.3rem 0.85rem; font-size: 0.875rem;
+}
+.facts .k { font-weight: 700; color: var(--brand-ink); }
+
+/* ---------------------- Typography ---------------------- */
+h2 {
+  font-size: clamp(1.25rem, 3.2vw, 1.6rem);
+  margin: 2.5rem 0 0.75rem; color: var(--brand-ink);
+  padding-bottom: 0.35rem; border-bottom: 2px solid var(--border-soft);
+}
+h3 { font-size: 1.125rem; margin: 1.75rem 0 0.5rem; }
+p { margin: 0 0 1rem; max-width: var(--readw); }
+ul, ol { margin: 0 0 1rem; padding-left: 1.35rem; max-width: var(--readw); }
+li { margin-bottom: 0.4rem; }
+.mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.9375em; }
+.ui { font-weight: 700; }
+
+.callout {
+  border-left: 5px solid var(--brand); background: var(--accent-bg);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding: 0.9rem 1.1rem; margin: 0 0 1.25rem; max-width: var(--readw);
+}
+.callout > :last-child { margin-bottom: 0; }
+.callout h3 { margin-top: 0; font-size: 1.05rem; }
+.callout--warn { border-left-color: var(--warn-rule); background: var(--warn-bg); color: var(--warn-ink); }
+.callout--wide { max-width: none; }
+
+/* ---------------------- Video + transcript ---------------------- */
+.video-row { display: flex; flex-wrap: wrap; gap: 1.25rem; margin: 0 0 1.5rem; }
+.video-col { flex: 1 1 32rem; min-width: min(100%, 20rem); }
+.transcript-col { flex: 1 1 20rem; min-width: min(100%, 17rem); display: flex; flex-direction: column; }
+
+.video-frame {
+  position: relative; width: 100%; padding-top: 56.25%;
+  background: #000; border-radius: var(--radius); overflow: hidden;
+  border: 1px solid var(--field-border);
+}
+.video-frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+.video-caption { font-size: 0.875rem; color: var(--muted); margin-top: 0.5rem; }
+
+.transcript-head { display: flex; flex-wrap: wrap; gap: 0.5rem 0.75rem; align-items: flex-end; margin-bottom: 0.5rem; }
+.transcript-head h3 { margin: 0 0 0.3rem; font-size: 1rem; flex: 0 1 auto; }
+.transcript-search { flex: 1 1 10rem; }
+.transcript-search label { display: block; font-size: 0.8125rem; font-weight: 600; color: var(--muted); }
+.transcript-search input {
+  font: inherit; width: 100%; min-height: 2.5rem; color: var(--ink);
+  background: var(--surface); border: 1px solid var(--field-border);
+  border-radius: 8px; padding: 0.35rem 0.55rem;
+}
+
+.transcript-panel {
+  height: 24rem; max-height: 24rem; overflow-y: auto;
+  border: 1px solid var(--field-border); border-radius: var(--radius);
+  background: var(--panel); padding: 0.4rem;
+}
+.transcript-line {
+  display: block; width: 100%; text-align: left; font: inherit;
+  font-size: 0.9375rem; line-height: 1.5; color: var(--ink);
+  background: transparent; border: 0; border-radius: 6px;
+  padding: 0.45rem 0.6rem; cursor: pointer;
+}
+.transcript-line:hover { background: var(--accent-bg); }
+.transcript-line .t {
+  display: inline-block; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.8125rem; font-weight: 700; color: var(--brand-ink); margin-right: 0.5rem;
+}
+.transcript-line.is-active {
+  background: var(--accent-bg);
+  box-shadow: inset 3px 0 0 0 var(--brand);
+  font-weight: 600;
+}
+.transcript-line[hidden] { display: none; }
+.transcript-line mark { background: var(--hit); color: var(--hit-ink); }
+.transcript-note { color: var(--muted); font-size: 0.875rem; padding: 0.6rem; margin: 0; }
+
+/* Static fallback when the player never loads */
+.no-player .transcript-line { cursor: default; }
+.no-player .transcript-line:hover { background: transparent; }
+
+/* ---------------------- Topic index ---------------------- */
+.topic-index { margin: 0 0 1.5rem; }
+.topic-index__group {
+  font-weight: 700; color: var(--brand-ink); margin: 1.25rem 0 0.4rem;
+  font-size: 0.9375rem; letter-spacing: 0.02em;
+}
+.topic-index__group:first-child { margin-top: 0; }
+.topic-index__list { list-style: none; padding: 0; margin: 0; max-width: none; }
+.topic-index__item {
+  display: flex; gap: 0.7rem; align-items: baseline;
+  padding: 0.28rem 0; margin: 0; border-bottom: 1px solid var(--border-soft);
+}
+.topic-index__list li:last-child { border-bottom: none; }
+.topic-index__time {
+  flex: 0 0 auto; font: inherit;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.875rem; font-weight: 700;
+  min-width: 4.25rem; min-height: 2rem; text-align: center;
+  color: var(--btn2-fg); background: var(--btn2-bg);
+  border: 1px solid var(--field-border); border-radius: 6px;
+  padding: 0.15rem 0.4rem; cursor: pointer;
+}
+.topic-index__time:hover { background: var(--accent-bg); }
+.topic-index__label { flex: 1 1 auto; }
+
+.topic-index--static .topic-index__time {
+  cursor: default; background: transparent; border-color: transparent;
+  color: var(--muted); text-align: left; padding-left: 0;
+}
+.topic-index--static .topic-index__time:hover { background: transparent; }
+
+@media (min-width: 52em) {
+  .topic-cols { column-count: 2; column-gap: 2.25rem; }
+  .topic-cols .topic-index__group { break-after: avoid; }
+  .topic-cols .topic-index__list { break-inside: avoid; }
+}
+
+/* ---------------------- To-do / step lists ---------------------- */
+.todo { list-style: none; padding: 0; margin: 0 0 1.5rem; max-width: none; }
+.todo > li {
+  background: var(--panel); border: 1px solid var(--border-soft);
+  border-radius: var(--radius); padding: 0.85rem 1rem;
+  margin: 0 0 0.75rem;
+}
+.todo__top { display: flex; flex-wrap: wrap; gap: 0.6rem; align-items: baseline; }
+.todo__num {
+  flex: 0 0 auto; min-width: 1.9rem; height: 1.9rem; padding: 0 0.4rem; border-radius: 999px;
+  background: var(--btn-bg); color: var(--btn-fg); font-weight: 700; font-size: 0.9375rem;
+  display: flex; align-items: center; justify-content: center; align-self: flex-start;
+}
+.todo__num--setup { background: var(--btn2-bg); color: var(--btn2-fg); border: 1px solid var(--field-border); }
+.todo__title { flex: 1 1 14rem; font-weight: 700; margin: 0; }
+.todo__body { margin: 0.35rem 0 0 2.5rem; max-width: var(--readw); }
+.todo__body p { margin: 0 0 0.5rem; }
+.todo__body ul { margin: 0 0 0.5rem; }
+.todo__body > :last-child { margin-bottom: 0; }
+.todo__meta { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0.5rem 0 0 2.5rem; }
+.pill {
+  font-size: 0.8125rem; font-weight: 700; border-radius: 999px;
+  padding: 0.1rem 0.6rem; border: 1px solid currentColor; white-space: nowrap;
+}
+.pill--graded { color: var(--ok); background: var(--ok-bg); }
+.pill--setup { color: var(--brand-ink); background: var(--accent-bg); }
+.pill--due { color: var(--warn-ink); background: var(--warn-bg); }
+.pill--time {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  color: var(--btn2-fg); background: var(--btn2-bg); border-color: var(--field-border);
+  cursor: pointer; font-size: 0.8125rem; min-height: 1.9rem;
+}
+.pill--time:hover { background: var(--accent-bg); }
+.no-player .pill--time { cursor: default; }
+
+/* ---------------------- Platform tabs ---------------------- */
+.tabs { margin: 0 0 1.5rem; }
+.tablist { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0 0 -1px; padding: 0; }
+.tab {
+  font: inherit; font-weight: 700; cursor: pointer;
+  color: var(--btn2-fg); background: var(--btn2-bg);
+  border: 1px solid var(--field-border); border-bottom-color: transparent;
+  border-radius: var(--radius) var(--radius) 0 0;
+  padding: 0.5rem 1rem; min-height: 2.5rem;
+}
+.tab[aria-selected="true"] { background: var(--accent-bg); border-bottom-color: var(--accent-bg); }
+.tab:hover { background: var(--accent-bg); }
+.tabpanel {
+  border: 1px solid var(--field-border); border-radius: 0 var(--radius) var(--radius) var(--radius);
+  background: var(--panel); padding: 1rem 1.1rem;
+}
+.tabpanel > :last-child { margin-bottom: 0; }
+.tabpanel h3:first-child { margin-top: 0; }
+
+/* ---------------------- Reference table ---------------------- */
+.table-scroll { overflow-x: auto; margin: 0 0 1.5rem; }
+table { border-collapse: collapse; width: 100%; min-width: 30rem; background: var(--surface); }
+caption { text-align: left; font-weight: 700; padding: 0 0 0.5rem; color: var(--muted); }
+th, td { border: 1px solid var(--border); padding: 0.6rem 0.7rem; text-align: left; vertical-align: top; }
+thead th { background: var(--panel-2); }
+tbody th { background: var(--panel); font-weight: 700; white-space: nowrap; }
+
+.status {
+  min-height: 1.4rem; font-weight: 600; color: var(--ok); background: var(--ok-bg);
+  border-radius: 8px; padding: 0.3rem 0.55rem; margin: 0.5rem 0 0;
+  max-width: var(--readw); font-size: 0.9375rem;
+}
+.status:empty { background: transparent; padding: 0; min-height: 0; }
+
+.footnote {
+  margin-top: 2.5rem; padding-top: 1rem; border-top: 1px solid var(--border-soft);
+  color: var(--muted); font-size: 0.9375rem; max-width: var(--readw);
+}
+
+.sr-only {
+  position: absolute !important; width: 1px; height: 1px; margin: -1px; padding: 0;
+  overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
+}
+
+@media print {
+  .skip-link, .video-frame, .transcript-search, .tablist { display: none !important; }
+  .transcript-panel { height: auto !important; max-height: none !important; overflow: visible; border: none; }
+  .topic-index__time, .pill--time { border: none; }
+  .tabpanel { display: block !important; border-radius: var(--radius); margin-bottom: 1rem; }
+  body { background: #fff; color: #000; }
+  .todo > li, .callout, table { break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+
+<a class="skip-link" href="#main">Skip to page content</a>
+
+<header class="page-head">
+  <div class="wrap">
+    <p class="eyebrow">CSC 104 &middot; Week 4 &middot; Guided Assignment</p>
+    <h1>Word Module 2 &mdash; Guided Assignment Walkthrough</h1>
+    <p class="lede">Week 4 is the MLA research paper. The video below walks through all fifteen steps of the visual
+      communication report &mdash; styles, the page-number header, a footnote, four different things you can do to a
+      citation, the Thesaurus, find-and-replace and the bibliography. Every step is listed on this page with a button
+      that jumps the video straight to it, and the whole video is written out here so you can read it instead of
+      watching.</p>
+    <ul class="facts">
+      <li><span class="k">Video:</span> 23 minutes</li>
+      <li><span class="k">Week 4:</span> 9/21/2026 &ndash; 9/27/2026</li>
+      <li><span class="k">This assignment:</span> 25 pts in MindTap</li>
+      <li><span class="k">Attempts:</span> up to 10</li>
+      <li><span class="k">Due:</span> Sun 9/27, 11:59 PM</li>
+    </ul>
+  </div>
+</header>
+
+<main id="main" class="wrap" tabindex="-1">
+
+  <!-- ============ What to do this week ============ -->
+  <section aria-labelledby="todo-heading">
+    <h2 id="todo-heading" style="margin-top:1.25rem">What to do this week</h2>
+    <p>Same pattern as last week: a <strong>guided</strong> assignment we walk through together, then a
+      <strong>homework</strong> assignment you do on your own. Do them in that order. The content is different this
+      week &mdash; a research paper instead of a flyer &mdash; so the commands are new even though the routine isn't.
+      Each time stamp below jumps the video to the part that explains it.</p>
+
+    <div class="callout">
+      <p style="margin:0"><strong>You get ten attempts at the guided assignment.</strong> If a step comes back wrong,
+        fix it in your Word file, upload it again and resubmit. There is no reason to settle for a partial score on
+        this one.</p>
+    </div>
+
+    <ol class="todo">
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">1</span>
+          <p class="todo__title">Watch the walkthrough with Word open beside it</p>
+        </div>
+        <div class="todo__body">
+          <p>Pause after each step and do it in your own file. Several steps this week depend on the one before it
+            &mdash; the footnote style can't be modified until the footnote exists, and the bibliography only lists
+            the sources you actually added &mdash; so working along as you watch saves real time.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="0">0:00</button>
+          <span class="pill pill--setup">Not graded</span>
+        </p>
+      </li>
+
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">2</span>
+          <p class="todo__title">Download the assignment files from MindTap</p>
+        </div>
+        <div class="todo__body">
+          <p>An instruction file and a start file with your name on it. No support files this week. Use
+            <span class="ui">Download All</span> &mdash; say yes if your browser asks about downloading multiple
+            files.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="44">0:44</button>
+          <span class="pill pill--setup">Not graded</span>
+        </p>
+      </li>
+
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">3</span>
+          <p class="todo__title">Do the fifteen steps and submit the guided assignment</p>
+        </div>
+        <div class="todo__body">
+          <p>Every step is written out further down this page. Save as the <span class="mono">_2</span> version first,
+            work through the steps, then upload the file and select <span class="ui">Submit</span>. Check the
+            <span class="ui">Graded Summary Report</span> afterwards &mdash; it tells you exactly which steps earned
+            points.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="167">2:47</button>
+          <button type="button" class="pill pill--time" data-seek="1313">21:53</button>
+          <span class="pill pill--graded">Graded &mdash; 25 pts</span>
+          <span class="pill pill--due">Due Sun 9/27, 11:59 PM</span>
+        </p>
+      </li>
+
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">4</span>
+          <p class="todo__title">Do the Word Module 2 homework on your own</p>
+        </div>
+        <div class="todo__body">
+          <p>The second MindTap assignment this week. A different document, the same commands, and no walkthrough
+            &mdash; that's the point. Start it right after the guided one is submitted, while the citation dialogs are
+            still fresh.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="1341">22:21</button>
+          <span class="pill pill--graded">Graded &mdash; 100 pts</span>
+          <span class="pill pill--due">Due Sun 9/27, 11:59 PM</span>
+        </p>
+      </li>
+
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">5</span>
+          <p class="todo__title">Do the module reading</p>
+        </div>
+        <div class="todo__body">
+          <p>The Word Module 2 chapter in the Shelly Cashman text, on creating a research paper. Skim it for
+            <em>what</em> Word can do; come back to it as a step-by-step reference when an assignment names something
+            you haven't seen. Not graded.</p>
+        </div>
+        <p class="todo__meta">
+          <span class="pill pill--setup">Not graded</span>
+        </p>
+      </li>
+    </ol>
+  </section>
+
+  <!-- ============ Video + transcript ============ -->
+  <section aria-labelledby="video-heading">
+    <h2 id="video-heading">The walkthrough video</h2>
+    <p>Twenty-three minutes, start to finish: downloading the files, saving your copy, all fifteen steps, then
+      uploading and reading the graded report. If you're stuck on one step, use the topic index below rather than
+      scrubbing through.</p>
+
+    <div class="video-row">
+      <div class="video-col">
+        <div class="video-frame" id="video-container">
+          <iframe id="youtube-player"
+                  src="https://www.youtube.com/embed/7uO-g60dJ9g?enablejsapi=1&amp;cc_load_policy=1&amp;iv_load_policy=3&amp;modestbranding=1&amp;rel=0"
+                  title="CSC 104 Word Module 2 Guided Assignment Walkthrough"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  referrerpolicy="strict-origin-when-cross-origin"
+                  allowfullscreen loading="lazy"></iframe>
+        </div>
+        <p class="video-caption">Closed captions are on by default. Select any line of the transcript to jump the
+          video to that moment.</p>
+      </div>
+
+      <div class="transcript-col">
+        <div class="transcript-head">
+          <h3 id="transcript-heading">Transcript</h3>
+          <div class="transcript-search">
+            <label for="transcript-filter">Search the transcript</label>
+            <input type="search" id="transcript-filter" autocomplete="off" spellcheck="false"
+                   aria-describedby="transcript-filter-status">
+          </div>
+        </div>
+        <div class="transcript-panel" id="transcript-container" role="group" aria-labelledby="transcript-heading">
+          <p class="transcript-note">Loading transcript&hellip;</p>
+        </div>
+        <p class="sr-only" role="status" aria-live="polite" id="transcript-filter-status"></p>
+        <p class="sr-only" role="status" aria-live="polite" id="transcript-status"></p>
+        <p style="margin:0.5rem 0 0"><a href="#topic-index-heading">Skip past the transcript</a></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ Topic index ============ -->
+  <section aria-labelledby="topic-index-heading">
+    <h2 id="topic-index-heading">Find a moment in the video</h2>
+    <p><strong>Select any time below and the video jumps there.</strong> This is the detailed contents of the
+      walkthrough &mdash; if one step isn't working, come here, find it, and watch just that minute.</p>
+
+    <p id="topic-index-fallback" class="status" hidden></p>
+
+    <div class="topic-index topic-cols" id="topic-index">
+
+      <div class="topic-index__group">Getting started</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="0">0:00</button><span class="topic-index__label">What Module 2 is: creating a research paper</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="21">0:21</button><span class="topic-index__label">Why this is a re-recording, and why my screen has old attempts</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="44">0:44</button><span class="topic-index__label">Download All &mdash; the instruction file and the start file</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="55">0:55</button><span class="topic-index__label">Opening both files: Enable Editing, View &rsaquo; Page Width</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="92">1:32</button><span class="topic-index__label">Save As the _2 copy, so you can always start over</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="122">2:02</button><span class="topic-index__label">Turning on formatting marks</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="137">2:17</button><span class="topic-index__label">Check the bottom of the page for your own name</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="148">2:28</button><span class="topic-index__label">The scenario: an MLA report on visual communication</span></li>
+      </ul>
+
+      <div class="topic-index__group">Step 1 &mdash; the Normal style</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="167">2:47</button><span class="topic-index__label">What step 1 asks for, one piece at a time</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="183">3:03</button><span class="topic-index__label">Right-click Normal &rsaquo; Modify (don't retype the whole paper)</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="197">3:17</button><span class="topic-index__label">Setting the size, and why I use Format &rsaquo; Paragraph</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="212">3:32</button><span class="topic-index__label">Line spacing: Double</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="227">3:47</button><span class="topic-index__label">Spacing After down to zero</span></li>
+      </ul>
+
+      <div class="topic-index__group">Step 2 &mdash; the MLA heading block</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="250">4:10</button><span class="topic-index__label">Which four paragraphs: the name down to April 2027</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="264">4:24</button><span class="topic-index__label">Selecting them and clicking Normal</span></li>
+      </ul>
+
+      <div class="topic-index__group">Step 3 &mdash; the page-number header</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="280">4:40</button><span class="topic-index__label">What step 3 asks for: Plain Number 3 plus the last name</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="294">4:54</button><span class="topic-index__label">The header is grayed out &mdash; double-click to get into it</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="308">5:08</button><span class="topic-index__label">The Header &amp; Footer tab appears once you're inside</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="325">5:25</button><span class="topic-index__label">Page Number &rsaquo; Top of Page &rsaquo; Plain Number 3</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="339">5:39</button><span class="topic-index__label">Typing the last name and a space, then double-clicking back out</span></li>
+      </ul>
+
+      <div class="topic-index__group">Step 4 &mdash; first-line indents</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="362">6:02</button><span class="topic-index__label">What step 4 asks for, and where the body paragraphs start</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="377">6:17</button><span class="topic-index__label">Finding the last body paragraph</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="394">6:34</button><span class="topic-index__label">Paragraph dialog &rsaquo; Special &rsaquo; First line &rsaquo; 0.5"</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="409">6:49</button><span class="topic-index__label">What it looks like once it's applied</span></li>
+      </ul>
+
+      <div class="topic-index__group">Step 5 &mdash; replying to the comment</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="435">7:15</button><span class="topic-index__label">Copy the reply text, Paste Text Only, then Post Reply</span></li>
+      </ul>
+
+      <div class="topic-index__group">Steps 6&ndash;7 &mdash; the footnote</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="459">7:39</button><span class="topic-index__label">Step 6: a footnote that defines "histogram"</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="476">7:56</button><span class="topic-index__label">Copy the footnote text rather than typing it</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="505">8:25</button><span class="topic-index__label">Using Find when you can't locate the sentence</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="549">9:09</button><span class="topic-index__label">Finding the right sentence</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="570">9:30</button><span class="topic-index__label">References &rsaquo; Insert Footnote, then Paste Text Only</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="606">10:06</button><span class="topic-index__label">Step 7: modify the Footnote Text style</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="630">10:30</button><span class="topic-index__label">It isn't in the Styles gallery &mdash; right-click in the footnote instead</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="642">10:42</button><span class="topic-index__label">Confirming the style name really is Footnote Text</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="654">10:54</button><span class="topic-index__label">12 point, then Format &rsaquo; Paragraph</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="669">11:09</button><span class="topic-index__label">Double spacing and the half-inch first line</span></li>
+      </ul>
+
+      <div class="topic-index__group">Steps 8&ndash;9 &mdash; two kinds of citation</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="689">11:29</button><span class="topic-index__label">Step 8: a citation placeholder named Choi</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="708">11:48</button><span class="topic-index__label">Counting down to the third body paragraph</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="726">12:06</button><span class="topic-index__label">Insert Citation &rsaquo; Add New Placeholder</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="752">12:32</button><span class="topic-index__label">Step 9: a citation to the Westby source that's already there</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="767">12:47</button><span class="topic-index__label">Finding the sentence in the fourth body paragraph</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="785">13:05</button><span class="topic-index__label">Inserting it before the period</span></li>
+      </ul>
+
+      <div class="topic-index__group">Step 10 &mdash; the Thesaurus</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="797">13:17</button><span class="topic-index__label">What step 10 asks for: a synonym starting with S</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="818">13:38</button><span class="topic-index__label">Finding the sentence on page two</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="836">13:56</button><span class="topic-index__label">Review &rsaquo; Thesaurus</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="856">14:16</button><span class="topic-index__label">Scrolling for a word that starts with S</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="872">14:32</button><span class="topic-index__label">Clicking the word itself is the wrong move &mdash; undoing it</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="894">14:54</button><span class="topic-index__label">Use the word's down arrow &rsaquo; Insert to replace it</span></li>
+      </ul>
+
+      <div class="topic-index__group">Step 11 &mdash; the comment and a new website source</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="924">15:24</button><span class="topic-index__label">What step 11 asks for: delete the comment, then cite Table 1</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="942">15:42</button><span class="topic-index__label">You can't switch documents while the citation dialog is open</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="972">16:12</button><span class="topic-index__label">Noticing the footnote reply belonged here</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="992">16:32</button><span class="topic-index__label">Deleting the right comment</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1002">16:42</button><span class="topic-index__label">Add New Source &rsaquo; Web site &rsaquo; Corporate Author</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1032">17:12</button><span class="topic-index__label">Typing Design Group and Power of Infographics</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1062">17:42</button><span class="topic-index__label">The publication date, the access date, and Medium: Digital</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1077">17:57</button><span class="topic-index__label">Reading the whole dialog back before clicking OK</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1092">18:12</button><span class="topic-index__label">One typo will cost you the step</span></li>
+      </ul>
+
+      <div class="topic-index__group">Steps 12&ndash;15 &mdash; editing, deleting and listing sources</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1114">18:34</button><span class="topic-index__label">Step 12: edit the Zapata citation to add page 16</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1131">18:51</button><span class="topic-index__label">Right-click &rsaquo; Edit Citation, and the Pages box</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1144">19:04</button><span class="topic-index__label">Step 13: delete the Linear source</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1161">19:21</button><span class="topic-index__label">Manage Sources, and the duplicate in my own list</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1189">19:49</button><span class="topic-index__label">Step 14: replace "structure" with "layout"</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1203">20:03</button><span class="topic-index__label">Home &rsaquo; Replace &rsaquo; Replace All &mdash; two replacements</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1229">20:29</button><span class="topic-index__label">Step 15: the blank paragraph after Works Cited</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1245">20:45</button><span class="topic-index__label">References &rsaquo; Bibliography &rsaquo; Insert Bibliography, no title</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1264">21:04</button><span class="topic-index__label">Comparing your Works Cited to the sample</span></li>
+      </ul>
+
+      <div class="topic-index__group">Submitting and your score</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1283">21:23</button><span class="topic-index__label">Save and close both files before you upload</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1313">21:53</button><span class="topic-index__label">Dropping the _2 file into MindTap and submitting</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1341">22:21</button><span class="topic-index__label">25 out of 25 &mdash; and what this sets up for the homework</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1353">22:33</button><span class="topic-index__label">Closing</span></li>
+      </ul>
+
+    </div>
+  </section>
+
+  <!-- ============ The steps ============ -->
+  <section aria-labelledby="steps-heading">
+    <h2 id="steps-heading">The assignment, step by step</h2>
+    <p>Four setup items, then the fifteen graded steps, then submitting. Each one says <em>what</em> to change; the
+      time button next to it shows you <em>how</em>. <strong>Always go by the instruction file MindTap gave you</strong>
+      &mdash; the wording below is a summary, and MindTap grades against its own file.</p>
+
+    <div class="callout">
+      <p><strong>Copy and paste, don't retype.</strong> Four steps this week hand you exact text: the comment reply,
+        the footnote, the placeholder name and the website source details. A single typo in any of them loses the
+        whole step. Copy the text out of the instruction file and use
+        <span class="ui">Paste Text Only</span> so you don't drag formatting along with it.</p>
+      <p style="margin:0">The step numbers below are the ones spoken in the video. If your instruction file numbers
+        something differently, go by your file.</p>
+    </div>
+
+    <h3>Before you start</h3>
+    <ol class="todo">
+      <li>
+        <div class="todo__top">
+          <span class="todo__num todo__num--setup" aria-hidden="true">A</span>
+          <p class="todo__title">Download both files</p>
+        </div>
+        <div class="todo__body">
+          <p>An instruction file and a start file with your name in it, ending in <span class="mono">_1</span>. There
+            are no support files this week. They land in your Downloads folder.</p>
+        </div>
+        <p class="todo__meta"><button type="button" class="pill pill--time" data-seek="44">0:44</button></p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num todo__num--setup" aria-hidden="true">B</span>
+          <p class="todo__title">Open the instruction file and read it</p>
+        </div>
+        <div class="todo__body">
+          <p>Select <span class="ui">Enable Editing</span>, then <span class="ui">View &rsaquo; Page Width</span> to
+            make it readable. Keep it open in a second window the whole time &mdash; this week you'll be copying text
+            out of it repeatedly.</p>
+        </div>
+        <p class="todo__meta"><button type="button" class="pill pill--time" data-seek="55">0:55</button></p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num todo__num--setup" aria-hidden="true">C</span>
+          <p class="todo__title">Open the start file and save it as the _2 version</p>
+        </div>
+        <div class="todo__body">
+          <p><span class="ui">Enable Editing</span>, then <span class="ui">File &rsaquo; Save As</span>. Leave it in
+            Downloads, change the <span class="mono">1</span> in the file name to a <span class="mono">2</span>, and
+            save. <strong>Everything you do from here goes in the <span class="mono">_2</span> file</strong> &mdash;
+            that's the one you submit, and the <span class="mono">_1</span> file stays clean in case you want to
+            restart.</p>
+        </div>
+        <p class="todo__meta"><button type="button" class="pill pill--time" data-seek="92">1:32</button></p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num todo__num--setup" aria-hidden="true">D</span>
+          <p class="todo__title">Turn on formatting marks, and check that it's your file</p>
+        </div>
+        <div class="todo__body">
+          <p><span class="ui">Home &rsaquo; &para;</span> shows paragraph and space marks, which makes the indent and
+            spacing steps much easier to see. Then scroll to the bottom of the page: it should say the file was
+            created specifically for <em>you</em>, by name. If it doesn't, delete it and download it again.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="122">2:02</button>
+          <button type="button" class="pill pill--time" data-seek="137">2:17</button>
+        </p>
+      </li>
+    </ol>
+
+    <h3>The fifteen graded steps</h3>
+    <ol class="todo">
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">1</span>
+          <p class="todo__title">Modify the Normal style</p>
+        </div>
+        <div class="todo__body">
+          <p>Right-click <strong>Normal</strong> in the Styles gallery and choose
+            <span class="ui">Modify</span>, then set all four of these:</p>
+          <ul>
+            <li>Font <strong>Times New Roman</strong></li>
+            <li>Size <strong>12</strong></li>
+            <li>Line spacing <strong>Double</strong></li>
+            <li>Spacing <strong>After: 0</strong> (no blank space after a paragraph)</li>
+          </ul>
+          <p>The spacing controls are easier to get right in <span class="ui">Format &rsaquo; Paragraph</span> at the
+            bottom of the Modify dialog than in the little buttons on the dialog itself. Modifying the style is the
+            whole point &mdash; don't select the text and format it directly, or later steps won't match.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="167">2:47</button>
+          <button type="button" class="pill pill--time" data-seek="212">3:32</button>
+        </p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">2</span>
+          <p class="todo__title">Apply the modified Normal style to the first four paragraphs</p>
+        </div>
+        <div class="todo__body">
+          <p>The MLA heading block at the top: the writer's name, the instructor, the course, and the date ending
+            <strong>April 2027</strong>. Select all four and click <strong>Normal</strong> in the Styles gallery, so
+            they pick up the settings from step 1.</p>
+        </div>
+        <p class="todo__meta"><button type="button" class="pill pill--time" data-seek="250">4:10</button></p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">3</span>
+          <p class="todo__title">Add the MLA page-number header</p>
+        </div>
+        <div class="todo__body">
+          <p>Double-click in the grayed-out header area at the top of the page. On the
+            <span class="ui">Header &amp; Footer</span> tab choose <span class="ui">Page Number &rsaquo; Top of
+            Page &rsaquo; Plain Number 3</span>. Then type the writer's <strong>last name and one space</strong>
+            <em>before</em> the page number. Double-click anywhere in the body to close the header.</p>
+          <p>That space matters &mdash; MLA wants <span class="mono">Lastname&nbsp;1</span>, not
+            <span class="mono">Lastname1</span>.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="280">4:40</button>
+          <button type="button" class="pill pill--time" data-seek="325">5:25</button>
+        </p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">4</span>
+          <p class="todo__title">First-line indent of 0.5" on all body paragraphs</p>
+        </div>
+        <div class="todo__body">
+          <p>From the paragraph that begins "As the term &hellip; suggests" through the last one, which ends
+            "&hellip; makes sense to the viewer." Select them all, open the
+            <span class="ui">Paragraph settings</span> dialog (the small arrow at the corner of the Paragraph group),
+            and under <strong>Indentation</strong> set <strong>Special: First line</strong>,
+            <strong>By: 0.5"</strong>.</p>
+          <p>Use the dialog, not the Tab key. Tabbing each paragraph looks the same on screen and grades as
+            wrong.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="362">6:02</button>
+          <button type="button" class="pill pill--time" data-seek="394">6:34</button>
+        </p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">5</span>
+          <p class="todo__title">Reply to the comment about the footnote</p>
+        </div>
+        <div class="todo__body">
+          <p>One of Professor Garcia's comments asks for a footnote. Reply to that comment with the exact text your
+            instruction file gives &mdash; in the video it's <span class="mono">I added a footnote</span> &mdash; then
+            select <span class="ui">Post Reply</span>. Copy the text out of the instruction file and use
+            <span class="ui">Paste Text Only</span> rather than typing it.</p>
+          <p>Post the reply on the comment that asks for the footnote. That is <em>not</em> the same comment as the one
+            step 11 tells you to delete.</p>
+        </div>
+        <p class="todo__meta"><button type="button" class="pill pill--time" data-seek="435">7:15</button></p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">6</span>
+          <p class="todo__title">Insert a footnote defining "histogram"</p>
+        </div>
+        <div class="todo__body">
+          <p>Find the sentence that begins "Statistical infographics distill &hellip;" and ends "&hellip; other types
+            of visual representations." Click <strong>after the period</strong>, then
+            <span class="ui">References &rsaquo; Insert Footnote</span> (the big <strong>AB</strong> button). Paste
+            the footnote text from your instruction file &mdash; in the video it says a histogram groups numbers into
+            ranges &mdash; using <span class="ui">Paste Text Only</span>.</p>
+          <p>Can't find the sentence? <span class="ui">Home &rsaquo; Find</span> and type a few words of it. Faster
+            than scrolling, and it's how the video does it.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="459">7:39</button>
+          <button type="button" class="pill pill--time" data-seek="505">8:25</button>
+          <button type="button" class="pill pill--time" data-seek="570">9:30</button>
+        </p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">7</span>
+          <p class="todo__title">Modify the Footnote Text style</p>
+        </div>
+        <div class="todo__body">
+          <p><strong>12 point</strong>, <strong>double</strong> line spacing, <strong>first line indent 0.5"</strong>
+            &mdash; the same three settings as the body text.</p>
+          <p><strong>Footnote Text isn't in the Styles gallery.</strong> Right-click inside the footnote text at the
+            bottom of the page, choose <span class="ui">Style</span>, confirm the box says
+            <strong>Footnote Text</strong>, then <span class="ui">Modify</span>. Set the size, use
+            <span class="ui">Format &rsaquo; Paragraph</span> for the spacing and indent, then
+            <span class="ui">Apply</span>.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="606">10:06</button>
+          <button type="button" class="pill pill--time" data-seek="630">10:30</button>
+        </p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">8</span>
+          <p class="todo__title">Insert a citation placeholder named Choi</p>
+        </div>
+        <div class="todo__body">
+          <p>In the <strong>third body paragraph</strong>, at the sentence about statistical infographics and a
+            tailor-made design firm: click <strong>before the period</strong>, then
+            <span class="ui">References &rsaquo; Insert Citation &rsaquo; Add New Placeholder</span> and enter
+            <span class="mono">Choi</span> as the placeholder name.</p>
+          <p>Count the body paragraphs from the start of the report &mdash; the heading block at the top doesn't
+            count.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="689">11:29</button>
+          <button type="button" class="pill pill--time" data-seek="726">12:06</button>
+        </p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">9</span>
+          <p class="todo__title">Insert a citation to the existing Westby source</p>
+        </div>
+        <div class="todo__body">
+          <p>In the <strong>fourth body paragraph</strong>, at the sentence about comparison infographics comparing
+            products or services: click <strong>before the period</strong>, then
+            <span class="ui">References &rsaquo; Insert Citation</span> and pick <strong>Westby</strong> from the list
+            of sources already in the document. This one is a pick, not a new entry &mdash; don't retype it as a new
+            source.</p>
+        </div>
+        <p class="todo__meta"><button type="button" class="pill pill--time" data-seek="752">12:32</button></p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">10</span>
+          <p class="todo__title">Replace "present" with a synonym starting with S</p>
+        </div>
+        <div class="todo__body">
+          <p>On page two, the sentence beginning "Process infographics present &hellip;". Click in the word
+            <strong>present</strong>, then <span class="ui">Review &rsaquo; Thesaurus</span> and scroll for a
+            suggestion that starts with <strong>s</strong> &mdash; <strong>show</strong> is the one that fits.</p>
+          <p><strong>Don't click the word in the Thesaurus pane</strong> &mdash; that just looks it up again. Hover
+            over it, use the <strong>down arrow</strong> that appears at its right, and choose
+            <span class="ui">Insert</span>. The video gets this wrong first and undoes it.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="797">13:17</button>
+          <button type="button" class="pill pill--time" data-seek="894">14:54</button>
+        </p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">11</span>
+          <p class="todo__title">Delete a comment, then cite a new website source</p>
+        </div>
+        <div class="todo__body">
+          <p>Two things, on the sentence about <strong>65% of viewers</strong>:</p>
+          <ul>
+            <li>Read the comment attached to that sentence, then <strong>delete</strong> it
+              (<span class="ui">Review &rsaquo; Delete Comment</span>, or the comment's own menu).</li>
+            <li>Click <strong>before the period</strong> and add a <strong>new source</strong> from the information in
+              <strong>Table 1</strong>: <span class="ui">References &rsaquo; Insert Citation &rsaquo; Add New
+              Source</span>, <strong>Type of Source: Web site</strong>, then tick
+              <strong>Corporate Author</strong> and fill in the rest.</li>
+          </ul>
+          <p>In the video the values are <span class="mono">Design Group</span> /
+            <span class="mono">Power of Infographics</span> / published <span class="mono">2027, March, 10</span> /
+            accessed <span class="mono">2027, April, 20</span> / <span class="mono">Medium: Digital</span>. Take yours
+            from your own Table 1 and read the dialog back before clicking OK &mdash; a typo here loses the step.</p>
+          <p><strong>Open the instruction file on a second screen or window first.</strong> Once the citation dialog
+            is open you can't switch documents to go look something up.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="924">15:24</button>
+          <button type="button" class="pill pill--time" data-seek="1002">16:42</button>
+          <button type="button" class="pill pill--time" data-seek="1077">17:57</button>
+        </p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">12</span>
+          <p class="todo__title">Edit the Zapata citation to add page 16</p>
+        </div>
+        <div class="todo__body">
+          <p>In the next paragraph, right-click the <strong>Zapata</strong> citation and choose
+            <span class="ui">Edit Citation</span>. Put <span class="mono">16</span> in the <strong>Pages</strong>
+            box and select OK. <span class="ui">Edit Citation</span>, not Edit Source &mdash; the page number belongs
+            to this one reference, not to the source itself.</p>
+        </div>
+        <p class="todo__meta"><button type="button" class="pill pill--time" data-seek="1114">18:34</button></p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">13</span>
+          <p class="todo__title">Delete the Linear source from the source list</p>
+        </div>
+        <div class="todo__body">
+          <p><span class="ui">References &rsaquo; Manage Sources</span>, select <strong>Linear</strong> in the current
+            list, and <span class="ui">Delete</span>. It isn't cited in the paper, so it shouldn't appear in the
+            bibliography you build in step 15 &mdash; which is why this comes before it.</p>
+        </div>
+        <p class="todo__meta"><button type="button" class="pill pill--time" data-seek="1144">19:04</button></p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">14</span>
+          <p class="todo__title">Replace every "structure" with "layout"</p>
+        </div>
+        <div class="todo__body">
+          <p><span class="ui">Home &rsaquo; Replace</span>. <strong>Find what:</strong>
+            <span class="mono">structure</span>. <strong>Replace with:</strong> <span class="mono">layout</span>.
+            Then <span class="ui">Replace All</span> &mdash; it should report <strong>2 replacements</strong>. If you
+            get a different number, close the dialog and check you didn't leave stray text in either box.</p>
+        </div>
+        <p class="todo__meta"><button type="button" class="pill pill--time" data-seek="1189">19:49</button></p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">15</span>
+          <p class="todo__title">Insert the bibliography with no built-in heading</p>
+        </div>
+        <div class="todo__body">
+          <p>Scroll to the blank paragraph at the very end of the document, below the existing
+            <strong>Works Cited</strong> heading. Then
+            <span class="ui">References &rsaquo; Bibliography</span> and pick <strong>Insert Bibliography</strong>
+            &mdash; the plain command at the bottom of the menu, <em>not</em> the "Bibliography" or "Works Cited"
+            gallery entries above it. Those come with their own heading, and the document already has one.</p>
+          <p>Compare the result against the sample in the instruction file. It should list your sources and look
+            identical.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="1229">20:29</button>
+          <button type="button" class="pill pill--time" data-seek="1264">21:04</button>
+        </p>
+      </li>
+    </ol>
+
+    <h3>Submitting</h3>
+    <ol class="todo">
+      <li>
+        <div class="todo__top">
+          <span class="todo__num todo__num--setup" aria-hidden="true">E</span>
+          <p class="todo__title">Save and close both files</p>
+        </div>
+        <div class="todo__body">
+          <p>Save the <span class="mono">_2</span> file, close it, and close the instruction file too. A file still
+            open in Word can upload incomplete.</p>
+        </div>
+        <p class="todo__meta"><button type="button" class="pill pill--time" data-seek="1283">21:23</button></p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num todo__num--setup" aria-hidden="true">F</span>
+          <p class="todo__title">Upload the _2 file and select Submit</p>
+        </div>
+        <div class="todo__body">
+          <p>Drag and drop it into MindTap. Sorting your Downloads folder by <strong>Date Modified</strong> puts the
+            file you just saved at the top.</p>
+        </div>
+        <p class="todo__meta"><button type="button" class="pill pill--time" data-seek="1313">21:53</button></p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num todo__num--setup" aria-hidden="true">G</span>
+          <p class="todo__title">Open the Graded Summary Report</p>
+        </div>
+        <div class="todo__body">
+          <p>It lists every step with the points it earned. <strong>Read it even if you got 25 out of 25</strong>
+            &mdash; and if you didn't, it names the step to fix before your next attempt. With fifteen steps and ten
+            attempts, there's no reason to leave points on this one.</p>
+        </div>
+        <p class="todo__meta"><button type="button" class="pill pill--time" data-seek="1341">22:21</button></p>
+      </li>
+    </ol>
+  </section>
+
+  <!-- ============ Platform tabs ============ -->
+  <section aria-labelledby="platform-heading">
+    <h2 id="platform-heading">Windows and Mac differences</h2>
+    <p>The steps are the same on both, but this week has more real differences than last week's flyer did &mdash;
+      citations and the Thesaurus are the two places Mac Word genuinely diverges. Pick your platform.</p>
+
+    <div class="tabs">
+      <div class="tablist" role="tablist" aria-label="Choose your platform">
+        <button type="button" class="tab" role="tab" id="tab-win" aria-controls="panel-win" aria-selected="true">Windows</button>
+        <button type="button" class="tab" role="tab" id="tab-mac" aria-controls="panel-mac" aria-selected="false" tabindex="-1">Mac</button>
+      </div>
+
+      <div class="tabpanel" role="tabpanel" id="panel-win" aria-labelledby="tab-win" tabindex="0">
+        <h3>On Windows</h3>
+        <ul style="max-width:none">
+          <li><strong>Enable Editing.</strong> Downloaded files open in Protected View with a yellow bar across the
+            top. You must select <span class="ui">Enable Editing</span> before anything works.</li>
+          <li><strong>Formatting marks:</strong> <span class="mono">Ctrl+Shift+8</span>, or the
+            <span class="ui">&para;</span> button in the Home tab's Paragraph group.</li>
+          <li><strong>Paste Text Only:</strong> paste, then use the small clipboard button that appears and choose
+            the <strong>A</strong> icon. Or <span class="mono">Ctrl+Alt+V</span> &rsaquo;
+            <span class="ui">Unformatted Text</span>.</li>
+          <li><strong>Managing sources:</strong> <span class="ui">References &rsaquo; Manage Sources</span> opens the
+            Source Manager, with the master list on the left and this document's list on the right. Delete
+            <strong>Linear</strong> from the <em>current</em> list.</li>
+          <li><strong>Find and Replace:</strong> <span class="mono">Ctrl+H</span>. Undo is
+            <span class="mono">Ctrl+Z</span>; redo is <span class="mono">Ctrl+Y</span>.</li>
+          <li><strong>Finding your file:</strong> File Explorer, <span class="ui">View &rsaquo; Details</span>, then
+            click the <span class="ui">Date modified</span> heading to sort newest first.</li>
+        </ul>
+      </div>
+
+      <div class="tabpanel" role="tabpanel" id="panel-mac" aria-labelledby="tab-mac" tabindex="0" hidden>
+        <h3>On Mac</h3>
+        <p>Cengage's material is written for Windows. Most of this assignment matches, but check these before you
+          decide something is broken. I've done these assignments on a Mac myself &mdash; if a command genuinely
+          isn't where I say it is, message me through the Canvas Inbox rather than guessing at a substitute.</p>
+        <ul style="max-width:none">
+          <li><strong>No Protected View.</strong> There's no Enable Editing bar &mdash; the file opens ready to
+            edit.</li>
+          <li><strong>Modifying a style:</strong> open the <span class="ui">Styles Pane</span> from the Home tab,
+            then Control-click (or right-click) <strong>Normal</strong> &rsaquo;
+            <span class="ui">Modify Style</span>. Same dialog, same <span class="ui">Format &rsaquo;
+            Paragraph</span> button at the bottom.</li>
+          <li><strong>Formatting marks:</strong> <span class="mono">&#8984;+8</span>.</li>
+          <li><strong>The page number:</strong> recent versions of Word for Mac have the same
+            <span class="ui">Header &amp; Footer</span> tab and <span class="ui">Plain Number 3</span> gallery. If
+            yours only offers <span class="ui">Insert &rsaquo; Page Numbers&hellip;</span>, set
+            <strong>Position: Top of page</strong> and <strong>Alignment: Right</strong> &mdash; that's the same
+            result.</li>
+          <li><strong>Paste Text Only:</strong> <span class="ui">Edit &rsaquo; Paste Special</span>
+            (<span class="mono">&#8984;+Ctrl+V</span>) &rsaquo; <strong>Unformatted Text</strong>.</li>
+          <li><strong>Managing sources</strong> is the big one. <span class="ui">References &rsaquo; Citations</span>
+            opens a <strong>Citations pane</strong> rather than the Windows Source Manager. The full list lives
+            behind the pane's <span class="ui">settings (gear) &rsaquo; Citation Source Manager</span>, and that's
+            where you delete <strong>Linear</strong>. <span class="ui">Edit Citation</span> for the Zapata page
+            number is on the citation's own drop-down in the document, same as Windows.</li>
+          <li><strong>Thesaurus:</strong> <span class="ui">Review &rsaquo; Thesaurus</span>, or
+            <span class="ui">Tools &rsaquo; Thesaurus</span>. The list works the same way &mdash; hover a word, use
+            its arrow, choose <span class="ui">Insert</span>.</li>
+          <li><strong>Find and Replace:</strong> <span class="mono">&#8984;+Shift+H</span>, or
+            <span class="ui">Edit &rsaquo; Find &rsaquo; Replace&hellip;</span>. Undo is
+            <span class="mono">&#8984;+Z</span>; redo is <span class="mono">&#8984;+Y</span>.</li>
+          <li><strong>Finding your file:</strong> Finder &rsaquo; Downloads, switch to
+            <span class="ui">List</span> view, then click <span class="ui">Date Modified</span> to sort newest
+            first.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ Corrections ============ -->
+  <section aria-labelledby="corrections-heading">
+    <h2 id="corrections-heading">Since this was recorded</h2>
+    <p>A few things will look different on your screen than they do on mine. <strong>Where this page and the video
+      disagree, this page is right.</strong></p>
+
+    <div class="callout callout--warn callout--wide">
+      <ul style="margin:0; max-width:none">
+        <li><strong>This is take three.</strong> The audio didn't record the first time, so by the time you see me I
+          already have several Graded Summary Reports and a submitted file sitting there. Your list will be empty the
+          first time through &mdash; that's normal. <em>(Video 0:21 and 21:53.)</em></li>
+        <li><strong>I post the comment reply out of order.</strong> I do step 5's reply at 7:15, before the footnote
+          exists, and then at 16:12 I realize it probably belonged with the step 11 comment. The grader only cares
+          that the right comment carries the right reply and that the step 11 comment is deleted &mdash; so follow
+          your instruction file's order rather than mine. <em>(Video 7:15 and 16:12.)</em></li>
+        <li><strong>The duplicate source in my list.</strong> At 19:21 I have two "Power of Infographics" sources
+          because one of my earlier attempts had a typo in it. You should have exactly one. If you see duplicates,
+          delete the wrong one before you insert the bibliography.</li>
+        <li><strong>Sentences and names, as spoken.</strong> I read several of the sentences, source names and the
+          footnote text out loud, and the audio garbles a few of them. Go by your instruction file for the exact
+          wording of every sentence, name, date and footnote &mdash; and copy-paste rather than typing.</li>
+        <li><strong>The dates belong to the scenario, not to us.</strong> April 2027, March 10 2027 and the April 20
+          2027 access date are part of the assignment's fictional research paper. They have nothing to do with our
+          semester &mdash; enter them exactly as Table 1 and the instruction file give them.</li>
+        <li><strong>Module release.</strong> Modules post on the Friday before the week begins, so Week 4 opened
+          <strong>Friday 9/18</strong>. You can start early.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ AI policy ============ -->
+  <section aria-labelledby="ai-heading">
+    <h2 id="ai-heading">Using AI on this assignment</h2>
+    <p>The course AI policy is <strong>Limited</strong>. You can ask an AI tool to explain what a command does, to
+      tell you where something lives on the Mac ribbon when the video shows Windows, to troubleshoot an error, or to
+      quiz you afterward. <strong>You build the Word file yourself.</strong> Spell check, grammar check and the
+      Thesaurus are ordinary Word features and are always allowed &mdash; step 10 is asking you to use one.</p>
+    <p>The practical reason: the 200-point Word Project in Week 6 assumes you can insert a citation, modify a style
+      and build a bibliography from memory. Watching someone else's paper get formatted is not the same as formatting
+      one.</p>
+  </section>
+
+  <!-- ============ What's next ============ -->
+  <section aria-labelledby="next-heading">
+    <h2 id="next-heading">What's next</h2>
+    <p>Once the guided assignment is submitted, go straight to the <strong>Word Module 2 homework</strong> in MindTap
+      &mdash; same commands, different document, no walkthrough, 100 points. Week 5 continues with Word, and the
+      pattern repeats: guided first, homework second.</p>
+    <p>Stuck on a step after re-watching it? Send me a message in the Canvas Inbox and say which step number and what
+      you tried. That's faster than burning attempts.</p>
+  </section>
+
+  <!-- ============ Quick reference ============ -->
+  <section aria-labelledby="reference-heading">
+    <h2 id="reference-heading">Quick reference</h2>
+    <div class="table-scroll" tabindex="0" role="region" aria-label="Quick reference table, scrollable">
+      <table>
+        <caption>Every value this assignment asks for, in one place. Confirm each one against your own instruction
+          file.</caption>
+        <thead>
+          <tr><th scope="col">Step</th><th scope="col">Where it lives</th><th scope="col">Exact setting</th></tr>
+        </thead>
+        <tbody>
+          <tr><th scope="row">1. Normal style</th><td>Home &rsaquo; Styles &rsaquo; right-click Normal &rsaquo; Modify</td><td>Times New Roman, 12 pt, line spacing Double, spacing After 0</td></tr>
+          <tr><th scope="row">2. Heading block</th><td>Home &rsaquo; Styles</td><td>Normal applied to the first four paragraphs (name &rarr; April 2027)</td></tr>
+          <tr><th scope="row">3. Page number</th><td>Header &amp; Footer &rsaquo; Page Number &rsaquo; Top of Page</td><td>Plain Number 3, then the last name <strong>and a space</strong> before the number</td></tr>
+          <tr><th scope="row">4. Body paragraphs</th><td>Home &rsaquo; Paragraph settings &rsaquo; Indentation</td><td>Special: First line, By 0.5"</td></tr>
+          <tr><th scope="row">5. Comment reply</th><td>Review &rsaquo; Comments</td><td>The reply text from your instruction file, then Post Reply</td></tr>
+          <tr><th scope="row">6. Footnote</th><td>References &rsaquo; Insert Footnote</td><td>After the period in the "Statistical infographics distill&hellip;" sentence; the histogram definition from your file</td></tr>
+          <tr><th scope="row">7. Footnote Text style</th><td>Right-click in the footnote &rsaquo; Style &rsaquo; Modify</td><td>12 pt, Double, first line 0.5"</td></tr>
+          <tr><th scope="row">8. Placeholder</th><td>References &rsaquo; Insert Citation &rsaquo; Add New Placeholder</td><td><span class="mono">Choi</span> &mdash; third body paragraph, before the period</td></tr>
+          <tr><th scope="row">9. Existing source</th><td>References &rsaquo; Insert Citation</td><td>Westby &mdash; fourth body paragraph, before the period</td></tr>
+          <tr><th scope="row">10. Synonym</th><td>Review &rsaquo; Thesaurus</td><td>"present" &rarr; "show", via the word's down arrow &rsaquo; Insert</td></tr>
+          <tr><th scope="row">11a. Comment</th><td>Review &rsaquo; Delete Comment</td><td>Read, then delete, the comment on the "65% of viewers" sentence</td></tr>
+          <tr><th scope="row">11b. New source</th><td>References &rsaquo; Insert Citation &rsaquo; Add New Source</td><td>Web site; Corporate Author <span class="mono">Design Group</span>; <span class="mono">Power of Infographics</span>; 2027, March, 10; accessed 2027, April, 20; Medium Digital</td></tr>
+          <tr><th scope="row">12. Edit citation</th><td>Right-click the Zapata citation &rsaquo; Edit Citation</td><td>Pages: <span class="mono">16</span></td></tr>
+          <tr><th scope="row">13. Delete a source</th><td>References &rsaquo; Manage Sources</td><td>Remove <strong>Linear</strong> from the current list</td></tr>
+          <tr><th scope="row">14. Find and replace</th><td>Home &rsaquo; Replace</td><td><span class="mono">structure</span> &rarr; <span class="mono">layout</span>, Replace All (2 replacements)</td></tr>
+          <tr><th scope="row">15. Bibliography</th><td>References &rsaquo; Bibliography &rsaquo; Insert Bibliography</td><td>In the blank paragraph after Works Cited, with no built-in heading</td></tr>
+          <tr><th scope="row">File name</th><td>File &rsaquo; Save As</td><td>The <span class="mono">_2</span> version, in Downloads</td></tr>
+          <tr><th scope="row">Submission</th><td>MindTap</td><td>Upload the <span class="mono">_2</span> file, select Submit, read the Graded Summary Report</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <p class="footnote">CSC 104 &middot; Computers and Computer Applications &middot; Fall 2026, Section 0840 &middot;
+    Mendocino College &middot; Instructor: David Pai &middot; <span class="mono">dpai@mendocino.edu</span>.
+    Nothing you type on this page is saved or submitted. Use the Canvas navigation outside this page to get back to
+    the Week 4 module.</p>
+</main>
+
+<script>
+(function () {
+  "use strict";
+
+  var VIDEO_ID = "7uO-g60dJ9g";
+
+  /* Transcript source: weeks/week04/csc104-word-2-guided-corrected.vtt — the
+     Whisper output with its hallucinated and non-English passages removed, its
+     repeated and duplicate cues collapsed, and its Word command names, proper
+     nouns and punctuation restored. Inlined rather than fetched so this page
+     stays self-contained inside the Canvas iframe. Keep the two copies in step:
+     if the YouTube captions are re-uploaded from the .vtt, re-paste it here
+     too. */
+  var vttContent = `WEBVTT
+
+NOTE
+CSC 104 — Week 4 — Word Module 2 Guided Assignment Walkthrough (YouTube 7uO-g60dJ9g)
+Corrected transcript. Source: csc104_wk4_word_2.vtt (Whisper output).
+Cleanup applied: hallucinated and non-English word-salad blocks removed (the
+Portuguese fragment at ~6:49, the "Nature X / poor sensitivity" block at
+~13:15, and the Korean/English garble at ~18:11 that repeats the citation
+read-back); repeated single-word cues collapsed (the four "statistical" cues
+while typing in Find, 8:39–9:06, and the stray "you"/"okay"/"into" filler at
+6:16, 8:19, 9:07 and 9:59); exact duplicate cue pairs collapsed (10:35, 10:42,
+10:48, 10:54) and the misplaced duplicate of the footnote-style line at 12:17
+removed; stutter duplicates collapsed (14:32, 19:33); sentence casing and
+punctuation restored throughout; Word command names and proper nouns corrected
+(Times New Roman, Normal, Plain Number 3, Header & Footer, Insert Footnote,
+Footnote Text, Paste Text Only, Insert Citation, Add New Placeholder, Add New
+Source, Corporate Author, Manage Sources, Thesaurus, Replace All, Insert
+Bibliography, Works Cited, MLA, MindTap, Cengage, Graded Summary Report, Choi,
+Westby, Zapata, Linear, Design Group, Power of Infographics, Professor Garcia);
+short cues merged into readable 1–2 sentence lines; timestamps normalized to
+HH:MM:SS.mmm. Sentence wording the instructor reads aloud is garbled in the
+source in several places and is given here as a recognizable description rather
+than reconstructed word for word. The instructor's voice and hedges are
+preserved, including the moment at 16:12 where he notices he posted the comment
+reply out of order.
+
+00:00:00.040 --> 00:00:21.360
+Aloha. So in this video I'm going to do the guided portion — the video for the Module 2 project. Module 2 is creating a research paper.
+
+00:00:21.360 --> 00:00:44.560
+So you're going to click on it and open the file, or open it in Cengage. And you'll see, when I go through this, that I have some things I've already done — because I recorded this video and the audio wasn't recorded when I did it, so I'm doing it over.
+
+00:00:44.560 --> 00:00:55.180
+All right, so we're going to start. You can see I have all these Graded Summary Reports already. Well, it's okay — we're going to do a new one. Download All, because we need the instructions and we need our starting file.
+
+00:00:55.560 --> 00:01:32.940
+Okay, I'll go to those files. Here is my instruction file — open that, I'll Enable Editing, and I'll use View › Page Width to make it all big. Then I'll open up my starter file and do the same thing: Enable Editing, View › Page Width. This one's going to be a little bit smaller, because it's a little bit smaller than the instructions. And I have these notes from the professor here.
+
+00:01:32.940 --> 00:01:54.500
+Okay, so the first thing I want to do is rename my file. Rather than just renaming it, what I like to do is a File › Save As. So now I'll have two copies of it: one labeled underscore one and one labeled underscore two. And if I want to start over, I can just go back to underscore one and start over.
+
+00:01:54.500 --> 00:02:02.620
+Okay, so File › Save As. Save it in the same directory, click on it, change the one to a two, and say Save.
+
+00:02:02.620 --> 00:02:17.880
+Okay. Again, as I said before in the other videos, I always show my paragraph marks — all my formatting marks — so that will be there.
+
+00:02:17.880 --> 00:02:28.620
+Okay. Make sure that your last name is displayed in the footer, so you scroll down to the bottom of the page. You should see that this file was created specifically for your name.
+
+00:02:28.620 --> 00:02:47.880
+Okay, so this is a research report on visual communication for your business communications class. You must write in MLA style and incorporate the suggestions from your instructor, Professor Garcia. The first thing is to modify the Normal style by changing its font to Times New Roman.
+
+00:02:47.880 --> 00:03:03.820
+Size 12, with double line spacing and no blank space after the paragraph. Okay, so we're going to be in here, anywhere in here — let me click somewhere in the page.
+
+00:03:03.820 --> 00:03:17.620
+And we're on Home, and here's Normal. I like to right-click and go to Modify. So what we want is our font — I already have it, but you can start typing it: Times New Roman.
+
+00:03:17.880 --> 00:03:32.780
+Size 12 — I'll change the size to 12. And now you could use some of these other paragraph and indent controls, but I like to do it through the Format › Paragraph dialog, because it's easier for you to see.
+
+00:03:32.780 --> 00:03:47.840
+Line spacing: Double. Yeah, so we have that right. Oh — and no space after.
+
+00:03:47.880 --> 00:04:10.260
+So we're going to click the After down to zero, and say OK, and OK. Okay, so: no space, double-spaced lines, 12 point, and Times New Roman.
+
+00:04:10.260 --> 00:04:24.480
+Okay, so apply this modified Normal style — the new Normal style — to the first four paragraphs, from the writer's name at the top down to April 2027. Okay, so that means these four here, the four paragraphs at the beginning, and we want to find Normal.
+
+00:04:24.480 --> 00:04:40.200
+Okay, just to make sure, let's select everything: Normal. Okay, so they're now Normal, just like everything else.
+
+00:04:40.200 --> 00:04:54.240
+Insert a Plain Number 3 page number at the top of the page. Add the last name, Mana, and a space before the page number. Then you can close the Header & Footer tab.
+
+00:04:54.240 --> 00:05:08.780
+All right, so to include something in the header — the header's up here at the top, and it's grayed out when you're working in the document. So to get into the header, the easiest way is just to double-click, and you'll see it says Header.
+
+00:05:08.780 --> 00:05:25.080
+All right. If you want to insert a header, you can go to Insert › Header or Footer. But once we're in there, there's a new Header & Footer tab, or menu item.
+
+00:05:25.080 --> 00:05:39.380
+And we want to insert a page number at the top of our page, and we use the Plain Number 3 style.
+
+00:05:39.380 --> 00:05:57.540
+Okay, and then we're going to type the word Mana and a space after it. And then we can double-click out of it — double-click anywhere on the page outside of the header — and you're back on the normal page.
+
+00:05:57.540 --> 00:06:02.520
+Okay, so I didn't close it, I just double-clicked out of it, which essentially closes it.
+
+00:06:02.520 --> 00:06:16.600
+Okay. Create a first-line indent of a half inch for all body paragraphs, beginning with the one that starts "As the term … suggests" and ending with the one that ends "… makes sense to the viewer." Okay, so: first-line indent, half an inch, from "As the term suggests" all the way down…
+
+00:06:17.280 --> 00:06:34.840
+… to this last paragraph, "… makes sense to the viewer." Okay, so these are indented in a way that doesn't do what we want.
+
+00:06:34.840 --> 00:06:49.000
+So we're going to click the Paragraph settings dialog launcher in the corner, and we're going to go to Special and choose First line, and it's half an inch. Take the default there and we'll say OK.
+
+00:06:49.240 --> 00:07:14.560
+And it will apply it to the first line of every paragraph. Now we'll have a half-inch indent.
+
+00:07:15.360 --> 00:07:39.120
+The comment says to add a footnote, so I'm going to copy that. I'll copy the reply text — "I added a footnote" — to make sure I don't mistype it. Then in the comment I'll Paste Text Only: "I added a footnote." Then I'm going to click Post Reply. So I have made my reply.
+
+00:07:39.120 --> 00:07:56.800
+So: find the sentence that begins "Statistical infographics distill …" — blah blah blah — "… types of visual representations." After the period in that sentence, insert a footnote with the following text, to define the term histogram.
+
+00:07:56.800 --> 00:08:07.360
+"A histogram groups numbers into ranges." Okay, so we're going to insert a footnote. I'm going to copy this, and this is going to be the text we add to it.
+
+00:08:09.120 --> 00:08:19.680
+"Statistical infographics distill … types of visual representations." Okay.
+
+00:08:25.360 --> 00:08:38.880
+Okay, so if you ever have a problem finding something, we can search for it. So you just use Find — let's say "statistic."
+
+00:08:39.920 --> 00:09:09.120
+"Statistical." Okay, here's the one. So it's "Statistical infographics distill …"
+
+00:09:09.120 --> 00:09:30.180
+"… into pie charts and other types of visual representations." And the instruction says after the period. So then we can close Find, because we found it. It says: after the period, insert a footnote with the following text.
+
+00:09:30.180 --> 00:09:59.700
+Okay, so I'm here, after this — here's the sentence. I want to be after the period. I'm going to go to References › Insert Footnote, which is the big AB, Insert Footnote. And so it puts in a number, and at the bottom of the page I can now paste in. And I want to paste just the text.
+
+00:10:00.160 --> 00:10:06.540
+"A histogram groups numbers into ranges."
+
+00:10:06.540 --> 00:10:30.160
+Okay. Modify the Footnote Text style to change its font to 12 point, double line spacing, and that half-inch first line. Okay, so typically what you can do is: styles are here, and you can check to see if there's a footnote style there. Okay.
+
+00:10:30.160 --> 00:10:42.560
+There isn't one. So what we're going to do instead is just right-click anywhere in this text in the footnotes area, and we'll click on Style.
+
+00:10:42.560 --> 00:10:54.120
+That'll bring up the style of what it is. It should say Footnote Text — that's a style name. We're going to modify it.
+
+00:10:54.120 --> 00:11:09.600
+Okay, and now we're going to modify it. We make it 12 point. And then I'm going to click on Format for the paragraph, and we're going to make it Double.
+
+00:11:09.600 --> 00:11:29.440
+Okay, and First line, half an inch. Say OK, OK, and Apply. And that made it double-spaced and indented a half inch. All right, so we did that.
+
+00:11:29.440 --> 00:11:44.160
+Okay. In the third body paragraph — number eight — before the period at the end of the sentence about statistical infographics and a tailor-made design firm, insert a citation placeholder using Choi as the name of the placeholder.
+
+00:11:44.160 --> 00:11:47.800
+Copy Choi.
+
+00:11:48.040 --> 00:12:06.940
+"… tailor-made design firm." Third body paragraph: okay, first paragraph, second paragraph, third — "tailor-made design firm" — before the period.
+
+00:12:06.940 --> 00:12:17.960
+References › Insert Citation › Add New Placeholder, and Ctrl+V to paste the word Choi in there, and say OK.
+
+00:12:18.000 --> 00:12:32.700
+Okay, and then put in Choi. All right, so that was eight: insert Choi as a citation placeholder.
+
+00:12:32.700 --> 00:12:47.920
+In the fourth body paragraph, insert a citation to the existing Westby source, before the period at the end of the sentence about comparison infographics comparing products or services.
+
+00:12:47.920 --> 00:13:05.560
+Okay, so the other one — Choi — was the third. So the first line is this: "Comparison infographics compare products or services." So before the period we're going to insert a citation to Westby, the one that's already in here.
+
+00:13:05.560 --> 00:13:15.320
+So add that, and there it is, right here.
+
+00:13:17.760 --> 00:13:38.320
+Number 10, on page two. Okay: find the sentence "Process infographics present …", and replace the word "present" with a more appropriate synonym that begins with the letter S.
+
+00:13:38.320 --> 00:13:54.880
+Okay, so let's find "process infographics present" on page two. Here it is: "Process infographics present." And what we want to do is take this word "present."
+
+00:13:56.320 --> 00:14:16.240
+All right, and we're going to go to — it's in Review, there's a Thesaurus. We're going to click on the Thesaurus, and it's going to come up and give us a bunch of possible words we could use instead of "present."
+
+00:14:16.400 --> 00:14:32.080
+And then we're going to scroll, looking for something that starts with an S. "Stage," "show" — I think "show." "Process infographics show the main steps or actions." So we'll click on "show."
+
+00:14:32.080 --> 00:14:52.000
+Oops, let me undo that. Oh, let me undo that. Redo whatever we did. Let's close up the Thesaurus and let's do that over.
+
+00:14:54.400 --> 00:15:11.840
+Here it is — here's "present." Thesaurus. And when I get to "show," I don't want to click on it. What I do is click on this down arrow over here and go to Insert, to replace "present" with the word "show."
+
+00:15:12.720 --> 00:15:24.400
+All right, so I replaced it, and now there's "show" instead of "present." I'm going to close my Thesaurus.
+
+00:15:24.400 --> 00:15:41.840
+Number 11: read, and then delete, the comment attached to the sentence about 65% of viewers. And then it says, before the period of that sentence, insert a citation to a new source using information from Table 1.
+
+00:15:42.720 --> 00:16:01.940
+All right. I'm moving this to another screen so I can access that information, because once I open up the citation dialog I can't switch which Word document I'm working on. Okay, so right here — see this?
+
+00:16:12.720 --> 00:16:24.320
+Oops. I think this is when I'm supposed to put in the "I added a footnote" reply. Oops.
+
+00:16:32.380 --> 00:16:42.720
+That's the one we want — that one. This one we're going to delete. It's no longer in there.
+
+00:16:42.720 --> 00:17:12.020
+And at the 65% sentence, at the end here, we're going to add a new source for a website — that's where the information came from, a website source. Okay, so References › Insert Citation › Add New Source. Type: there are a bunch of different types; we want to make sure it's Web site. Author: it's not an individual, it's a group, so I'm going to click on Corporate Author.
+
+00:17:12.720 --> 00:17:42.600
+It's a picture, so I can't copy it: Design Group — D-E-S-I-G-N G-R-O-U-P. Okay. The name is Power of Infographics. The year is 2027, the month is March.
+
+00:17:42.720 --> 00:17:57.960
+The day is 10. Okay. Accessed 2027, April 20. And it's Digital.
+
+00:17:57.960 --> 00:18:11.640
+Okay, let's check — I'm going to double-check to make sure everything's correct. All right: Web site, Design Group, Power of Infographics, 2027, March 10. Year Accessed 2027, Month Accessed April, Day Accessed 20.
+
+00:18:12.720 --> 00:18:34.860
+April 20, Digital. Okay — because if you have a typo, it's going to kill it, or it's going to score it wrong. Okay, say OK, and Design Group jumps in there.
+
+00:18:34.860 --> 00:18:51.060
+And let's come back here. Okay: in the next paragraph, edit the Zapata citation to add 16 as the page number. So in the next paragraph, here's Zapata.
+
+00:18:51.060 --> 00:19:04.860
+I'm going to right-click and Edit Citation, and add that page, 16. Say OK, and it'll add that page to the citation.
+
+00:19:04.860 --> 00:19:21.100
+Thirteen: delete the Linear source from the current list of sources, so it's not used in the paper. Okay, so what we're going to do is go to Manage Sources.
+
+00:19:21.100 --> 00:19:49.880
+And when we look through our list — I have two of these Power of Infographics, because I have one that has a typo in it. Anyway, we want this Linear one. I'm going to go ahead and delete it, and then I'm going to close this and get rid of my magnifying box.
+
+00:19:49.880 --> 00:20:03.820
+All right, so we delete Linear. Fourteen: find all the instances of the word "structure" in the document, and use "layout" as a more accurate replacement.
+
+00:20:03.820 --> 00:20:29.500
+Okay, so on our Home tab we have Find, and we have Replace. We can click Replace: Find what — "structure," s-t-r-u-c-t-u-r-e — Replace with "layout." And then we can go Replace All. It made two replacements.
+
+00:20:29.500 --> 00:20:45.120
+And we can close our replacement. And then, in the blank paragraph at the end of the document, use the Insert Bibliography command to insert a list of sources without a built-in heading.
+
+00:20:45.120 --> 00:21:04.260
+Okay, so we scroll down, scroll down. Here's our empty paragraph, after Works Cited. References › Bibliography — so it's built in. Insert Bibliography is the last one; we'll insert it with no title.
+
+00:21:04.260 --> 00:21:23.100
+Okay. Inserted. No title. Okay. And then you can compare all this to see if it matches up and it looks the same. Here's our Works Cited. It looks identical. So hopefully we did it well.
+
+00:21:23.100 --> 00:21:51.460
+Okay, so we can save our file that we worked on. We can close it. These are the instructions — we can close the instructions. Okay, here's my file that I used for this. Now I can drop it into here. And then I can submit it.
+
+00:21:53.100 --> 00:22:21.540
+Okay, so I have the third one, because the last one didn't record audio. So, all right. And so then, hopefully we did this right. Here's our report — it should open up. We got 25 out of 25. Okay, so yeah.
+
+00:22:21.980 --> 00:22:31.940
+So that's how you do this. Hopefully this helps you not just with the guided lesson, but with the homework as well.
+
+00:22:33.040 --> 00:22:37.380
+All right. Good luck this week, and we'll see you soon. Bye.`;
+
+  var player = null, timeUpdater = null, parsedTranscript = [], playerReady = false;
+
+  try {
+    if (!CSS.supports("selector(:focus-visible)")) { document.body.classList.add("no-fv"); }
+  } catch (e) { document.body.classList.add("no-fv"); }
+
+  /* ---------------- VTT parsing ---------------- */
+  function timeToSeconds(timeStr) {
+    if (!timeStr) { return 0; }
+    var parts = timeStr.trim().split(":");
+    if (parts.length === 2) {
+      return (parseInt(parts[0], 10) || 0) * 60 + (parseFloat(parts[1]) || 0);
+    }
+    if (parts.length === 3) {
+      return (parseInt(parts[0], 10) || 0) * 3600 + (parseInt(parts[1], 10) || 0) * 60 + (parseFloat(parts[2]) || 0);
+    }
+    return 0;
+  }
+
+  function formatTime(sec) {
+    sec = Math.max(0, Math.floor(sec));
+    var h = Math.floor(sec / 3600), m = Math.floor((sec % 3600) / 60), s = sec % 60;
+    var mm = (h > 0 && m < 10) ? "0" + m : String(m);
+    return (h > 0 ? h + ":" : "") + mm + ":" + (s < 10 ? "0" + s : s);
+  }
+
+  function parseVtt(vttText) {
+    var blocks = vttText.trim().split(/\n\n+/);
+    var cues = [];
+    blocks.forEach(function (block) {
+      var trimmed = block.trim();
+      if (!trimmed || trimmed.indexOf("WEBVTT") === 0 || trimmed.indexOf("NOTE") === 0) { return; }
+      var lines = trimmed.split("\n");
+      var timeLine = null, timeIndex = -1;
+      for (var i = 0; i < lines.length; i++) {
+        if (lines[i].indexOf("-->") !== -1) { timeLine = lines[i]; timeIndex = i; break; }
+      }
+      if (!timeLine) { return; }
+      var ends = timeLine.split("-->");
+      var text = lines.slice(timeIndex + 1).join(" ").trim();
+      if (!text) { return; }
+      cues.push({ start: timeToSeconds(ends[0]), end: timeToSeconds(ends[1]), text: text });
+    });
+    return cues;
+  }
+
+  /* ---------------- Transcript panel ---------------- */
+  function seek(seconds) {
+    if (!player || !player.seekTo) { return false; }
+    player.seekTo(seconds, true);
+    if (player.playVideo) { player.playVideo(); }
+    return true;
+  }
+
+  function scrollPlayerIntoView() {
+    var frame = document.getElementById("video-container");
+    if (frame && frame.scrollIntoView) { frame.scrollIntoView({ behavior: "smooth", block: "center" }); }
+  }
+
+  function populateTranscript() {
+    var container = document.getElementById("transcript-container");
+    if (!container) { return; }
+    container.innerHTML = "";
+    parsedTranscript.forEach(function (cue, i) {
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "transcript-line";
+      btn.dataset.start = cue.start;
+      btn.dataset.end = cue.end;
+      btn.dataset.index = i;
+
+      var stamp = document.createElement("span");
+      stamp.className = "t";
+      stamp.textContent = formatTime(cue.start);
+
+      var body = document.createElement("span");
+      body.className = "tx";
+      body.textContent = cue.text;
+
+      btn.appendChild(stamp);
+      btn.appendChild(body);
+      btn.setAttribute("aria-label", "Jump to " + formatTime(cue.start) + ". " + cue.text);
+
+      btn.addEventListener("click", function () {
+        if (seek(cue.start)) { scrollPlayerIntoView(); }
+      });
+      container.appendChild(btn);
+    });
+  }
+
+  /* ---------------- Active-line highlight ---------------- */
+  var lastAnnounced = null;
+  function announceLine(text) {
+    if (text === lastAnnounced) { return; }
+    lastAnnounced = text;
+    var s = document.getElementById("transcript-status");
+    if (s) { s.textContent = text || ""; }
+  }
+
+  function highlightCurrentLine() {
+    if (!player || !player.getCurrentTime) { return; }
+    var now = player.getCurrentTime();
+    var lines = document.querySelectorAll("#transcript-container .transcript-line");
+    var active = null;
+    Array.prototype.forEach.call(lines, function (line) {
+      var start = parseFloat(line.dataset.start), end = parseFloat(line.dataset.end);
+      if (now >= start && now < end) { active = line; }
+    });
+    var prev = document.querySelector("#transcript-container .is-active");
+    if (active === prev) { return; }
+    if (prev) { prev.classList.remove("is-active"); }
+    if (active) {
+      active.classList.add("is-active");
+      var body = active.querySelector(".tx");
+      announceLine(body ? body.textContent : active.textContent);
+      if (!active.hidden) { active.scrollIntoView({ behavior: "smooth", block: "center" }); }
+    }
+  }
+
+  /* ---------------- Panel height ---------------- */
+  function syncTranscriptHeight() {
+    var videoContainer = document.getElementById("video-container");
+    var panel = document.getElementById("transcript-container");
+    if (!videoContainer || !panel) { return; }
+    // Match the panel to the video only when the two columns actually sit side
+    // by side. Compared by rendered position rather than a viewport-width test,
+    // because in a Canvas iframe a media query measures the iframe, not the
+    // browser window, and can disagree with the flex-wrap result.
+    var videoCol = videoContainer.parentNode;
+    var transcriptCol = panel.parentNode;
+    var sideBySide = Math.abs(
+      transcriptCol.getBoundingClientRect().top - videoCol.getBoundingClientRect().top) < 40
+      && transcriptCol.getBoundingClientRect().left !== videoCol.getBoundingClientRect().left;
+    // Side by side, the panel should end level with the video, so subtract the
+    // heading/search row that sits above it inside the transcript column.
+    var head = transcriptCol.querySelector(".transcript-head");
+    var headH = head ? head.offsetHeight + 8 : 0;
+    var h = sideBySide ? Math.max(240, videoContainer.offsetHeight - headH) + "px" : "24rem";
+    panel.style.height = h;
+    panel.style.maxHeight = h;
+  }
+
+  /* ---------------- Transcript search ---------------- */
+  function escapeRe(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); }
+
+  function runFilter(term) {
+    var lines = document.querySelectorAll("#transcript-container .transcript-line");
+    var status = document.getElementById("transcript-filter-status");
+    var q = term.trim().toLowerCase();
+    var shown = 0;
+
+    Array.prototype.forEach.call(lines, function (line) {
+      var body = line.querySelector(".tx");
+      var cue = parsedTranscript[parseInt(line.dataset.index, 10)];
+      if (!body || !cue) { return; }
+      if (!q) {
+        body.textContent = cue.text;
+        line.hidden = false;
+        shown++;
+        return;
+      }
+      if (cue.text.toLowerCase().indexOf(q) === -1) {
+        body.textContent = cue.text;
+        line.hidden = true;
+        return;
+      }
+      line.hidden = false;
+      shown++;
+      // Rebuild with <mark> around the matches, without using innerHTML on
+      // user-supplied text.
+      body.textContent = "";
+      var re = new RegExp(escapeRe(term.trim()), "ig");
+      var last = 0, m;
+      while ((m = re.exec(cue.text)) !== null) {
+        if (m.index > last) { body.appendChild(document.createTextNode(cue.text.slice(last, m.index))); }
+        var mk = document.createElement("mark");
+        mk.textContent = m[0];
+        body.appendChild(mk);
+        last = m.index + m[0].length;
+        if (m[0].length === 0) { re.lastIndex++; }
+      }
+      if (last < cue.text.length) { body.appendChild(document.createTextNode(cue.text.slice(last))); }
+    });
+
+    if (status) {
+      status.textContent = q
+        ? (shown === 0 ? "No transcript lines match " + term : shown + " transcript line" + (shown === 1 ? "" : "s") + " match " + term)
+        : "Showing the whole transcript.";
+    }
+  }
+
+  function wireSearch() {
+    var input = document.getElementById("transcript-filter");
+    if (!input) { return; }
+    var t = null;
+    input.addEventListener("input", function () {
+      clearTimeout(t);
+      t = setTimeout(function () { runFilter(input.value); }, 250);
+    });
+  }
+
+  /* ---------------- Seek buttons (topic index + step pills) ----------------
+     Buttons wired to the embedded player, never youtu.be?t= links: a time link
+     would navigate the Canvas iframe away from this page. If the player never
+     comes up, the buttons are turned back into plain text so the index reads
+     as a reference list rather than as controls that silently do nothing. */
+  function wireSeekButtons() {
+    var btns = document.querySelectorAll("[data-seek]");
+    Array.prototype.forEach.call(btns, function (btn) {
+      var t = parseInt(btn.getAttribute("data-seek"), 10) || 0;
+      var item = btn.closest(".topic-index__item") || btn.closest(".todo > li");
+      var text = item ? item.querySelector(".topic-index__label, .todo__title") : null;
+      btn.setAttribute("aria-label", "Jump to " + formatTime(t) + (text ? " — " + text.textContent : "") + " in the video");
+      btn.addEventListener("click", function () {
+        if (seek(t)) { scrollPlayerIntoView(); }
+      });
+    });
+  }
+
+  function degradeToStatic(message) {
+    if (playerReady) { return; }
+    document.body.classList.add("no-player");
+    var idx = document.getElementById("topic-index");
+    if (idx) { idx.classList.add("topic-index--static"); }
+    Array.prototype.forEach.call(document.querySelectorAll("[data-seek]"), function (btn) {
+      btn.disabled = true;
+      btn.removeAttribute("aria-label");
+    });
+    var note = document.getElementById("topic-index-fallback");
+    if (note) { note.hidden = false; note.textContent = message; }
+  }
+
+  /* ---------------- Platform tabs ---------------- */
+  function wireTabs() {
+    var tablist = document.querySelector(".tablist");
+    if (!tablist) { return; }
+    var tabs = Array.prototype.slice.call(tablist.querySelectorAll('[role="tab"]'));
+
+    function select(tab, focus) {
+      tabs.forEach(function (t) {
+        var selected = t === tab;
+        t.setAttribute("aria-selected", selected ? "true" : "false");
+        t.tabIndex = selected ? 0 : -1;
+        var panel = document.getElementById(t.getAttribute("aria-controls"));
+        if (panel) { panel.hidden = !selected; }
+      });
+      if (focus) { tab.focus(); }
+    }
+
+    tabs.forEach(function (tab, i) {
+      tab.addEventListener("click", function () { select(tab, false); });
+      tab.addEventListener("keydown", function (e) {
+        var next = null;
+        if (e.key === "ArrowRight") { next = tabs[(i + 1) % tabs.length]; }
+        else if (e.key === "ArrowLeft") { next = tabs[(i - 1 + tabs.length) % tabs.length]; }
+        else if (e.key === "Home") { next = tabs[0]; }
+        else if (e.key === "End") { next = tabs[tabs.length - 1]; }
+        if (next) { e.preventDefault(); select(next, true); }
+      });
+    });
+  }
+
+  /* ---------------- YouTube player ---------------- */
+  window.onYouTubeIframeAPIReady = function () {
+    if (!VIDEO_ID || !document.getElementById("youtube-player")) { return; }
+    player = new YT.Player("youtube-player", {
+      events: {
+        onReady: function () {
+          playerReady = true;
+          syncTranscriptHeight();
+        },
+        onStateChange: function (event) {
+          clearInterval(timeUpdater);
+          if (event.data === YT.PlayerState.PLAYING) {
+            timeUpdater = setInterval(highlightCurrentLine, 300);
+          } else {
+            highlightCurrentLine();
+          }
+        }
+      }
+    });
+  };
+
+  document.addEventListener("DOMContentLoaded", function () {
+    parsedTranscript = parseVtt(vttContent);
+    populateTranscript();
+    wireSearch();
+    wireSeekButtons();
+    wireTabs();
+    setTimeout(syncTranscriptHeight, 100);
+
+    if (typeof YT === "undefined" || typeof YT.Player === "undefined") {
+      var tag = document.createElement("script");
+      tag.src = "https://www.youtube.com/iframe_api";
+      tag.onerror = function () {
+        degradeToStatic("The video player could not load, so the times below are listed for reference rather than as buttons. The full transcript is above.");
+      };
+      document.head.appendChild(tag);
+    } else {
+      window.onYouTubeIframeAPIReady();
+    }
+
+    // If the API never reports ready — blocked script, offline, restrictive
+    // network — fall back rather than leaving dead buttons on the page.
+    setTimeout(function () {
+      degradeToStatic("The video player did not load, so the times below are listed for reference rather than as buttons. The full transcript is above.");
+    }, 8000);
+  });
+
+  var resizeTimeout;
+  window.addEventListener("resize", function () {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(syncTranscriptHeight, 250);
+  });
+
+  /* Report height to a Canvas parent that listens for it. Harmless otherwise. */
+  function postHeight() {
+    try {
+      if (window.parent && window.parent !== window) {
+        var h = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
+        window.parent.postMessage({ subject: "lti.frameResize", height: h }, "*");
+      }
+    } catch (e) { /* cross-origin parent — ignore */ }
+  }
+  window.addEventListener("load", postHeight);
+  if (window.ResizeObserver) { new ResizeObserver(postHeight).observe(document.body); }
+})();
+</script>
+</body>
+</html>
