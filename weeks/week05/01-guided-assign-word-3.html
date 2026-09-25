@@ -1,0 +1,1774 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CSC 104 — Word Module 3 Guided Assignment</title>
+<style>
+/* ============================================================
+   CSC 104 — Week 5 — Word Module 3 Guided Assignment
+   Self-contained SPA for embedding in a Canvas iframe.
+   Vanilla CSS + vanilla JS, one file, no outbound links.
+   The only external resources are the YouTube player iframe and
+   the YouTube IFrame API (needed for click-to-seek); the page
+   degrades to a readable transcript and a plain topic list if
+   either is blocked.
+   Token block and layout match weeks/week03/01-guided-assign-word-1.html.
+   ============================================================ */
+
+:root {
+  color-scheme: light dark;
+  --surface:      #ffffff;
+  --panel:        #f6f8fb;
+  --panel-2:      #eef2f8;
+  --accent-bg:    #e8f0fe;
+  --ink:          #16202f;
+  --muted:        #46536b;
+  --brand:        #1d4ed8;
+  --brand-ink:    #17399c;
+  --border:       #c3cddc;
+  --border-soft:  #dde4ee;
+  --field-border: #6b7a92;
+  --btn-bg:       #1d4ed8;
+  --btn-fg:       #ffffff;
+  --btn-bg-hover: #17399c;
+  --btn2-bg:      #ffffff;
+  --btn2-fg:      #17399c;
+  --ok:           #1a6b3c;
+  --ok-bg:        #e6f4ec;
+  --warn-ink:     #7a4a06;
+  --warn-bg:      #fdf3e0;
+  --warn-rule:    #b8860b;
+  --focus:        #b4530a;
+  --hit:          #fff2b8;
+  --hit-ink:      #3a2c00;
+  --radius:       10px;
+  --maxw:         70rem;
+  --readw:        46rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --surface:      #0f1726;
+    --panel:        #17223a;
+    --panel-2:      #1e2b45;
+    --accent-bg:    #1a2a4d;
+    --ink:          #e9eefa;
+    --muted:        #b6c3d8;
+    --brand:        #9dbcff;
+    --brand-ink:    #bcd2ff;
+    --border:       #3a4a68;
+    --border-soft:  #2b3a56;
+    --field-border: #7b89a3;
+    --btn-bg:       #9dbcff;
+    --btn-fg:       #0b1424;
+    --btn-bg-hover: #c3d6ff;
+    --btn2-bg:      #17223a;
+    --btn2-fg:      #bcd2ff;
+    --ok:           #8fe0b0;
+    --ok-bg:        #123328;
+    --warn-ink:     #f6d59a;
+    --warn-bg:      #3a2c11;
+    --warn-rule:    #d9a441;
+    --focus:        #ffb066;
+    --hit:          #5c4a10;
+    --hit-ink:      #ffeeb8;
+  }
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--surface);
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; border-radius: 4px; }
+.no-fv :focus { outline: 3px solid var(--focus); outline-offset: 2px; }
+
+.skip-link {
+  position: absolute; left: -9999px; top: 0; z-index: 60;
+  background: var(--btn-bg); color: var(--btn-fg);
+  padding: 0.6rem 1rem; font-weight: 700; border-radius: 0 0 var(--radius) 0;
+}
+.skip-link:focus { left: 0; outline: 3px solid var(--focus); outline-offset: 2px; }
+
+.wrap { max-width: var(--maxw); margin: 0 auto; padding: 1rem 1rem 3rem; }
+.read { max-width: var(--readw); }
+
+/* ---------------------- Header ---------------------- */
+.page-head { background: var(--panel); border-bottom: 3px solid var(--brand); }
+.page-head .wrap { padding-bottom: 1.25rem; }
+
+.eyebrow {
+  font-size: 0.8125rem; letter-spacing: 0.09em; text-transform: uppercase;
+  font-weight: 700; color: var(--brand-ink); margin: 0.75rem 0 0.35rem;
+}
+h1 { font-size: clamp(1.5rem, 4.2vw, 2.15rem); line-height: 1.22; margin: 0 0 0.6rem; }
+.lede { margin: 0; color: var(--muted); max-width: var(--readw); }
+
+.facts { list-style: none; display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 1rem 0 0; padding: 0; }
+.facts li {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 999px; padding: 0.3rem 0.85rem; font-size: 0.875rem;
+}
+.facts .k { font-weight: 700; color: var(--brand-ink); }
+
+/* ---------------------- Typography ---------------------- */
+h2 {
+  font-size: clamp(1.25rem, 3.2vw, 1.6rem);
+  margin: 2.5rem 0 0.75rem; color: var(--brand-ink);
+  padding-bottom: 0.35rem; border-bottom: 2px solid var(--border-soft);
+}
+h3 { font-size: 1.125rem; margin: 1.75rem 0 0.5rem; }
+p { margin: 0 0 1rem; max-width: var(--readw); }
+ul, ol { margin: 0 0 1rem; padding-left: 1.35rem; max-width: var(--readw); }
+li { margin-bottom: 0.4rem; }
+.mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.9375em; }
+.ui { font-weight: 700; }
+
+.callout {
+  border-left: 5px solid var(--brand); background: var(--accent-bg);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding: 0.9rem 1.1rem; margin: 0 0 1.25rem; max-width: var(--readw);
+}
+.callout > :last-child { margin-bottom: 0; }
+.callout h3 { margin-top: 0; font-size: 1.05rem; }
+.callout--warn { border-left-color: var(--warn-rule); background: var(--warn-bg); color: var(--warn-ink); }
+.callout--wide { max-width: none; }
+
+/* ---------------------- Video + transcript ---------------------- */
+.video-row { display: flex; flex-wrap: wrap; gap: 1.25rem; margin: 0 0 1.5rem; }
+.video-col { flex: 1 1 32rem; min-width: min(100%, 20rem); }
+.transcript-col { flex: 1 1 20rem; min-width: min(100%, 17rem); display: flex; flex-direction: column; }
+
+.video-frame {
+  position: relative; width: 100%; padding-top: 56.25%;
+  background: #000; border-radius: var(--radius); overflow: hidden;
+  border: 1px solid var(--field-border);
+}
+.video-frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+.video-caption { font-size: 0.875rem; color: var(--muted); margin-top: 0.5rem; }
+
+.transcript-head { display: flex; flex-wrap: wrap; gap: 0.5rem 0.75rem; align-items: flex-end; margin-bottom: 0.5rem; }
+.transcript-head h3 { margin: 0 0 0.3rem; font-size: 1rem; flex: 0 1 auto; }
+.transcript-search { flex: 1 1 10rem; }
+.transcript-search label { display: block; font-size: 0.8125rem; font-weight: 600; color: var(--muted); }
+.transcript-search input {
+  font: inherit; width: 100%; min-height: 2.5rem; color: var(--ink);
+  background: var(--surface); border: 1px solid var(--field-border);
+  border-radius: 8px; padding: 0.35rem 0.55rem;
+}
+
+.transcript-panel {
+  height: 24rem; max-height: 24rem; overflow-y: auto;
+  border: 1px solid var(--field-border); border-radius: var(--radius);
+  background: var(--panel); padding: 0.4rem;
+}
+.transcript-line {
+  display: block; width: 100%; text-align: left; font: inherit;
+  font-size: 0.9375rem; line-height: 1.5; color: var(--ink);
+  background: transparent; border: 0; border-radius: 6px;
+  padding: 0.45rem 0.6rem; cursor: pointer;
+}
+.transcript-line:hover { background: var(--accent-bg); }
+.transcript-line .t {
+  display: inline-block; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.8125rem; font-weight: 700; color: var(--brand-ink); margin-right: 0.5rem;
+}
+.transcript-line.is-active {
+  background: var(--accent-bg);
+  box-shadow: inset 3px 0 0 0 var(--brand);
+  font-weight: 600;
+}
+.transcript-line[hidden] { display: none; }
+.transcript-line mark { background: var(--hit); color: var(--hit-ink); }
+.transcript-note { color: var(--muted); font-size: 0.875rem; padding: 0.6rem; margin: 0; }
+
+/* Static fallback when the player never loads */
+.no-player .transcript-line { cursor: default; }
+.no-player .transcript-line:hover { background: transparent; }
+
+/* ---------------------- Topic index ---------------------- */
+.topic-index { margin: 0 0 1.5rem; }
+.topic-index__group {
+  font-weight: 700; color: var(--brand-ink); margin: 1.25rem 0 0.4rem;
+  font-size: 0.9375rem; letter-spacing: 0.02em;
+}
+.topic-index__group:first-child { margin-top: 0; }
+.topic-index__list { list-style: none; padding: 0; margin: 0; max-width: none; }
+.topic-index__item {
+  display: flex; gap: 0.7rem; align-items: baseline;
+  padding: 0.28rem 0; margin: 0; border-bottom: 1px solid var(--border-soft);
+}
+.topic-index__list li:last-child { border-bottom: none; }
+.topic-index__time {
+  flex: 0 0 auto; font: inherit;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.875rem; font-weight: 700;
+  min-width: 4.25rem; min-height: 2rem; text-align: center;
+  color: var(--btn2-fg); background: var(--btn2-bg);
+  border: 1px solid var(--field-border); border-radius: 6px;
+  padding: 0.15rem 0.4rem; cursor: pointer;
+}
+.topic-index__time:hover { background: var(--accent-bg); }
+.topic-index__label { flex: 1 1 auto; }
+
+.topic-index--static .topic-index__time {
+  cursor: default; background: transparent; border-color: transparent;
+  color: var(--muted); text-align: left; padding-left: 0;
+}
+.topic-index--static .topic-index__time:hover { background: transparent; }
+
+@media (min-width: 52em) {
+  .topic-cols { column-count: 2; column-gap: 2.25rem; }
+  .topic-cols .topic-index__group { break-after: avoid; }
+  .topic-cols .topic-index__list { break-inside: avoid; }
+}
+
+/* ---------------------- To-do / step lists ---------------------- */
+.todo { list-style: none; padding: 0; margin: 0 0 1.5rem; max-width: none; }
+.todo > li {
+  background: var(--panel); border: 1px solid var(--border-soft);
+  border-radius: var(--radius); padding: 0.85rem 1rem;
+  margin: 0 0 0.75rem;
+}
+.todo__top { display: flex; flex-wrap: wrap; gap: 0.6rem; align-items: baseline; }
+.todo__num {
+  flex: 0 0 auto; min-width: 1.9rem; height: 1.9rem; padding: 0 0.4rem; border-radius: 999px;
+  background: var(--btn-bg); color: var(--btn-fg); font-weight: 700; font-size: 0.9375rem;
+  display: flex; align-items: center; justify-content: center; align-self: flex-start;
+}
+.todo__num--setup { background: var(--btn2-bg); color: var(--btn2-fg); border: 1px solid var(--field-border); }
+.todo__title { flex: 1 1 14rem; font-weight: 700; margin: 0; }
+.todo__body { margin: 0.35rem 0 0 2.5rem; max-width: var(--readw); }
+.todo__body p { margin: 0 0 0.5rem; }
+.todo__body ul { margin: 0 0 0.5rem; }
+.todo__body > :last-child { margin-bottom: 0; }
+.todo__meta { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0.5rem 0 0 2.5rem; }
+.pill {
+  font-size: 0.8125rem; font-weight: 700; border-radius: 999px;
+  padding: 0.1rem 0.6rem; border: 1px solid currentColor; white-space: nowrap;
+}
+.pill--graded { color: var(--ok); background: var(--ok-bg); }
+.pill--setup { color: var(--brand-ink); background: var(--accent-bg); }
+.pill--due { color: var(--warn-ink); background: var(--warn-bg); }
+.pill--time {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  color: var(--btn2-fg); background: var(--btn2-bg); border-color: var(--field-border);
+  cursor: pointer; font-size: 0.8125rem; min-height: 1.9rem;
+}
+.pill--time:hover { background: var(--accent-bg); }
+.no-player .pill--time { cursor: default; }
+
+/* ---------------------- Platform tabs ---------------------- */
+.tabs { margin: 0 0 1.5rem; }
+.tablist { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0 0 -1px; padding: 0; }
+.tab {
+  font: inherit; font-weight: 700; cursor: pointer;
+  color: var(--btn2-fg); background: var(--btn2-bg);
+  border: 1px solid var(--field-border); border-bottom-color: transparent;
+  border-radius: var(--radius) var(--radius) 0 0;
+  padding: 0.5rem 1rem; min-height: 2.5rem;
+}
+.tab[aria-selected="true"] { background: var(--accent-bg); border-bottom-color: var(--accent-bg); }
+.tab:hover { background: var(--accent-bg); }
+.tabpanel {
+  border: 1px solid var(--field-border); border-radius: 0 var(--radius) var(--radius) var(--radius);
+  background: var(--panel); padding: 1rem 1.1rem;
+}
+.tabpanel > :last-child { margin-bottom: 0; }
+.tabpanel h3:first-child { margin-top: 0; }
+
+/* ---------------------- Reference table ---------------------- */
+.table-scroll { overflow-x: auto; margin: 0 0 1.5rem; }
+table { border-collapse: collapse; width: 100%; min-width: 30rem; background: var(--surface); }
+caption { text-align: left; font-weight: 700; padding: 0 0 0.5rem; color: var(--muted); }
+th, td { border: 1px solid var(--border); padding: 0.6rem 0.7rem; text-align: left; vertical-align: top; }
+thead th { background: var(--panel-2); }
+tbody th { background: var(--panel); font-weight: 700; white-space: nowrap; }
+
+.status {
+  min-height: 1.4rem; font-weight: 600; color: var(--ok); background: var(--ok-bg);
+  border-radius: 8px; padding: 0.3rem 0.55rem; margin: 0.5rem 0 0;
+  max-width: var(--readw); font-size: 0.9375rem;
+}
+.status:empty { background: transparent; padding: 0; min-height: 0; }
+
+.footnote {
+  margin-top: 2.5rem; padding-top: 1rem; border-top: 1px solid var(--border-soft);
+  color: var(--muted); font-size: 0.9375rem; max-width: var(--readw);
+}
+
+.sr-only {
+  position: absolute !important; width: 1px; height: 1px; margin: -1px; padding: 0;
+  overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
+}
+
+@media print {
+  .skip-link, .video-frame, .transcript-search, .tablist { display: none !important; }
+  .transcript-panel { height: auto !important; max-height: none !important; overflow: visible; border: none; }
+  .topic-index__time, .pill--time { border: none; }
+  .tabpanel { display: block !important; border-radius: var(--radius); margin-bottom: 1rem; }
+  body { background: #fff; color: #000; }
+  .todo > li, .callout, table { break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+
+<a class="skip-link" href="#main">Skip to page content</a>
+
+<header class="page-head">
+  <div class="wrap">
+    <p class="eyebrow">CSC 104 &middot; Week 5 &middot; Guided Assignment</p>
+    <h1>Word Module 3 &mdash; Guided Assignment Walkthrough</h1>
+    <p class="lede">Week 5 is about graphics, tables and tab stops. The video below walks through a four-page
+      information sheet for Red Arrow Logistics: flipping and positioning a logo, a double-line border, the Format
+      Painter, picture corrections and alt text, a SmartArt diagram, a right tab, a table and a formatted shape. Every
+      step is listed on this page with a button that jumps the video straight to it, and the whole video is written
+      out here so you can read it instead of watching.</p>
+    <ul class="facts">
+      <li><span class="k">Video:</span> 28 minutes</li>
+      <li><span class="k">Week 5:</span> 9/28/2026 &ndash; 10/4/2026</li>
+      <li><span class="k">This assignment:</span> 25 pts in MindTap</li>
+      <li><span class="k">Attempts:</span> up to 10</li>
+      <li><span class="k">Due:</span> Sun 10/4, 11:59 PM</li>
+    </ul>
+  </div>
+</header>
+
+<main id="main" class="wrap" tabindex="-1">
+
+  <!-- ============ What to do this week ============ -->
+  <section aria-labelledby="todo-heading">
+    <h2 id="todo-heading" style="margin-top:1.25rem">What to do this week</h2>
+    <p>Same pattern as the last two weeks: a <strong>guided</strong> assignment we walk through together, then a
+      <strong>homework</strong> assignment you do on your own. Do them in that order. This week is less about typing
+      text and more about pictures, shapes and tables, so most of the steps are on the <span class="ui">Picture
+      Format</span>, <span class="ui">Shape Format</span>, <span class="ui">SmartArt Design</span> and
+      <span class="ui">Table Design</span> tabs. Those tabs only show up when the object is selected. Each time stamp
+      below jumps the video to the part that explains it.</p>
+
+    <div class="callout">
+      <p style="margin:0"><strong>You get ten attempts at the guided assignment, and the video uses two of
+        them.</strong> I get 24 out of 25 on the first try because I used the wrong kind of shadow, then fix it and
+        resubmit for 25. That's exactly how the attempts are meant to be used. Read the report, fix the one step and
+        submit again. <em>(Video 25:21 and 26:15.)</em></p>
+    </div>
+
+    <ol class="todo">
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">1</span>
+          <p class="todo__title">Watch the walkthrough with Word open beside it</p>
+        </div>
+        <div class="todo__body">
+          <p>Pause after each step and do it in your own file. Several steps this week only work on the right
+            object: the SmartArt settings need the <em>whole</em> diagram selected, and the shadow has to go on the
+            shape rather than its text. Doing it alongside the video is the quickest way to catch that.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="0.24">0:00</button>
+          <span class="pill pill--setup">Not graded</span>
+        </p>
+      </li>
+
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">2</span>
+          <p class="todo__title">Download the assignment files from MindTap</p>
+        </div>
+        <div class="todo__body">
+          <p>An instruction file and a start file with your name on it. Use <span class="ui">Download All</span>,
+            and say yes if your browser asks about downloading multiple files.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="27.36">0:27</button>
+          <span class="pill pill--setup">Not graded</span>
+        </p>
+      </li>
+
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">3</span>
+          <p class="todo__title">Do the thirteen steps and submit the guided assignment</p>
+        </div>
+        <div class="todo__body">
+          <p>Every step is written out further down this page. Save as the <span class="mono">_2</span> version first,
+            work through the steps, then upload the file and select <span class="ui">Submit</span>. Check the
+            <span class="ui">Graded Summary Report</span> afterwards. It tells you exactly which steps earned
+            points.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="125.38">2:05</button>
+          <button type="button" class="pill pill--time" data-seek="1521.3">25:21</button>
+          <span class="pill pill--graded">Graded &mdash; 25 pts</span>
+          <span class="pill pill--due">Due Sun 10/4, 11:59 PM</span>
+        </p>
+      </li>
+
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">4</span>
+          <p class="todo__title">Do the Word Module 3 homework on your own</p>
+        </div>
+        <div class="todo__body">
+          <p>The second MindTap assignment this week. It's a different document with the same commands, and there's
+            no walkthrough. That's the point. Start it right after the guided one is submitted, while you still
+            remember where the SmartArt and table menus are.</p>
+        </div>
+        <p class="todo__meta">
+          <span class="pill pill--graded">Graded &mdash; 100 pts</span>
+          <span class="pill pill--due">Due Sun 10/4, 11:59 PM</span>
+        </p>
+      </li>
+
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">5</span>
+          <p class="todo__title">Do the module reading</p>
+        </div>
+        <div class="todo__body">
+          <p>The Word Module 3 chapter in the Shelly Cashman text, on creating a business letter. Skim it for
+            <em>what</em> Word can do, and come back to it as a step-by-step reference when an assignment names
+            something you haven't seen. Not graded.</p>
+        </div>
+        <p class="todo__meta">
+          <span class="pill pill--setup">Not graded</span>
+        </p>
+      </li>
+    </ol>
+  </section>
+
+  <!-- ============ Video + transcript ============ -->
+  <section aria-labelledby="video-heading">
+    <h2 id="video-heading">The walkthrough video</h2>
+    <p>Twenty-eight minutes, start to finish. It covers downloading the files, saving your copy, all thirteen steps,
+      submitting, finding the one step that lost a point, and resubmitting. If you're stuck on one step, use the
+      topic index below rather than scrubbing through.</p>
+
+    <div class="video-row">
+      <div class="video-col">
+        <div class="video-frame" id="video-container">
+          <iframe id="youtube-player"
+                  src="https://www.youtube.com/embed/bmgRKYmyXiE?enablejsapi=1&amp;cc_load_policy=1&amp;iv_load_policy=3&amp;modestbranding=1&amp;rel=0"
+                  title="CSC 104 Word Module 3 Guided Assignment Walkthrough"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  referrerpolicy="strict-origin-when-cross-origin"
+                  allowfullscreen loading="lazy"></iframe>
+        </div>
+        <p class="video-caption">Closed captions are on by default. Select any line of the transcript to jump the
+          video to that moment.</p>
+      </div>
+
+      <div class="transcript-col">
+        <div class="transcript-head">
+          <h3 id="transcript-heading">Transcript</h3>
+          <div class="transcript-search">
+            <label for="transcript-filter">Search the transcript</label>
+            <input type="search" id="transcript-filter" autocomplete="off" spellcheck="false"
+                   aria-describedby="transcript-filter-status">
+          </div>
+        </div>
+        <div class="transcript-panel" id="transcript-container" role="group" aria-labelledby="transcript-heading">
+          <p class="transcript-note">Loading transcript&hellip;</p>
+        </div>
+        <p class="sr-only" role="status" aria-live="polite" id="transcript-filter-status"></p>
+        <p class="sr-only" role="status" aria-live="polite" id="transcript-status"></p>
+        <p style="margin:0.5rem 0 0"><a href="#topic-index-heading">Skip past the transcript</a></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ Topic index ============ -->
+  <section aria-labelledby="topic-index-heading">
+    <h2 id="topic-index-heading">Find a moment in the video</h2>
+    <p><strong>Select any time below and the video jumps there.</strong> This is the detailed contents of the
+      walkthrough. If one step isn't working, find it here and watch just that minute.</p>
+
+    <p id="topic-index-fallback" class="status" hidden></p>
+
+    <div class="topic-index topic-cols" id="topic-index">
+
+      <div class="topic-index__group">Getting started</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="0.24">0:00</button><span class="topic-index__label">What Module 3 is, and why the documents are just the context</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="27.36">0:27</button><span class="topic-index__label">Download All</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="53.52">0:53</button><span class="topic-index__label">The instruction file and the start file</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="67.76">1:07</button><span class="topic-index__label">Page Width, so the instructions are readable</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="76.96">1:16</button><span class="topic-index__label">Opening the start file: Enable Editing, Red Arrow Logistics</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="94.64">1:34</button><span class="topic-index__label">Save As the _2 copy</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="111.52">1:51</button><span class="topic-index__label">Check the footer for your own name</span></li>
+      </ul>
+
+      <div class="topic-index__group">Step 1 &mdash; the logo</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="125.38">2:05</button><span class="topic-index__label">The scenario, and what step 1 asks for</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="147.02">2:27</button><span class="topic-index__label">The text is backwards: Rotate &rsaquo; Flip Horizontal</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="160.9">2:40</button><span class="topic-index__label">Position &rsaquo; Top Left with Square Text Wrapping</span></li>
+      </ul>
+
+      <div class="topic-index__group">Step 2 &mdash; the double-line border</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="179.74">2:59</button><span class="topic-index__label">What step 2 asks for (and the Mac hints in the file)</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="200.98">3:20</button><span class="topic-index__label">Bottom Border only gives you a single line</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="215.68">3:35</button><span class="topic-index__label">Borders and Shading: Red, 1&frac12; pt</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="234.8">3:54</button><span class="topic-index__label">Picking the double line resets the width &mdash; set it again</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="256.66">4:16</button><span class="topic-index__label">The finished border</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="268.22">4:28</button><span class="topic-index__label">Checking your work against the final figure</span></li>
+      </ul>
+
+      <div class="topic-index__group">Step 3 &mdash; the Format Painter</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="290.16">4:50</button><span class="topic-index__label">What step 3 asks for</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="310.86">5:10</button><span class="topic-index__label">Finding both pieces of text on page 2</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="323.86">5:23</button><span class="topic-index__label">Select the source, click Format Painter, select the target</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="342.1">5:42</button><span class="topic-index__label">Why the Format Painter is worth learning</span></li>
+      </ul>
+
+      <div class="topic-index__group">Step 4 &mdash; the transportation picture</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="364.24">6:04</button><span class="topic-index__label">What step 4 asks for: correction, width, alt text</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="383.62">6:23</button><span class="topic-index__label">Leave off the period and the alt text is marked wrong</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="443.38">7:23</button><span class="topic-index__label">Right-click &rsaquo; Format Picture, the way I do it</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="488.66">8:08</button><span class="topic-index__label">Brightness +40, Contrast &minus;20 with the sliders and arrows</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="506.58">8:26</button><span class="topic-index__label">Resizing to a width of 6.5"</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="532.12">8:52</button><span class="topic-index__label">Pasting in the alt text</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="555.86">9:15</button><span class="topic-index__label">Closing the pane, and a good moment to save</span></li>
+      </ul>
+
+      <div class="topic-index__group">Step 5 &mdash; clearing formatting</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="574.92">9:34</button><span class="topic-index__label">Which paragraph: "In addition to discounts&hellip;"</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="593.24">9:53</button><span class="topic-index__label">Right-click doesn't offer it</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="622.56">10:22</button><span class="topic-index__label">Styles gallery &rsaquo; Clear Formatting</span></li>
+      </ul>
+
+      <div class="topic-index__group">Steps 6&ndash;7 &mdash; the SmartArt diagram</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="636.1">10:36</button><span class="topic-index__label">Step 6: a Grid Matrix on page 3</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="660.44">11:00</button><span class="topic-index__label">The blank paragraph under Program Benefits</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="673.76">11:13</button><span class="topic-index__label">Insert &rsaquo; SmartArt &rsaquo; Matrix &rsaquo; Grid Matrix</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="699.58">11:39</button><span class="topic-index__label">Filling in the four boxes</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="734.8">12:14</button><span class="topic-index__label">Ctrl+C, Alt+Tab, Ctrl+V &mdash; copying from the instructions</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="764.44">12:44</button><span class="topic-index__label">Step 7: resize proportionally to a height of 3"</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="786.8">13:06</button><span class="topic-index__label">Hunting for the size controls</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="849.7">14:09</button><span class="topic-index__label">Size: check Lock aspect ratio first</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="876.72">14:36</button><span class="topic-index__label">Height 3.5 &rarr; 3, and the width follows</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="894.72">14:54</button><span class="topic-index__label">Colors and style: what the rest of step 7 asks for</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="912.38">15:12</button><span class="topic-index__label">Finding Moderate Effect in the SmartArt Styles</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="951.3">15:51</button><span class="topic-index__label">Change Colors &rsaquo; Gradient Range - Accent 1</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="972.12">16:12</button><span class="topic-index__label">Select the whole diagram, not one box</span></li>
+      </ul>
+
+      <div class="topic-index__group">Step 8 &mdash; the right tab</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="990.54">16:30</button><span class="topic-index__label">What step 8 asks for: a right tab at 5" on Grants 2028</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1018.56">16:58</button><span class="topic-index__label">The tab selector in the upper left of the ruler</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1048.56">17:28</button><span class="topic-index__label">Clicking through Left, Center, Right&hellip;</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1078.56">17:58</button><span class="topic-index__label">Click the ruler at 5"</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1108.56">18:28</button><span class="topic-index__label">It now matches the line below it</span></li>
+      </ul>
+
+      <div class="topic-index__group">Steps 9&ndash;10 &mdash; the Grants table</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1128.94">18:48</button><span class="topic-index__label">Step 9: a new last row, Veterans Coffee</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1138.56">18:58</button><span class="topic-index__label">Insert Rows Below, or Tab out of the last cell</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1168.56">19:28</button><span class="topic-index__label">Typing Veterans Coffee and $15,000</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1190.94">19:50</button><span class="topic-index__label">Step 10: the List Table 3 - Accent 1 style</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1207.32">20:07</button><span class="topic-index__label">Table Design &rsaquo; expand the gallery &rsaquo; List Tables</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1228.5">20:28</button><span class="topic-index__label">It should match the table below it</span></li>
+      </ul>
+
+      <div class="topic-index__group">Step 11 &mdash; the Getting Started picture</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1243.92">20:43</button><span class="topic-index__label">What step 11 asks for: Square wrapping</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1250.94">20:50</button><span class="topic-index__label">What Square wrapping actually does</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1275.74">21:15</button><span class="topic-index__label">Recolor to Red, Accent color 1 Light</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1280.94">21:20</button><span class="topic-index__label">Picture Format &rsaquo; Color &rsaquo; Recolor</span></li>
+      </ul>
+
+      <div class="topic-index__group">Steps 12&ndash;13 &mdash; the shapes</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1310.94">21:50</button><span class="topic-index__label">Step 12: the Purchase Product shape style</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1340.94">22:20</button><span class="topic-index__label">Shape Styles &rsaquo; Moderate Effect - Black, Dark 1</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1367.7">22:47</button><span class="topic-index__label">The shadow &mdash; I use Text Effects here by mistake (corrected at 26:15)</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1389.4">23:09</button><span class="topic-index__label">Offset: Center in the Shadow gallery</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1416.42">23:36</button><span class="topic-index__label">Step 13: Format Painter from Select Vendor to Product ID</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1457.7">24:17</button><span class="topic-index__label">Comparing the whole document to the final figure</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1487.7">24:47</button><span class="topic-index__label">My Purchase Product sits lower &mdash; leave yours alone</span></li>
+      </ul>
+
+      <div class="topic-index__group">Submitting, and fixing a lost point</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1500.34">25:00</button><span class="topic-index__label">Save and close, then back to MindTap</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1521.3">25:21</button><span class="topic-index__label">Dropping in the _2 file &mdash; 24 out of 25</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1547.54">25:47</button><span class="topic-index__label">Reading the report: the shadow step lost the point</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1575.34">26:15</button><span class="topic-index__label">The fix: Shape Effects, not Text Effects</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1614.04">26:54</button><span class="topic-index__label">Reopening the assignment to start another attempt</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1667.14">27:47</button><span class="topic-index__label">25 out of 25</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1699.8">28:19</button><span class="topic-index__label">Closing</span></li>
+      </ul>
+
+    </div>
+  </section>
+
+  <!-- ============ The steps ============ -->
+  <section aria-labelledby="steps-heading">
+    <h2 id="steps-heading">The assignment, step by step</h2>
+    <p>Four setup items, then the thirteen graded steps, then submitting. Each one says <em>what</em> to change; the
+      time button next to it shows you <em>how</em>. <strong>Always go by the instruction file MindTap gave you.</strong>
+      The wording below is a summary, and MindTap grades against its own file.</p>
+
+    <div class="callout">
+      <h3>Two details worth knowing</h3>
+      <ul style="margin:0 0 0.75rem">
+        <li><strong>Shape Effects, not Text Effects.</strong> The shadow in step 12 goes on the shape itself. Both
+          menus have a Shadow gallery with an <strong>Offset: Center</strong> in it. I use Text Effects at 22:47,
+          which is a mistake, and I correct it later in the video at 26:15.</li>
+        <li><strong>The period in the alt text.</strong> Step 4's alt text ends with a period. Leave it off and the
+          step is marked wrong. Copy and paste it from the instruction file.</li>
+      </ul>
+      <p style="margin:0">The video only says some step numbers out loud. The numbers below follow the order of the
+        instruction file as it's read in the video. If your file groups or numbers something differently, go by your
+        file.</p>
+    </div>
+
+    <h3>Before you start</h3>
+    <ol class="todo">
+      <li>
+        <div class="todo__top">
+          <span class="todo__num todo__num--setup" aria-hidden="true">A</span>
+          <p class="todo__title">Download both files</p>
+        </div>
+        <div class="todo__body">
+          <p>An instruction file and a start file with your name in it, ending in <span class="mono">_1</span>. They
+            land in your Downloads folder.</p>
+        </div>
+        <p class="todo__meta"><button type="button" class="pill pill--time" data-seek="27.36">0:27</button></p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num todo__num--setup" aria-hidden="true">B</span>
+          <p class="todo__title">Open the instruction file and read it</p>
+        </div>
+        <div class="todo__body">
+          <p>Select <span class="ui">Enable Editing</span>, then <span class="ui">View &rsaquo; Page Width</span> to
+            make it readable. Keep it open in a second window. You'll copy text from it for the alt text, the
+            SmartArt and the table. <strong>The final figure is at the very end of the file</strong>, so scroll down
+            and look at it before you start. It's the quickest way to check any step.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="53.52">0:53</button>
+          <button type="button" class="pill pill--time" data-seek="268.22">4:28</button>
+        </p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num todo__num--setup" aria-hidden="true">C</span>
+          <p class="todo__title">Open the start file and save it as the _2 version</p>
+        </div>
+        <div class="todo__body">
+          <p><span class="ui">Enable Editing</span>, then <span class="ui">File &rsaquo; Save As</span>. Leave it in
+            Downloads, change the <span class="mono">1</span> in the file name to a <span class="mono">2</span>, and
+            save. <strong>Everything you do from here goes in the <span class="mono">_2</span> file.</strong> That's
+            the one you submit. The <span class="mono">_1</span> file stays clean in case you want to restart.</p>
+        </div>
+        <p class="todo__meta"><button type="button" class="pill pill--time" data-seek="94.64">1:34</button></p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num todo__num--setup" aria-hidden="true">D</span>
+          <p class="todo__title">Check that it's your file</p>
+        </div>
+        <div class="todo__body">
+          <p>Scroll to the footer. It should show that the file was created specifically for <em>you</em>, by name.
+            If it doesn't, delete it and download it again.</p>
+        </div>
+        <p class="todo__meta"><button type="button" class="pill pill--time" data-seek="111.52">1:51</button></p>
+      </li>
+    </ol>
+
+    <h3>The thirteen graded steps</h3>
+    <ol class="todo">
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">1</span>
+          <p class="todo__title">Flip the logo and move it to the top left</p>
+        </div>
+        <div class="todo__body">
+          <p>On page 1 the logo's text reads backwards. Select the picture, then on
+            <span class="ui">Picture Format</span>:</p>
+          <ul>
+            <li><span class="ui">Rotate &rsaquo; Flip Horizontal</span></li>
+            <li><span class="ui">Position &rsaquo; Top Left with Square Text Wrapping</span></li>
+          </ul>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="125.38">2:05</button>
+          <button type="button" class="pill pill--time" data-seek="147.02">2:27</button>
+          <button type="button" class="pill pill--time" data-seek="160.9">2:40</button>
+        </p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">2</span>
+          <p class="todo__title">A double-line bottom border on the address line</p>
+        </div>
+        <div class="todo__body">
+          <p>Click in the address line paragraph and open <span class="ui">Home &rsaquo; Borders &rsaquo; Borders and
+            Shading</span>. Plain <span class="ui">Bottom Border</span> only gives you a single line. Set:</p>
+          <ul>
+            <li>Style: the <strong>double line</strong></li>
+            <li>Color: <strong>Red, Accent 1</strong></li>
+            <li>Width: <strong>1&frac12; pt</strong></li>
+          </ul>
+          <p><strong>Pick the double line first, then the width.</strong> Choosing a line style resets the width to
+            &frac12; pt. Then click the bottom edge in the Preview so the new border replaces the old one.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="179.74">2:59</button>
+          <button type="button" class="pill pill--time" data-seek="215.68">3:35</button>
+          <button type="button" class="pill pill--time" data-seek="234.8">3:54</button>
+        </p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">3</span>
+          <p class="todo__title">Format Painter: "Why Red Arrow" to "Keep up with innovations&hellip;"</p>
+        </div>
+        <div class="todo__body">
+          <p>On page 2, select the <strong>Why Red Arrow</strong> text, click
+            <span class="ui">Home &rsaquo; Format Painter</span> (the paintbrush), then select the
+            <strong>Keep up with innovations and technology</strong> text just after the picture. It picks up the red
+            formatting.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="290.16">4:50</button>
+          <button type="button" class="pill pill--time" data-seek="323.86">5:23</button>
+        </p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">4</span>
+          <p class="todo__title">Correct, resize and describe the transportation picture</p>
+        </div>
+        <div class="todo__body">
+          <p>Three changes to the same picture:</p>
+          <ul>
+            <li><strong>Correction: Brightness +40%, Contrast &minus;20%.</strong> The
+              <span class="ui">Picture Format &rsaquo; Corrections</span> gallery has this exact preset. Hover over
+              the thumbnails to read their names. The video does it instead with right-click &rsaquo;
+              <span class="ui">Format Picture</span> and the sliders. Either route works.</li>
+            <li><strong>Width 6.5"</strong>, proportionally. Change the width in
+              <span class="ui">Picture Format &rsaquo; Size</span> and let the height follow.</li>
+            <li><strong>Alt text</strong>: <span class="mono">Vehicles and technology.</span>, including the
+              period.</li>
+          </ul>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="364.24">6:04</button>
+          <button type="button" class="pill pill--time" data-seek="488.66">8:08</button>
+          <button type="button" class="pill pill--time" data-seek="506.58">8:26</button>
+          <button type="button" class="pill pill--time" data-seek="532.12">8:52</button>
+        </p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">5</span>
+          <p class="todo__title">Clear the formatting from one paragraph</p>
+        </div>
+        <div class="todo__body">
+          <p>The paragraph that starts "In addition to discounts" and ends "and vendor options." Select it, then
+            either expand the <span class="ui">Styles</span> gallery and choose
+            <span class="ui">Clear Formatting</span>, or use the <span class="ui">Clear All Formatting</span> button
+            (an <strong>A</strong> with an eraser) in the Home tab's Font group. All the red goes away.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="574.92">9:34</button>
+          <button type="button" class="pill pill--time" data-seek="622.56">10:22</button>
+        </p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">6</span>
+          <p class="todo__title">Insert a Grid Matrix SmartArt and fill it in</p>
+        </div>
+        <div class="todo__body">
+          <p>On page 3, click in the blank paragraph after "The Red Arrow TechPLUS program offers benefits in four
+            areas." Then <span class="ui">Insert &rsaquo; SmartArt &rsaquo; Matrix &rsaquo; Grid Matrix</span>.</p>
+          <p>Put the four words from your instruction file in the four boxes, in the positions it gives. In the video
+            they're <strong>Variety</strong> (top left), <strong>Flexibility</strong> (top right) and
+            <strong>Support</strong> (bottom left). The fourth isn't read out loud, so take it from your file.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="636.1">10:36</button>
+          <button type="button" class="pill pill--time" data-seek="673.76">11:13</button>
+          <button type="button" class="pill pill--time" data-seek="699.58">11:39</button>
+        </p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">7</span>
+          <p class="todo__title">Resize the SmartArt, then change its colors and style</p>
+        </div>
+        <div class="todo__body">
+          <p>First, <strong>select the whole diagram</strong>. Click its outer frame, not one of the boxes inside it.
+            Then:</p>
+          <ul>
+            <li><strong>Height 3", proportionally.</strong> Open the size settings (the small arrow at the corner of
+              the <span class="ui">Format &rsaquo; Size</span> group, or right-click the frame &rsaquo;
+              <span class="ui">More Layout Options &rsaquo; Size</span>). Check <strong>Lock aspect ratio</strong>
+              <em>first</em>, then change the height from 3.5 to 3.</li>
+            <li><span class="ui">SmartArt Design &rsaquo; Change Colors &rsaquo;</span> <strong>Gradient Range -
+              Accent 1</strong>, the third choice in the Accent 1 row.</li>
+            <li><span class="ui">SmartArt Design &rsaquo; SmartArt Styles &rsaquo;</span> <strong>Moderate
+              Effect</strong>. Hover over the thumbnails to read their names. It's not one of the 3-D ones.</li>
+          </ul>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="764.44">12:44</button>
+          <button type="button" class="pill pill--time" data-seek="849.7">14:09</button>
+          <button type="button" class="pill pill--time" data-seek="951.3">15:51</button>
+          <button type="button" class="pill pill--time" data-seek="972.12">16:12</button>
+        </p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">8</span>
+          <p class="todo__title">A right tab stop at 5" on "Grants 2028"</p>
+        </div>
+        <div class="todo__body">
+          <p>Click in the <strong>Grants 2028</strong> paragraph. The video uses the tab selector at the far left end
+            of the ruler: click it until it shows the <strong>right tab</strong> (an L flipped backwards), then click
+            the ruler at <strong>5"</strong>. Turn the ruler on with <span class="ui">View &rsaquo; Ruler</span> if
+            you can't see it.</p>
+          <p>For an exact position, use the Tabs dialog instead: <span class="ui">Home &rsaquo; Paragraph settings
+            &rsaquo; Tabs</span>, type <span class="mono">5"</span>, choose <strong>Right</strong>, then
+            <span class="ui">Set</span> and OK.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="990.54">16:30</button>
+          <button type="button" class="pill pill--time" data-seek="1048.56">17:28</button>
+          <button type="button" class="pill pill--time" data-seek="1078.56">17:58</button>
+        </p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">9</span>
+          <p class="todo__title">Add a last row to the Grants table</p>
+        </div>
+        <div class="todo__body">
+          <p>Click in the last cell of the table, in the <strong>Vertical Gardening</strong> row, and press
+            <span class="mono">Tab</span>. That adds a new row. (Or right-click &rsaquo;
+            <span class="ui">Insert &rsaquo; Insert Rows Below</span>.) Type <span class="mono">Veterans
+            Coffee</span> in the first column and <span class="mono">$15,000</span> in the second.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="1128.94">18:48</button>
+          <button type="button" class="pill pill--time" data-seek="1138.56">18:58</button>
+        </p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">10</span>
+          <p class="todo__title">Apply the List Table 3 - Accent 1 table style</p>
+        </div>
+        <div class="todo__body">
+          <p>Click anywhere in the Grants table, then <span class="ui">Table Design</span>, expand the Table Styles
+            gallery, and find <strong>List Table 3 - Accent 1</strong> in the List Tables section. You should see
+            red, bold text in the first column. It should look like the table right below it.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="1190.94">19:50</button>
+          <button type="button" class="pill pill--time" data-seek="1207.32">20:07</button>
+        </p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">11</span>
+          <p class="todo__title">Wrap and recolor the Getting Started picture</p>
+        </div>
+        <div class="todo__body">
+          <p>On page 4, the picture in the <strong>Getting Started</strong> section:</p>
+          <ul>
+            <li><span class="ui">Picture Format &rsaquo; Wrap Text &rsaquo;</span> <strong>Square</strong>, so the
+              text flows around it instead of the picture sitting in front of it.</li>
+            <li><span class="ui">Picture Format &rsaquo; Color &rsaquo; Recolor &rsaquo;</span> <strong>Red, Accent
+              color 1 Light</strong>. The black picture turns red to match the Red Arrow brand.</li>
+          </ul>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="1243.92">20:43</button>
+          <button type="button" class="pill pill--time" data-seek="1280.94">21:20</button>
+        </p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">12</span>
+          <p class="todo__title">Style the Purchase Product shape and give it a shadow</p>
+        </div>
+        <div class="todo__body">
+          <p>Select the <strong>Purchase Product</strong> shape by clicking its edge, so the whole shape is selected
+            and not just the text inside it. Then:</p>
+          <ul>
+            <li><span class="ui">Shape Format &rsaquo; Shape Styles &rsaquo;</span> <strong>Moderate Effect - Black,
+              Dark 1</strong></li>
+            <li><span class="ui">Shape Format &rsaquo; <strong>Shape Effects</strong> &rsaquo; Shadow &rsaquo;</span>
+              <strong>Offset: Center</strong>, in the Outer group</li>
+          </ul>
+          <p><strong>Shape Effects, not Text Effects.</strong> Text Effects has a Shadow gallery with the same
+            Offset: Center in it, but that shadow goes on the letters. In the video I use Text Effects here by
+            mistake, and I correct it later at 26:15.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="1310.94">21:50</button>
+          <button type="button" class="pill pill--time" data-seek="1340.94">22:20</button>
+          <button type="button" class="pill pill--time" data-seek="1575.34">26:15</button>
+        </p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">13</span>
+          <p class="todo__title">Format Painter: Select Vendor shape to Product ID shape</p>
+        </div>
+        <div class="todo__body">
+          <p>Select the <strong>Select Vendor</strong> shape, click <span class="ui">Format Painter</span>, then click
+            the <strong>Product ID</strong> shape. It's the same tool as step 3, used on shapes this time.</p>
+          <p>Then compare the whole document against the final figure at the end of the instruction file.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="1416.42">23:36</button>
+          <button type="button" class="pill pill--time" data-seek="1457.7">24:17</button>
+        </p>
+      </li>
+    </ol>
+
+    <h3>Submitting</h3>
+    <ol class="todo">
+      <li>
+        <div class="todo__top">
+          <span class="todo__num todo__num--setup" aria-hidden="true">E</span>
+          <p class="todo__title">Save and close both files</p>
+        </div>
+        <div class="todo__body">
+          <p>Save the <span class="mono">_2</span> file, close it, and close the instruction file too. A file still
+            open in Word can upload incomplete.</p>
+        </div>
+        <p class="todo__meta"><button type="button" class="pill pill--time" data-seek="1500.34">25:00</button></p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num todo__num--setup" aria-hidden="true">F</span>
+          <p class="todo__title">Upload the _2 file and select Submit</p>
+        </div>
+        <div class="todo__body">
+          <p>Drag and drop it into MindTap. Sorting your Downloads folder by <strong>Date Modified</strong> puts the
+            file you just saved at the top.</p>
+        </div>
+        <p class="todo__meta"><button type="button" class="pill pill--time" data-seek="1521.3">25:21</button></p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num todo__num--setup" aria-hidden="true">G</span>
+          <p class="todo__title">Open the Graded Summary Report, and fix anything it flags</p>
+        </div>
+        <div class="todo__body">
+          <p>It lists every step with the points it earned. If one comes back short, the report says what it
+            expected. In the video it says the shape should use the Shadow Offset: Center <em>shape</em> effect.
+            Fix that step in your <span class="mono">_2</span> file, save and close it, then reopen the guided
+            assignment in MindTap to start a new attempt, and upload again.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="1547.54">25:47</button>
+          <button type="button" class="pill pill--time" data-seek="1614.04">26:54</button>
+          <button type="button" class="pill pill--time" data-seek="1667.14">27:47</button>
+        </p>
+      </li>
+    </ol>
+  </section>
+
+  <!-- ============ Platform tabs ============ -->
+  <section aria-labelledby="platform-heading">
+    <h2 id="platform-heading">Windows and Mac differences</h2>
+    <p>The steps are the same on both. Most of this week's commands are on the object tabs (Picture Format, Shape
+      Format, SmartArt Design, Table Design), and those look nearly the same on Mac and Windows. The differences are
+      mostly in right-click menus, dialogs and keyboard shortcuts. The instruction file has a few Mac hints of its own
+      <em>(video 2:59)</em>. Pick your platform.</p>
+
+    <div class="tabs">
+      <div class="tablist" role="tablist" aria-label="Choose your platform">
+        <button type="button" class="tab" role="tab" id="tab-win" aria-controls="panel-win" aria-selected="true">Windows</button>
+        <button type="button" class="tab" role="tab" id="tab-mac" aria-controls="panel-mac" aria-selected="false" tabindex="-1">Mac</button>
+      </div>
+
+      <div class="tabpanel" role="tabpanel" id="panel-win" aria-labelledby="tab-win" tabindex="0">
+        <h3>On Windows</h3>
+        <ul style="max-width:none">
+          <li><strong>Enable Editing.</strong> Downloaded files open in Protected View with a yellow bar across the
+            top. You must select <span class="ui">Enable Editing</span> before anything works.</li>
+          <li><strong>Copying between the two documents:</strong> <span class="mono">Ctrl+C</span>, then
+            <span class="mono">Alt+Tab</span> to switch windows, then <span class="mono">Ctrl+V</span>. That's how
+            the video fills in the SmartArt boxes.</li>
+          <li><strong>Format Picture pane:</strong> right-click the picture &rsaquo; <span class="ui">Format
+            Picture</span> &rsaquo; the Picture icon &rsaquo; <span class="ui">Picture Corrections</span>.</li>
+          <li><strong>Alt text:</strong> <span class="ui">Picture Format &rsaquo; Alt Text</span>, or right-click
+            &rsaquo; <span class="ui">View Alt Text</span>. If Word has already put in a generated description,
+            replace it completely.</li>
+          <li><strong>Lock aspect ratio:</strong> right-click the SmartArt frame &rsaquo;
+            <span class="ui">More Layout Options</span> &rsaquo; <span class="ui">Size</span> tab.</li>
+          <li><strong>Tabs dialog:</strong> the small arrow at the corner of the Home tab's Paragraph group &rsaquo;
+            <span class="ui">Tabs&hellip;</span> button at the bottom left.</li>
+          <li><strong>Finding your file:</strong> File Explorer, <span class="ui">View &rsaquo; Details</span>, then
+            click the <span class="ui">Date modified</span> heading to sort newest first.</li>
+        </ul>
+      </div>
+
+      <div class="tabpanel" role="tabpanel" id="panel-mac" aria-labelledby="tab-mac" tabindex="0" hidden>
+        <h3>On Mac</h3>
+        <p>Cengage's material is written for Windows. Most of this assignment matches, but check these before you
+          decide something is broken. I've done these assignments on a Mac myself. If a command genuinely isn't where
+          I say it is, message me through the Canvas Inbox rather than guessing at a substitute.</p>
+        <ul style="max-width:none">
+          <li><strong>No Protected View.</strong> There's no Enable Editing bar. The file opens ready to edit.</li>
+          <li><strong>Copying between the two documents:</strong> <span class="mono">&#8984;+C</span> and
+            <span class="mono">&#8984;+V</span>. To switch between two Word windows use
+            <span class="mono">&#8984;+`</span> (the key above Tab). <span class="mono">&#8984;+Tab</span> switches
+            apps, not documents.</li>
+          <li><strong>Right-click</strong> is Control-click, or a two-finger click on a trackpad.</li>
+          <li><strong>Borders and Shading:</strong> the Borders drop-down on the Home tab &rsaquo;
+            <span class="ui">Borders and Shading&hellip;</span>, or <span class="ui">Format &rsaquo; Borders and
+            Shading</span> in the menu bar.</li>
+          <li><strong>Picture corrections:</strong> the <span class="ui">Picture Format &rsaquo; Corrections</span>
+            gallery is there too. For the sliders, Control-click the picture &rsaquo;
+            <span class="ui">Format Picture</span>.</li>
+          <li><strong>Alt text:</strong> Control-click the picture &rsaquo; <span class="ui">Edit Alt
+            Text&hellip;</span>, or <span class="ui">Picture Format &rsaquo; Alt Text</span>.</li>
+          <li><strong>Lock aspect ratio:</strong> in the size and position settings for the SmartArt frame
+            (Control-click the frame, or the size options on the Format tab). If you can't find the check box,
+            message me before you resize by hand.</li>
+          <li><strong>Tabs dialog:</strong> <span class="ui">Format &rsaquo; Tabs&hellip;</span> in the menu bar.
+            The ruler's tab selector works the same way as on Windows.</li>
+          <li><strong>Finding your file:</strong> Finder &rsaquo; Downloads, switch to
+            <span class="ui">List</span> view, then click <span class="ui">Date Modified</span> to sort newest
+            first.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ Corrections ============ -->
+  <section aria-labelledby="corrections-heading">
+    <h2 id="corrections-heading">Since this was recorded</h2>
+    <p>A few things will look different on your screen than they do on mine. <strong>Where this page and the video
+      disagree, this page is right.</strong></p>
+
+    <div class="callout callout--warn callout--wide">
+      <ul style="margin:0; max-width:none">
+        <li><strong>"Creating a business letter."</strong> That's the name of the Module 3 chapter. The guided
+          assignment itself is a four-page information sheet for Red Arrow Logistics, not a letter. Don't go looking
+          for a letter in your start file. <em>(Video 0:00.)</em></li>
+        <li><strong>The shadow.</strong> At 22:47 I apply the shadow from <span class="ui">Text Effects</span>
+          instead of <span class="ui">Shape Effects</span>. That's a mistake, and it's corrected later in the video:
+          the report flags it at 25:47 and I fix it at 26:15.</li>
+        <li><strong>Hunting through menus.</strong> From 6:45 to 7:23 and from 13:06 to 14:09 I'm looking for the
+          picture and SmartArt settings. The transcript skips the humming and the dead ends, so it has gaps there,
+          but no instructions are missing. For step 4 the Corrections gallery has the preset built in. For step 7
+          the size settings are described above.</li>
+        <li><strong>The fourth SmartArt box.</strong> I read three of the four words out loud. Take all four from
+          your instruction file.</li>
+        <li><strong>My Purchase Product shape sits lower.</strong> At 24:47 my shape is lower than the others and not
+          centered. I left it alone and still scored 25 out of 25. Don't drag yours around to match mine.</li>
+        <li><strong>I'm on attempt three.</strong> My report at 27:47 is my third attempt, so my MindTap screen shows
+          earlier attempts. Your list will be shorter. Starting a new attempt means going back and reopening the
+          guided assignment first <em>(26:54)</em>.</li>
+        <li><strong>Text as spoken.</strong> I read the sentences, alt text and table entries out loud, and the audio
+          garbles some of them. Go by your instruction file for the exact wording, and copy and paste rather than
+          typing.</li>
+        <li><strong>Module release.</strong> Modules post on the Friday before the week begins, so Week 5 opened
+          <strong>Friday 9/25</strong>. You can start early.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ AI policy ============ -->
+  <section aria-labelledby="ai-heading">
+    <h2 id="ai-heading">Using AI on this assignment</h2>
+    <p>The course AI policy is <strong>Limited</strong>. You can ask an AI tool to explain what a command does, to
+      tell you where something is on the Mac ribbon when the video shows Windows, to troubleshoot an error, or to
+      quiz you afterward. <strong>You build the Word file yourself.</strong> Spell check and grammar check are
+      ordinary Word features and are always allowed.</p>
+    <p>The practical reason: next week's 200-point Word Project expects you to position a picture, format a table and
+      style a shape from memory. Watching someone else do it isn't the same as doing it.</p>
+  </section>
+
+  <!-- ============ What's next ============ -->
+  <section aria-labelledby="next-heading">
+    <h2 id="next-heading">What's next</h2>
+    <p>Once the guided assignment is submitted, go straight to the <strong>Word Module 3 homework</strong> in MindTap.
+      It's the same commands on a different document, with no walkthrough, for 100 points. Week 6 brings the
+      200-point <strong>Word Project</strong>, submitted in Canvas. It can't be dropped, and it isn't accepted late
+      unless you arrange it before the due date.</p>
+    <p>Stuck on a step after re-watching it? Send me a message in the Canvas Inbox and say which step number and what
+      you tried. That's faster than burning attempts.</p>
+  </section>
+
+  <!-- ============ Quick reference ============ -->
+  <section aria-labelledby="reference-heading">
+    <h2 id="reference-heading">Quick reference</h2>
+    <div class="table-scroll" tabindex="0" role="region" aria-label="Quick reference table, scrollable">
+      <table>
+        <caption>Every value this assignment asks for, in one place. Confirm each one against your own instruction
+          file.</caption>
+        <thead>
+          <tr><th scope="col">Step</th><th scope="col">Where it lives</th><th scope="col">Exact setting</th></tr>
+        </thead>
+        <tbody>
+          <tr><th scope="row">1. Logo</th><td>Picture Format &rsaquo; Rotate; Position</td><td>Flip Horizontal; Top Left with Square Text Wrapping</td></tr>
+          <tr><th scope="row">2. Address line</th><td>Home &rsaquo; Borders &rsaquo; Borders and Shading</td><td>Bottom border, double line, Red Accent 1, 1&frac12; pt</td></tr>
+          <tr><th scope="row">3. Format Painter</th><td>Home &rsaquo; Format Painter</td><td>From "Why Red Arrow" to "Keep up with innovations and technology" (page 2)</td></tr>
+          <tr><th scope="row">4a. Correction</th><td>Picture Format &rsaquo; Corrections</td><td>Brightness: +40% Contrast: &minus;20%</td></tr>
+          <tr><th scope="row">4b. Size</th><td>Picture Format &rsaquo; Size</td><td>Width 6.5", proportional</td></tr>
+          <tr><th scope="row">4c. Alt text</th><td>Picture Format &rsaquo; Alt Text</td><td><span class="mono">Vehicles and technology.</span> (with the period)</td></tr>
+          <tr><th scope="row">5. Clear formatting</th><td>Home &rsaquo; Styles &rsaquo; Clear Formatting</td><td>"In addition to discounts &hellip; and vendor options." paragraph</td></tr>
+          <tr><th scope="row">6. SmartArt</th><td>Insert &rsaquo; SmartArt &rsaquo; Matrix</td><td>Grid Matrix in the blank paragraph under the TechPLUS sentence (page 3); four words from your file</td></tr>
+          <tr><th scope="row">7a. SmartArt size</th><td>Size dialog (More Layout Options)</td><td>Lock aspect ratio on; Height 3"</td></tr>
+          <tr><th scope="row">7b. SmartArt look</th><td>SmartArt Design</td><td>Change Colors: Gradient Range - Accent 1; Style: Moderate Effect</td></tr>
+          <tr><th scope="row">8. Tab stop</th><td>Ruler tab selector, or Paragraph &rsaquo; Tabs</td><td>Right tab at 5" on "Grants 2028"</td></tr>
+          <tr><th scope="row">9. New row</th><td>Tab in the last cell, or Insert Rows Below</td><td><span class="mono">Veterans Coffee</span> | <span class="mono">$15,000</span></td></tr>
+          <tr><th scope="row">10. Table style</th><td>Table Design &rsaquo; Table Styles</td><td>List Table 3 - Accent 1</td></tr>
+          <tr><th scope="row">11. Picture (page 4)</th><td>Picture Format &rsaquo; Wrap Text; Color</td><td>Square; Recolor Red, Accent color 1 Light</td></tr>
+          <tr><th scope="row">12. Purchase Product</th><td>Shape Format &rsaquo; Shape Styles; <strong>Shape</strong> Effects &rsaquo; Shadow</td><td>Moderate Effect - Black, Dark 1; Offset: Center</td></tr>
+          <tr><th scope="row">13. Format Painter</th><td>Home &rsaquo; Format Painter</td><td>From the Select Vendor shape to the Product ID shape</td></tr>
+          <tr><th scope="row">File name</th><td>File &rsaquo; Save As</td><td>The <span class="mono">_2</span> version, in Downloads</td></tr>
+          <tr><th scope="row">Submission</th><td>MindTap</td><td>Upload the <span class="mono">_2</span> file, select Submit, read the Graded Summary Report</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <p class="footnote">CSC 104 &middot; Computers and Computer Applications &middot; Fall 2026, Section 0840 &middot;
+    Mendocino College &middot; Instructor: David Pai &middot; <span class="mono">dpai@mendocino.edu</span>.
+    Nothing you type on this page is saved or submitted. Use the Canvas navigation outside this page to get back to
+    the Week 5 module.</p>
+</main>
+
+
+<script>
+(function () {
+  "use strict";
+
+  var VIDEO_ID = "bmgRKYmyXiE";
+
+  /* Transcript source: weeks/week05/csc104-word-3-guided-corrected.vtt — the
+     Whisper output with its hallucinated and non-English passages removed, its
+     repeated and duplicate cues collapsed, and its Word command names, proper
+     nouns and punctuation restored. Inlined rather than fetched so this page
+     stays self-contained inside the Canvas iframe. Keep the two copies in step:
+     if the YouTube captions are re-uploaded from the .vtt, re-paste it here
+     too. */
+  var vttContent = `WEBVTT
+
+NOTE
+CSC 104 — Week 5 — Word Module 3 Guided Assignment Walkthrough (YouTube bmgRKYmyXiE)
+Corrected transcript. Source: wk5-guided-word-3.vtt (Whisper output).
+Cleanup applied: hallucinated and non-English word-salad blocks removed (the
+humming and invented "add a new image / flip it over" narration at 6:45–7:18,
+the "darken this out" fragment at 9:08, the Japanese/Russian garble at
+16:43–16:58, and the Portuguese/Chinese garble at 22:19–22:20); the
+"insert a new row" phrase that Whisper repeated a dozen times at 18:58–19:28
+collapsed to the one real sentence; duplicated cues collapsed (3:20–3:21,
+4:10, 26:00); stutter duplicates collapsed; sentence casing and punctuation
+restored throughout; Word command names and proper nouns corrected (Red Arrow
+Logistics, Red Arrow TechPLUS, Flip Horizontal, Top Left with Square Text
+Wrapping, Borders and Shading, Red Accent 1, Format Painter, Brightness +40%
+Contrast −20%, Corrections, Format Picture, alt text, Clear All Formatting,
+Grid Matrix, SmartArt, Lock aspect ratio, Gradient Range - Accent 1, Moderate
+Effect, Powder, right tab, Grants 2028, Vertical Gardening, Veterans Coffee,
+List Table 3 - Accent 1, Recolor, Red Accent color 1 Light, Purchase Product,
+Moderate Effect - Black Dark 1, Offset: Center, Shape Effects, Text Effects,
+Select Vendor, Product ID, SAM, MindTap, Graded Summary Report); short cues
+merged into readable 1–2 sentence lines; timestamps normalized to
+HH:MM:SS.mmm. Text the instructor reads from the instruction file is garbled in
+places and is given here as a recognizable description rather than
+reconstructed word for word. The instructor's voice, hedges and menu-hunting
+are preserved, including the Text Effects / Shape Effects mistake at 22:47 and
+its correction at 26:15.
+
+00:00:00.240 --> 00:00:14.960
+Aloha, and welcome to Week 5. For this guided assignment we're going to work with creating a business letter — we'll do End of Module Project 1 for Word Module 3, Creating a Business Letter.
+
+00:00:14.960 --> 00:00:27.360
+And remember, these are just the context with which we learn how to use Word. We're doing little mini projects that will teach us different tools within Word that we can use.
+
+00:00:27.360 --> 00:00:51.280
+All right, so we load our system up, we start our project, and we're going to Download All. Okay, let's see if we can make this a little bit bigger so you can read it better. Okay, and so we Download All.
+
+00:00:53.520 --> 00:01:05.840
+And then we'll go to our folder. In our folder we have the instructions and our starting document, so let me open up the instructions first.
+
+00:01:07.760 --> 00:01:15.680
+Okay, so here are our instructions. We'll view them at Page Width so we can read them well.
+
+00:01:16.960 --> 00:01:34.640
+And then we'll also open up our actual Word document that we need to modify: Enable Editing, View › Page Width. I'm going to make these all full screen. All right, so this is Red Arrow Logistics.
+
+00:01:34.640 --> 00:01:51.520
+Of course, the first thing we want to do is take our file — File › Save As — and we're going to add a two to the end. Change the one to a two, so we have it.
+
+00:01:51.520 --> 00:02:05.380
+Okay, and then we're going to scroll down and make sure our name is in the footer. All right, so that's the basics before we get started.
+
+00:02:05.380 --> 00:02:27.020
+Now, project step 1. We're creating an information sheet to mail to current clients. On the first page, we need to flip the picture of the company's logo to orient the text horizontally, and change the picture to Top Left with Square Text Wrapping to adjust the layout.
+
+00:02:27.020 --> 00:02:40.900
+All right, so if you look at this picture, you'll see the text is backwards. So click on the picture, Picture Format, and under Rotate we want Flip Horizontal.
+
+00:02:40.900 --> 00:02:59.740
+Okay, so we flip it horizontal. And then under Position we're going to select Top Left with Square Text Wrapping.
+
+00:02:59.740 --> 00:03:20.980
+All right, so it'll be top left with square text wrapping. Next: add a double-line bottom border to the address line paragraph, change the color of the border to Red, Accent 1, and change the width to 1½ point. And there are some Mac hints here.
+
+00:03:20.980 --> 00:03:35.680
+Okay, so I'm going to add a double-line bottom border to this paragraph here, which is the address line paragraph. So to do that, I'm going to go to Borders, and I'm going to add a bottom border.
+
+00:03:35.680 --> 00:03:54.800
+But then it's just a single line. So instead of Bottom Border, let's go to Borders and Shading. Okay: color is Red, width is 1½,
+
+00:03:54.800 --> 00:04:16.660
+and then we have to find the double line — one, two, three, four, five... right here, I think. If I click that, it changes the width back to half a point, and I really want 1½. And I'm going to click to take the bottom border off and then add it again,
+
+00:04:16.660 --> 00:04:28.220
+and you can see there's a double line. All right, and we'll say OK. And now we get a double line that goes across that whole paragraph, and that's what we want.
+
+00:04:28.220 --> 00:04:50.160
+If you're not sure while you're working on this, what you can do is scroll all the way down to the bottom of the instructions to see the final figure. And you see this double red line, just like this — so we've matched that. So if you want to check right away, you can do that.
+
+00:04:50.160 --> 00:05:10.860
+All right, number 3. On page 2, use the Format Painter to apply the formatting from the text "Why Red Arrow" to the text "Keep up with innovations and technology," just after the picture.
+
+00:05:10.860 --> 00:05:23.860
+Okay, so we're going to go down to page 2. We want to take this formatting here, "Why Red Arrow," and apply it to "Keep up with innovations" — we want to apply it to this.
+
+00:05:23.860 --> 00:05:40.920
+Okay, so we're using the Format Painter. I'm going to highlight this whole paragraph — you don't have to do the whole paragraph, but it works just as well. Click Format Painter. So now I've stored that formatting, and whatever I select next is what it will apply to.
+
+00:05:42.100 --> 00:06:04.240
+Okay, so I applied it to the exact same thing, the whole paragraph: "Keep up with innovations and technology." The Format Painter is great. Once you have something formatted the way you want it, you can just use that without having to remember, "Hey, what did I do?" — all that kind of stuff.
+
+00:06:04.240 --> 00:06:23.620
+Okay, number 4. Apply the Brightness: +40% Contrast: −20% correction to the transportation picture, resize the picture proportionally to a width of 6.5", and add the following alt text description to the picture. The alt text is "Vehicles and technology." — with a period.
+
+00:06:23.620 --> 00:06:45.320
+Okay, if you don't include the period, you'll get it marked incorrect. So this is the image we want to adjust. We'll go to Picture Format after we select it — we're going to Picture Format, and we'll go to Corrections.
+
+00:07:23.380 --> 00:07:48.040
+You just have all the things that are there. Okay, I usually do everything this way: through Format, by right-clicking and going down to Format Picture. It'll open up this extra pane to format my picture.
+
+00:07:48.040 --> 00:08:08.660
+Okay. Somewhere it's also in one of these menus — we can find it... Not there. Anyway, I'm sure you'll find it, but this is the way I always find it.
+
+00:08:08.660 --> 00:08:23.540
+We want to make it Brightness +40. So you can grab the slider and move it over to get it close to 40, and then use the little arrows to get it to 40. Contrast −20, so that'll be to the left.
+
+00:08:26.580 --> 00:08:52.120
+Okay, so we want +40, −20. And then we'll resize it to a width of 6.5 and add this alt text. All right, so we can resize the width to 6.5. Okay, and see, it gets bigger.
+
+00:08:52.120 --> 00:09:15.860
+And then we can apply this alt text of "Vehicles and technology." — with the period. So I just copied it, and I will paste it in here.
+
+00:09:15.860 --> 00:09:34.920
+Okay, so our alt text is in, and our image has been adjusted, so we can close our Format Picture pane. If you want, you can always go File › Save, just to make sure you have all those changes you've made.
+
+00:09:34.920 --> 00:09:53.240
+Okay, 5. Clear the formatting from the paragraph that starts with "In addition to discounts" and ends with "and vendor options." So it's this spot — this paragraph right here, "In addition to discounts."
+
+00:09:53.240 --> 00:10:22.560
+So what we want to do is remove all this red — we want to get rid of all that stuff. Okay, if I try to right-click, there's nothing there.
+
+00:10:22.560 --> 00:10:36.100
+What I want is under Styles. So I'm going to go up here, expand Styles, and select Clear Formatting. That's the easiest way: Clear All Formatting, and it all goes away.
+
+00:10:36.100 --> 00:11:00.440
+Okay. On page 3, add the Grid Matrix SmartArt in the blank paragraph after "The Red Arrow TechPLUS program offers benefits in four areas," and then put this information into our shape.
+
+00:11:00.440 --> 00:11:13.760
+Okay, so: Grid Matrix SmartArt. Right here — Program Benefits, here's this paragraph. So we want to add it in this blank line here.
+
+00:11:13.760 --> 00:11:39.580
+Okay: Insert, SmartArt, and then we want to find Matrix — that's the easiest way. And here's a Basic Matrix; here's the Grid Matrix. Add the Grid Matrix and say OK.
+
+00:11:39.580 --> 00:12:14.800
+Okay, here are our four things, and they want: top left, Variety. Okay. Top right, Flexibility. Bottom left, Support.
+
+00:12:14.800 --> 00:12:36.800
+All right, if you're not sure what I'm doing here: I'm highlighting the word by double-clicking, I'm using Ctrl+C to copy it, I'm using Alt+Tab to return to the other document, then I click on Text and use Ctrl+V to paste it in. You could use, you know, Edit, Paste — all that kind of stuff.
+
+00:12:36.800 --> 00:12:43.060
+I just use the keyboard commands because I know them very well. I've used them forever.
+
+00:12:44.440 --> 00:13:05.740
+All right: resize the SmartArt proportionally to a height of 3 inches — and the hint says to check Lock aspect ratio to resize the SmartArt proportionally. Okay, so what we want to do here is, on our SmartArt —
+
+00:13:06.800 --> 00:13:30.100
+Okay, let's see. You can try Format Object, but it's not really going to give us what we want.
+
+00:13:30.100 --> 00:14:03.280
+So what I want to do is... Format... I can't just change this, because that's not what we want to do. We don't want that. Let's change Layout.
+
+00:14:09.700 --> 00:14:36.720
+There's Text Position. Okay, so we expand Size — this is my size. What we want to do is make sure we check the Lock aspect ratio box. Okay, stop there.
+
+00:14:36.720 --> 00:14:54.720
+That means that no matter what I do, the aspect ratio won't change. I don't remember the size... okay, I think it was 3 inches for the height. So it's 3.5 — change it to 3, say OK,
+
+00:14:54.720 --> 00:15:12.380
+and then it will shrink in both directions the correct amount. Okay, so height 3, proportionately, by making sure it's locked. Okay, then we want to change the colors to Gradient Range - Accent 1, with a Moderate Effect.
+
+00:15:12.380 --> 00:15:51.300
+Okay, so we're in here, in our SmartArt Design, and we want to change it to — Powder, 3-D? No, let's see. This is the Moderate Effect. I think this is Moderate, right here. But first we want to change the colors.
+
+00:15:51.300 --> 00:16:12.120
+First one: change the colors to Gradient Range - Accent 1. So we're going to Change Colors, and we'll go to Accent 1. Gradient Range - Accent 1 is the middle one — the third one. Okay.
+
+00:16:12.120 --> 00:16:30.540
+And so that changed — no. I have this whole object... I'm not selecting the individual things; I'm trying to select the entire object. Okay: SmartArt Design, Change Colors, and then we need to apply the Moderate Effect, and then click somewhere else.
+
+00:16:30.540 --> 00:16:43.300
+So we changed the colors, and then we applied the Moderate Effect. Okay: set a right-align tab at 5 inches for the paragraph "Grants 2028."
+
+00:16:58.560 --> 00:17:25.080
+I think so. No, there's no tabs there — sorry. There's a Tabs menu somewhere. And what I like to do is up in the upper left. Let me show you — let me magnify that. So, up in the upper left.
+
+00:17:28.560 --> 00:17:58.540
+There's this thing — this little thing. In fact, click on it: it changes. Left, Center, Right. Okay. Hanging, something else... Okay, so: Left — we want Right. Center — we want Right.
+
+00:17:58.560 --> 00:18:24.280
+So we want the one with the line that goes up on the right — so it's the right tab. And then we're just going to go over here to 5 inches and click at 5 inches. So: put a right tab at 5 inches. Okay, that's what it asked me to do, so that's what I did.
+
+00:18:28.560 --> 00:18:44.940
+Okay, so: right tab at 5 inches for the paragraph "Grants 2028." So, Grants 2028 — and you notice it matches the Technology line below it.
+
+00:18:48.940 --> 00:18:58.540
+Right, we're almost done. Number 9: insert a row at the end of the Grants table, with the words "Veterans Coffee" in the first column of that new row,
+
+00:18:58.560 --> 00:19:28.560
+and "$15,000" in the second column. Okay, so we're going to go down here to Vertical Gardening. I'm going to click in Vertical Gardening, right-click on it, and go Insert Rows Below — and it'll insert a new row. Now, I don't have to do it that way: I can just click in Vertical Gardening, press Tab to go to the next cell, and press Tab again,
+
+00:19:28.560 --> 00:19:50.940
+and it makes a new row. Okay, either way, it doesn't really matter. So we want "Veterans Coffee" — I believe that's what we want — and then "$15,000": the dollar sign, 15, comma, three zeros.
+
+00:19:50.940 --> 00:20:07.320
+Okay: apply the List Table 3 - Accent 1 table style to the table. So, List Table 3 - Accent 1. Click anywhere in our table,
+
+00:20:07.320 --> 00:20:28.500
+and we'll go to Table Design and expand the styles. Okay, and what we're looking for is a List Table, and then we want this List Table 3 - Accent 1.
+
+00:20:28.500 --> 00:20:43.920
+We'll click on that, and we get red, bolded text on the left, and it matches the one right below it. Okay, that's the key here: you want them to match.
+
+00:20:43.920 --> 00:20:49.300
+Okay. On page 4, change the text wrapping of the picture in the Getting Started section to Square.
+
+00:20:50.940 --> 00:21:15.740
+Okay, so, page 4 — this picture here. We need to change its text wrapping to Square. So now it's on the left: it's not in front of the text, it's beside the text, and the text wraps around it in a square.
+
+00:21:15.740 --> 00:21:19.300
+Okay. Recolor the picture to Red, Accent color 1 Light.
+
+00:21:20.940 --> 00:21:49.460
+Okay, so in Word we can modify this: go to Color, and we're going to change the color — Recolor — to Red, Accent color 1 Light. And now I've changed it from all that black to red,
+
+00:21:50.940 --> 00:22:05.940
+which matches with our Red Arrow, right? So red's a key thing, because it's Red Arrow. Okay: change the shape style of the Purchase Product shape to Moderate Effect - Black, Dark 1.
+
+00:22:05.940 --> 00:22:18.940
+Okay, so Purchase Product — we want to change it to Moderate Effect - Black, Dark 1. So, Purchase Product.
+
+00:22:20.940 --> 00:22:47.700
+We want the whole thing. Shape Format, Shape Styles — I'm going to be looking through these: Colored Fill, Light, Moderate Effect... Black, Dark 1. So I'm going to choose Moderate Effect - Black, Dark 1.
+
+00:22:47.700 --> 00:23:08.880
+And then we're going to apply a Shadow Offset: Center shape effect from the Shadow gallery. So now we're going to go to our Shape Format, Text Effects, Shadow.
+
+00:23:09.400 --> 00:23:30.700
+Okay, and we're going to go to the one in the middle — oops — Offset: Center. So we have Inner, Inside: Center... I think we want the Offset: Center, and we'll find out.
+
+00:23:36.420 --> 00:23:47.280
+Okay: using the Format Painter, apply the formatting of the Select Vendor shape to the Product ID shape.
+
+00:23:47.700 --> 00:24:16.580
+Okay, so we'll go to Select Vendor, take our Format Painter, and apply it to our Product ID shape. Okay, let's see if I turn this off... Yeah, I'm not sure. We'll see what happens with Purchase Product. So it should look like the final figure.
+
+00:24:17.700 --> 00:24:47.580
+Okay, so it should have this red arrow — we've looked at that already, my red arrow. This image is bigger; "Keep up with innovations" is in red; we added this diagram; we changed Grants; we modified this table; we modified this. Somehow our Purchase Product looks different.
+
+00:24:47.700 --> 00:25:00.340
+I don't know why mine's lower than the rest, and it's not centered, but that's the way it was, so we'll just see what happens.
+
+00:25:00.340 --> 00:25:21.300
+Okay, so I'm going to save this, because I'm done. I'll save it and close it, and then I'm going to go back to here — "Save your work in SAM" — and I'm going to grab that _2 file.
+
+00:25:21.300 --> 00:25:46.720
+I'm going to grab the _2 and drag and drop it to submit it, and then I'll submit it to get a grade. Then I'll grab my Graded Summary Report and look at it. It says 24 out of 25. Yeah, it probably has to do with that
+
+00:25:47.540 --> 00:26:15.300
+one thing. Let's see: 2, 2, 2, 2... 1. So it says it should be formatted using the Shadow Offset: Center shape effect — so somehow I didn't get that right.
+
+00:26:15.340 --> 00:26:54.040
+So I can go back to my original — this one. Shape Effect... I think I did Text Effect instead of Shape. Okay, so now it's moved up, even. Yeah, I think I did Text Effect and not Shape Effect.
+
+00:26:54.040 --> 00:27:25.080
+Okay, so now let me save it and close it. Close this one. Then from here I have to cancel this. I need to go back here — I need to reopen the guided project so that I can start it again.
+
+00:27:30.540 --> 00:27:46.520
+Right, and then I can grab the _2, which should be the new one, and submit it for a grade, and view the Graded Summary Report
+
+00:27:47.140 --> 00:28:19.800
+for attempt number 3, for me. And now I have 25 out of 25, because on this one step — the Shadow Offset: Center shape effect — I did Text Effect the first time instead of Shape Effect. And then we corrected it, and everything else came out correctly.
+
+00:28:19.800 --> 00:28:33.780
+And then that's all you would do. All right, so hopefully that all makes sense to everybody, and we'll see you next time. Thanks, bye.`;
+
+  var player = null, timeUpdater = null, parsedTranscript = [], playerReady = false;
+
+  try {
+    if (!CSS.supports("selector(:focus-visible)")) { document.body.classList.add("no-fv"); }
+  } catch (e) { document.body.classList.add("no-fv"); }
+
+  /* ---------------- VTT parsing ---------------- */
+  function timeToSeconds(timeStr) {
+    if (!timeStr) { return 0; }
+    var parts = timeStr.trim().split(":");
+    if (parts.length === 2) {
+      return (parseInt(parts[0], 10) || 0) * 60 + (parseFloat(parts[1]) || 0);
+    }
+    if (parts.length === 3) {
+      return (parseInt(parts[0], 10) || 0) * 3600 + (parseInt(parts[1], 10) || 0) * 60 + (parseFloat(parts[2]) || 0);
+    }
+    return 0;
+  }
+
+  function formatTime(sec) {
+    sec = Math.max(0, Math.floor(sec));
+    var h = Math.floor(sec / 3600), m = Math.floor((sec % 3600) / 60), s = sec % 60;
+    var mm = (h > 0 && m < 10) ? "0" + m : String(m);
+    return (h > 0 ? h + ":" : "") + mm + ":" + (s < 10 ? "0" + s : s);
+  }
+
+  function parseVtt(vttText) {
+    var blocks = vttText.trim().split(/\n\n+/);
+    var cues = [];
+    blocks.forEach(function (block) {
+      var trimmed = block.trim();
+      if (!trimmed || trimmed.indexOf("WEBVTT") === 0 || trimmed.indexOf("NOTE") === 0) { return; }
+      var lines = trimmed.split("\n");
+      var timeLine = null, timeIndex = -1;
+      for (var i = 0; i < lines.length; i++) {
+        if (lines[i].indexOf("-->") !== -1) { timeLine = lines[i]; timeIndex = i; break; }
+      }
+      if (!timeLine) { return; }
+      var ends = timeLine.split("-->");
+      var text = lines.slice(timeIndex + 1).join(" ").trim();
+      if (!text) { return; }
+      cues.push({ start: timeToSeconds(ends[0]), end: timeToSeconds(ends[1]), text: text });
+    });
+    return cues;
+  }
+
+  /* ---------------- Transcript panel ---------------- */
+  function seek(seconds) {
+    if (!player || !player.seekTo) { return false; }
+    player.seekTo(seconds, true);
+    if (player.playVideo) { player.playVideo(); }
+    return true;
+  }
+
+  function scrollPlayerIntoView() {
+    var frame = document.getElementById("video-container");
+    if (frame && frame.scrollIntoView) { frame.scrollIntoView({ behavior: "smooth", block: "center" }); }
+  }
+
+  function populateTranscript() {
+    var container = document.getElementById("transcript-container");
+    if (!container) { return; }
+    container.innerHTML = "";
+    parsedTranscript.forEach(function (cue, i) {
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "transcript-line";
+      btn.dataset.start = cue.start;
+      btn.dataset.end = cue.end;
+      btn.dataset.index = i;
+
+      var stamp = document.createElement("span");
+      stamp.className = "t";
+      stamp.textContent = formatTime(cue.start);
+
+      var body = document.createElement("span");
+      body.className = "tx";
+      body.textContent = cue.text;
+
+      btn.appendChild(stamp);
+      btn.appendChild(body);
+      btn.setAttribute("aria-label", "Jump to " + formatTime(cue.start) + ". " + cue.text);
+
+      btn.addEventListener("click", function () {
+        if (seek(cue.start)) { scrollPlayerIntoView(); }
+      });
+      container.appendChild(btn);
+    });
+  }
+
+  /* ---------------- Active-line highlight ---------------- */
+  var lastAnnounced = null;
+  function announceLine(text) {
+    if (text === lastAnnounced) { return; }
+    lastAnnounced = text;
+    var s = document.getElementById("transcript-status");
+    if (s) { s.textContent = text || ""; }
+  }
+
+  function highlightCurrentLine() {
+    if (!player || !player.getCurrentTime) { return; }
+    var now = player.getCurrentTime();
+    var lines = document.querySelectorAll("#transcript-container .transcript-line");
+    var active = null;
+    Array.prototype.forEach.call(lines, function (line) {
+      var start = parseFloat(line.dataset.start), end = parseFloat(line.dataset.end);
+      if (now >= start && now < end) { active = line; }
+    });
+    var prev = document.querySelector("#transcript-container .is-active");
+    if (active === prev) { return; }
+    if (prev) { prev.classList.remove("is-active"); }
+    if (active) {
+      active.classList.add("is-active");
+      var body = active.querySelector(".tx");
+      announceLine(body ? body.textContent : active.textContent);
+      if (!active.hidden) { active.scrollIntoView({ behavior: "smooth", block: "center" }); }
+    }
+  }
+
+  /* ---------------- Panel height ---------------- */
+  function syncTranscriptHeight() {
+    var videoContainer = document.getElementById("video-container");
+    var panel = document.getElementById("transcript-container");
+    if (!videoContainer || !panel) { return; }
+    // Match the panel to the video only when the two columns actually sit side
+    // by side. Compared by rendered position rather than a viewport-width test,
+    // because in a Canvas iframe a media query measures the iframe, not the
+    // browser window, and can disagree with the flex-wrap result.
+    var videoCol = videoContainer.parentNode;
+    var transcriptCol = panel.parentNode;
+    var sideBySide = Math.abs(
+      transcriptCol.getBoundingClientRect().top - videoCol.getBoundingClientRect().top) < 40
+      && transcriptCol.getBoundingClientRect().left !== videoCol.getBoundingClientRect().left;
+    // Side by side, the panel should end level with the video, so subtract the
+    // heading/search row that sits above it inside the transcript column.
+    var head = transcriptCol.querySelector(".transcript-head");
+    var headH = head ? head.offsetHeight + 8 : 0;
+    var h = sideBySide ? Math.max(240, videoContainer.offsetHeight - headH) + "px" : "24rem";
+    panel.style.height = h;
+    panel.style.maxHeight = h;
+  }
+
+  /* ---------------- Transcript search ---------------- */
+  function escapeRe(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); }
+
+  function runFilter(term) {
+    var lines = document.querySelectorAll("#transcript-container .transcript-line");
+    var status = document.getElementById("transcript-filter-status");
+    var q = term.trim().toLowerCase();
+    var shown = 0;
+
+    Array.prototype.forEach.call(lines, function (line) {
+      var body = line.querySelector(".tx");
+      var cue = parsedTranscript[parseInt(line.dataset.index, 10)];
+      if (!body || !cue) { return; }
+      if (!q) {
+        body.textContent = cue.text;
+        line.hidden = false;
+        shown++;
+        return;
+      }
+      if (cue.text.toLowerCase().indexOf(q) === -1) {
+        body.textContent = cue.text;
+        line.hidden = true;
+        return;
+      }
+      line.hidden = false;
+      shown++;
+      // Rebuild with <mark> around the matches, without using innerHTML on
+      // user-supplied text.
+      body.textContent = "";
+      var re = new RegExp(escapeRe(term.trim()), "ig");
+      var last = 0, m;
+      while ((m = re.exec(cue.text)) !== null) {
+        if (m.index > last) { body.appendChild(document.createTextNode(cue.text.slice(last, m.index))); }
+        var mk = document.createElement("mark");
+        mk.textContent = m[0];
+        body.appendChild(mk);
+        last = m.index + m[0].length;
+        if (m[0].length === 0) { re.lastIndex++; }
+      }
+      if (last < cue.text.length) { body.appendChild(document.createTextNode(cue.text.slice(last))); }
+    });
+
+    if (status) {
+      status.textContent = q
+        ? (shown === 0 ? "No transcript lines match " + term : shown + " transcript line" + (shown === 1 ? "" : "s") + " match " + term)
+        : "Showing the whole transcript.";
+    }
+  }
+
+  function wireSearch() {
+    var input = document.getElementById("transcript-filter");
+    if (!input) { return; }
+    var t = null;
+    input.addEventListener("input", function () {
+      clearTimeout(t);
+      t = setTimeout(function () { runFilter(input.value); }, 250);
+    });
+  }
+
+  /* ---------------- Seek buttons (topic index + step pills) ----------------
+     Buttons wired to the embedded player, never youtu.be?t= links: a time link
+     would navigate the Canvas iframe away from this page. If the player never
+     comes up, the buttons are turned back into plain text so the index reads
+     as a reference list rather than as controls that silently do nothing. */
+  function wireSeekButtons() {
+    var btns = document.querySelectorAll("[data-seek]");
+    Array.prototype.forEach.call(btns, function (btn) {
+      var t = parseFloat(btn.getAttribute("data-seek")) || 0;
+      var item = btn.closest(".topic-index__item") || btn.closest(".todo > li");
+      var text = item ? item.querySelector(".topic-index__label, .todo__title") : null;
+      btn.setAttribute("aria-label", "Jump to " + formatTime(t) + (text ? " — " + text.textContent : "") + " in the video");
+      btn.addEventListener("click", function () {
+        if (seek(t)) { scrollPlayerIntoView(); }
+      });
+    });
+  }
+
+  function degradeToStatic(message) {
+    if (playerReady) { return; }
+    document.body.classList.add("no-player");
+    var idx = document.getElementById("topic-index");
+    if (idx) { idx.classList.add("topic-index--static"); }
+    Array.prototype.forEach.call(document.querySelectorAll("[data-seek]"), function (btn) {
+      btn.disabled = true;
+      btn.removeAttribute("aria-label");
+    });
+    var note = document.getElementById("topic-index-fallback");
+    if (note) { note.hidden = false; note.textContent = message; }
+  }
+
+  /* ---------------- Platform tabs ---------------- */
+  function wireTabs() {
+    var tablist = document.querySelector(".tablist");
+    if (!tablist) { return; }
+    var tabs = Array.prototype.slice.call(tablist.querySelectorAll('[role="tab"]'));
+
+    function select(tab, focus) {
+      tabs.forEach(function (t) {
+        var selected = t === tab;
+        t.setAttribute("aria-selected", selected ? "true" : "false");
+        t.tabIndex = selected ? 0 : -1;
+        var panel = document.getElementById(t.getAttribute("aria-controls"));
+        if (panel) { panel.hidden = !selected; }
+      });
+      if (focus) { tab.focus(); }
+    }
+
+    tabs.forEach(function (tab, i) {
+      tab.addEventListener("click", function () { select(tab, false); });
+      tab.addEventListener("keydown", function (e) {
+        var next = null;
+        if (e.key === "ArrowRight") { next = tabs[(i + 1) % tabs.length]; }
+        else if (e.key === "ArrowLeft") { next = tabs[(i - 1 + tabs.length) % tabs.length]; }
+        else if (e.key === "Home") { next = tabs[0]; }
+        else if (e.key === "End") { next = tabs[tabs.length - 1]; }
+        if (next) { e.preventDefault(); select(next, true); }
+      });
+    });
+  }
+
+  /* ---------------- YouTube player ---------------- */
+  window.onYouTubeIframeAPIReady = function () {
+    if (!VIDEO_ID || !document.getElementById("youtube-player")) { return; }
+    player = new YT.Player("youtube-player", {
+      events: {
+        onReady: function () {
+          playerReady = true;
+          syncTranscriptHeight();
+        },
+        onStateChange: function (event) {
+          clearInterval(timeUpdater);
+          if (event.data === YT.PlayerState.PLAYING) {
+            timeUpdater = setInterval(highlightCurrentLine, 300);
+          } else {
+            highlightCurrentLine();
+          }
+        }
+      }
+    });
+  };
+
+  document.addEventListener("DOMContentLoaded", function () {
+    parsedTranscript = parseVtt(vttContent);
+    populateTranscript();
+    wireSearch();
+    wireSeekButtons();
+    wireTabs();
+    setTimeout(syncTranscriptHeight, 100);
+
+    if (typeof YT === "undefined" || typeof YT.Player === "undefined") {
+      var tag = document.createElement("script");
+      tag.src = "https://www.youtube.com/iframe_api";
+      tag.onerror = function () {
+        degradeToStatic("The video player could not load, so the times below are listed for reference rather than as buttons. The full transcript is above.");
+      };
+      document.head.appendChild(tag);
+    } else {
+      window.onYouTubeIframeAPIReady();
+    }
+
+    // If the API never reports ready — blocked script, offline, restrictive
+    // network — fall back rather than leaving dead buttons on the page.
+    setTimeout(function () {
+      degradeToStatic("The video player did not load, so the times below are listed for reference rather than as buttons. The full transcript is above.");
+    }, 8000);
+  });
+
+  var resizeTimeout;
+  window.addEventListener("resize", function () {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(syncTranscriptHeight, 250);
+  });
+
+  /* Report height to a Canvas parent that listens for it. Harmless otherwise. */
+  function postHeight() {
+    try {
+      if (window.parent && window.parent !== window) {
+        var h = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
+        window.parent.postMessage({ subject: "lti.frameResize", height: h }, "*");
+      }
+    } catch (e) { /* cross-origin parent — ignore */ }
+  }
+  window.addEventListener("load", postHeight);
+  if (window.ResizeObserver) { new ResizeObserver(postHeight).observe(document.body); }
+})();
+</script>
+</body>
+</html>
