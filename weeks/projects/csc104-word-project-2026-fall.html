@@ -365,11 +365,11 @@ thead th { background: var(--panel-2); font-size: 0.8125rem; text-transform: upp
     <em>last</em>, so it lands in front of everything you've built.</p>
   <ol class="order" aria-label="Order of the seven parts">
     <li>Document setup <span class="pts-inline">· 15 pts</span></li>
-    <li>Page 1 text and formatting <span class="pts-inline">· 40 pts</span></li>
+    <li>Page 1 text and formatting <span class="pts-inline">· 47 pts</span></li>
     <li>The two lists <span class="pts-inline">· 30 pts</span></li>
     <li>Picture and page break <span class="pts-inline">· 30 pts</span></li>
-    <li>Budget table <span class="pts-inline">· 40 pts</span></li>
-    <li>SmartArt <span class="pts-inline">· 15 pts</span></li>
+    <li>Budget table <span class="pts-inline">· 26 pts</span></li>
+    <li>SmartArt <span class="pts-inline">· 22 pts</span></li>
     <li>Header, watermark, cover page <span class="pts-inline">· 25 pts</span></li>
   </ol>
   <p class="tip">Saving with the right file name is the last 5 points. Save early and often. A copy in OneDrive or on a USB drive
@@ -428,7 +428,7 @@ thead th { background: var(--panel-2); font-size: 0.8125rem; text-transform: upp
       <button type="button" class="part__trigger" id="t2" aria-expanded="false" aria-controls="p2">
         <span class="part__badge">Part 2</span>
         <span class="part__title">Page 1 text and formatting</span>
-        <span class="part__pts">40 pts</span>
+        <span class="part__pts">47 pts</span>
         <svg class="part__chev" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="5 8 10 13 15 8"/></svg>
       </button>
     </h3>
@@ -473,6 +473,13 @@ Space is limited in every program, so we encourage all interested community memb
             <p><strong>Character spacing:</strong> expand the character spacing of the title line by <strong>2 pt</strong>.</p>
           </div>
           <div class="task__meta"><span class="task__pts">4 pts</span></div>
+        </li>
+        <li class="task">
+          <div class="task__body">
+            <p><strong>Paragraph border:</strong> add a <strong>bottom border</strong> under the title line: a
+              <strong>double line</strong>, color <strong>Accent 1</strong>, width <strong>1½ pt</strong>.</p>
+          </div>
+          <div class="task__meta"><span class="task__pts">7 pts</span></div>
         </li>
         <li class="task">
           <div class="task__body">
@@ -654,7 +661,7 @@ Space is limited in every program, so we encourage all interested community memb
       <button type="button" class="part__trigger" id="t5" aria-expanded="false" aria-controls="p5">
         <span class="part__badge">Part 5</span>
         <span class="part__title">Budget table</span>
-        <span class="part__pts">40 pts</span>
+        <span class="part__pts">26 pts</span>
         <svg class="part__chev" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="5 8 10 13 15 8"/></svg>
       </button>
     </h3>
@@ -683,7 +690,7 @@ Space is limited in every program, so we encourage all interested community memb
               commas included.</p>
             <div class="table-scroll data-preview" tabindex="0" role="region" aria-label="Budget data to type into the table">
               <table>
-                <caption>Rows 1–4 (type these first)</caption>
+                <caption>Rows 1–4</caption>
                 <thead>
                   <tr><th scope="col">Category</th><th scope="col">Item Description</th><th scope="col">Allocated Budget</th></tr>
                 </thead>
@@ -695,7 +702,15 @@ Space is limited in every program, so we encourage all interested community memb
               </table>
             </div>
           </div>
-          <div class="task__meta"><span class="task__pts">6 pts</span></div>
+          <div class="task__meta"><span class="task__pts">8 pts</span></div>
+        </li>
+        <li class="task">
+          <div class="task__body">
+            <p><strong>Total row:</strong> add a new last row to the table and type <code>Total</code> in the first
+              column, <code>All categories</code> in the second, and <code>$11,500</code> in the third. The table now has
+              5 rows.</p>
+          </div>
+          <div class="task__meta"><span class="task__pts">7 pts</span></div>
         </li>
         <li class="task">
           <div class="task__body">
@@ -703,37 +718,7 @@ Space is limited in every program, so we encourage all interested community memb
             <p class="mac-note"><strong>Mac:</strong> if you can't find this exact one, pick the closest dark Accent 1 grid style and add a Word
               comment on the table saying which style you used.</p>
           </div>
-          <div class="task__meta"><span class="task__pts">6 pts</span></div>
-        </li>
-        <li class="task">
-          <div class="task__body">
-            <p><strong>Sort the table</strong> by <strong>Allocated Budget</strong>, Type: <strong>Number</strong>,
-              <strong>Descending</strong>, with "My list has a header row" selected. Programs ends up first and Events last.</p>
-          </div>
-          <div class="task__meta"><span class="task__pts">6 pts</span></div>
-        </li>
-        <li class="task">
-          <div class="task__body">
-            <p><strong>Total row:</strong> add a new last row, then
-              <strong>merge its first two cells</strong>. Type <code>Total Budget</code> in the merged cell and make it
-              <strong>Bold</strong>. The table now has 5 rows.</p>
-          </div>
-          <div class="task__meta"><span class="task__pts">6 pts</span></div>
-        </li>
-        <li class="task">
-          <div class="task__body">
-            <p><strong>Formula:</strong> in the last cell of the total row, insert the formula <code>=SUM(ABOVE)</code> with
-              the number format <code>$#,##0.00;($#,##0.00)</code>. It should show <strong>$11,500.00</strong>. Don't type
-              that number yourself. The grader checks that a formula is in the cell.</p>
-          </div>
-          <div class="task__meta"><span class="task__pts">8 pts</span></div>
-        </li>
-        <li class="task">
-          <div class="task__body">
-            <p><strong>Cell alignment:</strong> select the three data rows (rows 2–4, not the header or the total row) and
-              apply <strong>Align Center</strong>, which centers the text both horizontally and vertically in each cell.</p>
-          </div>
-          <div class="task__meta"><span class="task__pts">4 pts</span></div>
+          <div class="task__meta"><span class="task__pts">7 pts</span></div>
         </li>
       </ol>
     </div>
@@ -745,7 +730,7 @@ Space is limited in every program, so we encourage all interested community memb
       <button type="button" class="part__trigger" id="t6" aria-expanded="false" aria-controls="p6">
         <span class="part__badge">Part 6</span>
         <span class="part__title">SmartArt</span>
-        <span class="part__pts">15 pts</span>
+        <span class="part__pts">22 pts</span>
         <svg class="part__chev" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="5 8 10 13 15 8"/></svg>
       </button>
     </h3>
@@ -767,11 +752,18 @@ Space is limited in every program, so we encourage all interested community memb
         </li>
         <li class="task">
           <div class="task__body">
+            <p><strong>SmartArt size:</strong> resize the whole diagram <strong>proportionally</strong> to a height of
+              exactly <strong>2.5"</strong>. The width should change with it.</p>
+          </div>
+          <div class="task__meta"><span class="task__pts">6 pts</span></div>
+        </li>
+        <li class="task">
+          <div class="task__body">
             <p><strong>SmartArt style and colors:</strong> with the <em>whole diagram</em> selected, not one box, apply the
               SmartArt style <strong>Moderate Effect</strong> and change the colors to <strong>Colorful – Accent Colors</strong>,
               the first choice under Colorful.</p>
           </div>
-          <div class="task__meta"><span class="task__pts">7 pts</span></div>
+          <div class="task__meta"><span class="task__pts">8 pts</span></div>
         </li>
       </ol>
     </div>
@@ -860,9 +852,10 @@ Space is limited in every program, so we encourage all interested community memb
         <tr><td>Normal style modified: 11 pt, Spacing After 6 pt</td><td class="pts">5</td></tr>
         <tr><td>Box page border, single line, Accent 1, 1½ pt</td><td class="pts">5</td></tr>
 
-        <tr class="group"><th scope="rowgroup" colspan="2">Part 2: Page 1 text and formatting (40)</th></tr>
+        <tr class="group"><th scope="rowgroup" colspan="2">Part 2: Page 1 text and formatting (47)</th></tr>
         <tr><td>Title: 24 pt, Bold, centered, Accent 1 Darker 25%</td><td class="pts">6</td></tr>
         <tr><td>Title character spacing expanded by 2 pt</td><td class="pts">4</td></tr>
+        <tr><td>Title bottom border: double line, Accent 1, 1½ pt</td><td class="pts">7</td></tr>
         <tr><td>First body paragraph shaded Accent 1 Lighter 80%</td><td class="pts">6</td></tr>
         <tr><td>"Lakewood Community Center" in small caps</td><td class="pts">5</td></tr>
         <tr><td>"register by November 13" underlined</td><td class="pts">4</td></tr>
@@ -884,18 +877,16 @@ Space is limited in every program, so we encourage all interested community memb
         <tr><td>Descriptive alt text, one sentence ending in a period</td><td class="pts">4</td></tr>
         <tr><td>Manual page break after the last paragraph</td><td class="pts">4</td></tr>
 
-        <tr class="group"><th scope="rowgroup" colspan="2">Part 5: Budget table (40)</th></tr>
+        <tr class="group"><th scope="rowgroup" colspan="2">Part 5: Budget table (26)</th></tr>
         <tr><td>Heading 1 style on "Season Budget Overview"</td><td class="pts">4</td></tr>
-        <tr><td>Table with the correct header and data in every cell</td><td class="pts">6</td></tr>
-        <tr><td>Grid Table 5 Dark – Accent 1 (Mac: closest, with comment)</td><td class="pts">6</td></tr>
-        <tr><td>Data rows sorted by Allocated Budget, descending</td><td class="pts">6</td></tr>
-        <tr><td>Total row added; first two cells merged; "Total Budget" bold</td><td class="pts">6</td></tr>
-        <tr><td>=SUM(ABOVE) formula showing $11,500.00</td><td class="pts">8</td></tr>
-        <tr><td>Data rows 2–4 Align Center</td><td class="pts">4</td></tr>
+        <tr><td>3 × 4 table with the correct header and data in every cell</td><td class="pts">8</td></tr>
+        <tr><td>Total row added as the last row with the correct text</td><td class="pts">7</td></tr>
+        <tr><td>Grid Table 5 Dark – Accent 1 (Mac: closest, with comment)</td><td class="pts">7</td></tr>
 
-        <tr class="group"><th scope="rowgroup" colspan="2">Part 6: SmartArt (15)</th></tr>
+        <tr class="group"><th scope="rowgroup" colspan="2">Part 6: SmartArt (22)</th></tr>
         <tr><td>Basic Process with exactly three shapes and the correct text</td><td class="pts">8</td></tr>
-        <tr><td>Moderate Effect style and Colorful – Accent Colors</td><td class="pts">7</td></tr>
+        <tr><td>Resized proportionally to a height of 2.5"</td><td class="pts">6</td></tr>
+        <tr><td>Moderate Effect style and Colorful – Accent Colors</td><td class="pts">8</td></tr>
 
         <tr class="group"><th scope="rowgroup" colspan="2">Part 7: Header, watermark and cover page (25)</th></tr>
         <tr><td>Plain Number 3 header reading "Lakewood Newsletter" and the number</td><td class="pts">7</td></tr>
