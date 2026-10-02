@@ -6,7 +6,7 @@
 <title>CSC 104 — Word Project: Community Newsletter</title>
 <style>
 /* ============================================================
-   CSC 104 — Fall 2026 — Word Project (Week 6, 200 pts, Canvas)
+   CSC 104 — Fall 2026 — Word Project (assigned Week 6, due end of Week 7: Sun 10/18; 200 pts, Canvas)
    Self-contained SPA for embedding in a Canvas iframe.
    Vanilla CSS + vanilla JS, one file, no outbound links,
    no external resources, no browser storage.
@@ -257,6 +257,22 @@ thead th { background: var(--panel-2); font-size: 0.8125rem; text-transform: upp
 .rubric tfoot td, .rubric tfoot th { background: var(--panel-2); font-weight: 700; }
 
 /* Submission */
+/* ---------------- Intro video (placeholder until the recording is posted) ---------------- */
+.video-wrap { max-width: 48rem; margin: 0 0 1.5rem; }
+.video-frame {
+  position: relative; width: 100%; padding-top: 56.25%;
+  background: var(--panel); border-radius: var(--radius); overflow: hidden;
+  border: 1px solid var(--field-border);
+}
+.video-frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+.video-placeholder {
+  position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 0.5rem; padding: 1rem; text-align: center; color: var(--muted);
+}
+.video-placeholder svg { width: 3rem; height: 3rem; color: var(--brand); }
+.video-placeholder strong { color: var(--ink); font-size: 1.05rem; }
+.video-caption { font-size: 0.875rem; color: var(--muted); margin-top: 0.5rem; }
+
 .submit-box {
   border: 2px solid var(--brand); border-radius: var(--radius); background: var(--panel);
   padding: 1rem 1.2rem; margin: 0 0 1.5rem;
@@ -284,7 +300,7 @@ thead th { background: var(--panel-2); font-size: 0.8125rem; text-transform: upp
 
 <header class="page-head">
   <div class="wrap">
-    <p class="eyebrow">CSC 104 · Week 6 · Word Project</p>
+    <p class="eyebrow">CSC 104 · Weeks 6–7 · Word Project</p>
     <h1>Word Project: Community Newsletter</h1>
     <p class="lede">This is the end of the Word unit. You build a two-page newsletter, plus a cover page, from scratch, using
       what you've learned in Word Modules 1 through 4. There's no start file and no walkthrough this time. Every skill here
@@ -292,7 +308,7 @@ thead th { background: var(--panel-2); font-size: 0.8125rem; text-transform: upp
       look it up.</p>
     <ul class="facts" aria-label="Project facts">
       <li><span class="k">Worth:</span> 200 pts, not droppable</li>
-      <li><span class="k">Due:</span> Sun 10/11, 11:59 PM</li>
+      <li><span class="k">Due:</span> Sun 10/18, 11:59 PM</li>
       <li><span class="k">Submit to:</span> Canvas, not MindTap</li>
       <li><span class="k">Covers:</span> Word Modules 1–4</li>
       <li><span class="k">Late:</span> only if arranged before the due date</li>
@@ -301,6 +317,21 @@ thead th { background: var(--panel-2); font-size: 0.8125rem; text-transform: upp
 </header>
 
 <main id="main" class="wrap" tabindex="-1">
+
+  <h2 id="intro-video">Project intro video</h2>
+  <div class="video-wrap">
+    <!-- VIDEO PLACEHOLDER: when the intro is recorded, replace the .video-placeholder div below with the
+         YouTube iframe (src https://www.youtube.com/embed/<ID>?enablejsapi=1&cc_load_policy=1&iv_load_policy=3&modestbranding=1&rel=0,
+         title="Word Project intro video"), and add the corrected .vtt transcript panel per the CSC 104 video embed pattern. -->
+    <div class="video-frame">
+      <div class="video-placeholder" id="video-placeholder">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="2.5" y="5" width="13" height="14" rx="2"/><path d="M15.5 10l6-3.5v11l-6-3.5z"/></svg>
+        <strong>Intro video coming soon</strong>
+        <span>A short introduction to this project will be posted here. You can start on the project now.</span>
+      </div>
+    </div>
+    <p class="video-caption">Closed captions and a written transcript will be included with the video.</p>
+  </div>
 
   <h2 id="before">Before you start</h2>
 
@@ -808,7 +839,7 @@ Space is limited in every program, so we encourage all interested community memb
     <p>Save your document as a Word document named</p>
     <p class="filename"><code>Newsletter_LastName_FirstName.docx</code></p>
     <p>For example, <code>Newsletter_Smith_Jane.docx</code>. Close Word, then upload that one <code>.docx</code> file to the
-      <strong>Word Project</strong> assignment in Canvas by <strong>Sunday 10/11, 11:59 PM</strong>. I open your Word file
+      <strong>Word Project</strong> assignment in Canvas by <strong>Sunday 10/18, 11:59 PM</strong>. I open your Word file
       and check every item in the rubric below.</p>
     <p><strong>Mac:</strong> make sure the format is <em>Word Document (.docx)</em>, not
       <em>.pages</em>.</p>
