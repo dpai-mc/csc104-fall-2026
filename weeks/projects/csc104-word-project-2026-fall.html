@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CSC 104 — Word Project: Community Newsletter</title>
+<style>
+/* ============================================================
+   CSC 104 — Fall 2026 — Word Project (Week 6, 200 pts, Canvas)
+   Self-contained SPA for embedding in a Canvas iframe.
+   Vanilla CSS + vanilla JS, one file, no outbound links,
+   no external resources, no browser storage.
+   Adapted from weeks/projects/csc104-word-project-2026-spring.html,
+   cut down to what Word Modules 1–4 cover.
+   Token block matches weeks/week05/01-guided-assign-word-3.html.
+   ============================================================ */
+
+:root {
+  color-scheme: light dark;
+  --surface:      #ffffff;
+  --panel:        #f6f8fb;
+  --panel-2:      #eef2f8;
+  --accent-bg:    #e8f0fe;
+  --ink:          #16202f;
+  --muted:        #46536b;
+  --brand:        #1d4ed8;
+  --brand-ink:    #17399c;
+  --border:       #c3cddc;
+  --border-soft:  #dde4ee;
+  --field-border: #6b7a92;
+  --btn-bg:       #1d4ed8;
+  --btn-fg:       #ffffff;
+  --btn-bg-hover: #17399c;
+  --btn2-bg:      #ffffff;
+  --btn2-fg:      #17399c;
+  --ok:           #1a6b3c;
+  --ok-bg:        #e6f4ec;
+  --warn-ink:     #7a4a06;
+  --warn-bg:      #fdf3e0;
+  --warn-rule:    #b8860b;
+  --focus:        #b4530a;
+  --code-bg:      #f1f4f9;
+  --tag-bg:       #eef2f8;
+  --tag-ink:      #2c3a55;
+  --radius:       10px;
+  --maxw:         62rem;
+  --readw:        46rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --surface:      #0f1726;
+    --panel:        #17223a;
+    --panel-2:      #1e2b45;
+    --accent-bg:    #1a2a4d;
+    --ink:          #e9eefa;
+    --muted:        #b6c3d8;
+    --brand:        #9dbcff;
+    --brand-ink:    #bcd2ff;
+    --border:       #3a4a68;
+    --border-soft:  #2b3a56;
+    --field-border: #7b89a3;
+    --btn-bg:       #9dbcff;
+    --btn-fg:       #0b1424;
+    --btn-bg-hover: #c3d6ff;
+    --btn2-bg:      #17223a;
+    --btn2-fg:      #bcd2ff;
+    --ok:           #8fe0b0;
+    --ok-bg:        #123328;
+    --warn-ink:     #f6d59a;
+    --warn-bg:      #3a2c11;
+    --warn-rule:    #d9a441;
+    --focus:        #ffb066;
+    --code-bg:      #111c30;
+    --tag-bg:       #22314f;
+    --tag-ink:      #d5e0f5;
+  }
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--surface);
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; border-radius: 4px; }
+
+.skip-link {
+  position: absolute; left: -9999px; top: 0; z-index: 60;
+  background: var(--btn-bg); color: var(--btn-fg);
+  padding: 0.6rem 1rem; font-weight: 700; border-radius: 0 0 var(--radius) 0;
+}
+.skip-link:focus { left: 0; outline: 3px solid var(--focus); outline-offset: 2px; }
+
+.wrap { max-width: var(--maxw); margin: 0 auto; padding: 1rem 1rem 3rem; }
+
+/* ---------------- Header ---------------- */
+.page-head { background: var(--panel); border-bottom: 3px solid var(--brand); }
+.page-head .wrap { padding-bottom: 1.25rem; }
+.eyebrow {
+  font-size: 0.8125rem; letter-spacing: 0.09em; text-transform: uppercase;
+  font-weight: 700; color: var(--brand-ink); margin: 0.75rem 0 0.35rem;
+}
+h1 { font-size: clamp(1.5rem, 4.2vw, 2.15rem); line-height: 1.22; margin: 0 0 0.6rem; }
+.lede { margin: 0; color: var(--muted); max-width: var(--readw); }
+.facts { list-style: none; display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 1rem 0 0; padding: 0; }
+.facts li {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 999px; padding: 0.3rem 0.85rem; font-size: 0.875rem; margin: 0;
+}
+.facts .k { font-weight: 700; color: var(--brand-ink); }
+
+/* ---------------- Typography ---------------- */
+h2 {
+  font-size: clamp(1.25rem, 3.2vw, 1.6rem);
+  margin: 2.5rem 0 0.75rem; color: var(--brand-ink);
+  padding-bottom: 0.35rem; border-bottom: 2px solid var(--border-soft);
+}
+h3 { font-size: 1.125rem; margin: 1.5rem 0 0.5rem; }
+p { margin: 0 0 1rem; max-width: var(--readw); }
+ul, ol { margin: 0 0 1rem; padding-left: 1.35rem; max-width: var(--readw); }
+li { margin-bottom: 0.4rem; }
+.ui { font-weight: 700; }
+code, .mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.9em; background: var(--code-bg); border: 1px solid var(--border-soft);
+  border-radius: 4px; padding: 0.05em 0.35em; overflow-wrap: anywhere;
+}
+
+.callout {
+  border-left: 5px solid var(--brand); background: var(--accent-bg);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding: 0.9rem 1.1rem; margin: 0 0 1.25rem; max-width: var(--readw);
+}
+.callout > :last-child { margin-bottom: 0; }
+.callout h3 { margin-top: 0; font-size: 1.05rem; }
+.callout--warn { border-left-color: var(--warn-rule); background: var(--warn-bg); color: var(--warn-ink); }
+.callout--warn h3 { color: var(--warn-ink); }
+
+/* ---------------- Order of work ---------------- */
+.order { list-style: none; counter-reset: ord; padding: 0; margin: 0 0 1.5rem; max-width: none; display: grid; gap: 0.5rem; grid-template-columns: repeat(auto-fit, minmax(13.5rem, 1fr)); }
+.order li {
+  counter-increment: ord; margin: 0; position: relative;
+  background: var(--panel); border: 1px solid var(--border-soft); border-radius: var(--radius);
+  padding: 0.6rem 0.8rem 0.6rem 2.9rem; font-size: 0.9375rem;
+}
+.order li::before {
+  content: counter(ord); position: absolute; left: 0.7rem; top: 0.6rem;
+  width: 1.6rem; height: 1.6rem; border-radius: 50%;
+  background: var(--btn-bg); color: var(--btn-fg); font-weight: 700;
+  display: grid; place-items: center; font-size: 0.875rem;
+}
+.order .pts-inline { color: var(--muted); white-space: nowrap; }
+
+/* ---------------- Accordion parts ---------------- */
+.parts-tools { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0 0 1rem; }
+.btn {
+  font: inherit; font-weight: 600; font-size: 0.9375rem;
+  min-height: 2.5rem; padding: 0.4rem 0.95rem; border-radius: 8px; cursor: pointer;
+  background: var(--btn2-bg); color: var(--btn2-fg); border: 1px solid var(--field-border);
+}
+.btn:hover { background: var(--accent-bg); }
+.btn--primary { background: var(--btn-bg); color: var(--btn-fg); border-color: var(--btn-bg); }
+.btn--primary:hover { background: var(--btn-bg-hover); border-color: var(--btn-bg-hover); }
+
+.part {
+  border: 1px solid var(--border); border-radius: var(--radius);
+  margin: 0 0 0.9rem; background: var(--surface); overflow: hidden;
+}
+.part h3 { margin: 0; font-size: 1rem; }
+.part__trigger {
+  width: 100%; display: flex; align-items: center; gap: 0.75rem;
+  font: inherit; font-weight: 700; color: var(--ink); text-align: left;
+  background: var(--panel); border: 0; padding: 0.85rem 1rem; cursor: pointer; min-height: 3rem;
+}
+.part__trigger:hover { background: var(--panel-2); }
+.part__trigger:focus-visible { outline-offset: -3px; }
+.part__badge {
+  flex: 0 0 auto; font-size: 0.75rem; letter-spacing: 0.06em; text-transform: uppercase;
+  background: var(--btn-bg); color: var(--btn-fg); border-radius: 5px; padding: 0.15rem 0.5rem;
+}
+.part__title { flex: 1 1 auto; min-width: 0; }
+.part__pts { flex: 0 0 auto; font-weight: 600; font-size: 0.875rem; color: var(--muted); white-space: nowrap; }
+.part__chev { flex: 0 0 auto; width: 1.1rem; height: 1.1rem; transition: transform 0.2s ease; }
+.part__trigger[aria-expanded="true"] .part__chev { transform: rotate(180deg); }
+.part__panel { padding: 0.9rem 1.1rem 1.2rem; border-top: 1px solid var(--border); }
+.part__panel[hidden] { display: none; }
+.part__intro { color: var(--ink); }
+
+/* Task rows */
+.tasks { list-style: none; padding: 0; margin: 0 0 1rem; max-width: none; counter-reset: task; }
+.task {
+  counter-increment: task;
+  display: grid; grid-template-columns: 2rem 1fr auto; gap: 0.25rem 0.75rem; align-items: start;
+  padding: 0.7rem 0; margin: 0; border-bottom: 1px solid var(--border-soft);
+}
+.task:last-child { border-bottom: 0; }
+.task::before {
+  content: counter(task); grid-row: 1 / span 2;
+  width: 1.75rem; height: 1.75rem; border-radius: 50%;
+  border: 2px solid var(--brand); color: var(--brand-ink); font-weight: 700; font-size: 0.875rem;
+  display: grid; place-items: center; margin-top: 0.1rem;
+}
+.task__body { min-width: 0; }
+.task__body p { margin: 0 0 0.35rem; }
+.task__body p:last-child { margin-bottom: 0; }
+.task__meta { display: flex; flex-direction: column; align-items: flex-end; gap: 0.3rem; }
+.task__pts { font-weight: 700; font-size: 0.875rem; white-space: nowrap; }
+.mac-note {
+  margin: 0.45rem 0 0; padding: 0.45rem 0.75rem; font-size: 0.9rem;
+  background: var(--accent-bg); border-left: 4px solid var(--brand); border-radius: 0 6px 6px 0;
+  max-width: var(--readw);
+}
+.tip { color: var(--muted); font-size: 0.9375rem; }
+
+@media (max-width: 34em) {
+  .task { grid-template-columns: 2rem 1fr; }
+  .task__meta { grid-column: 2; flex-direction: row; align-items: center; justify-content: flex-start; flex-wrap: wrap; }
+}
+
+/* Content (copy) blocks */
+.content-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem; margin: 1.25rem 0 0.4rem; }
+.content-head h4 { margin: 0; font-size: 0.9375rem; }
+.copy-block {
+  margin: 0; background: var(--code-bg); border: 1px solid var(--field-border); border-radius: 8px;
+  padding: 0.9rem 1rem; white-space: pre-wrap; overflow-wrap: anywhere;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.875rem; line-height: 1.65;
+  color: var(--ink);
+}
+.copy-status { min-height: 1.4em; font-size: 0.875rem; color: var(--ok); margin: 0.35rem 0 0; }
+
+/* Preview of the list levels */
+.levels { background: var(--panel); border: 1px solid var(--border-soft); border-radius: 8px; padding: 0.7rem 1rem 0.5rem 2.2rem; margin: 0.5rem 0 1rem; }
+.levels ol { margin: 0.25rem 0 0.25rem; }
+.levels > ol { padding-left: 0.6rem; list-style-type: decimal; }
+.levels ol ol { list-style-type: lower-alpha; }
+.levels li { margin-bottom: 0.15rem; }
+
+/* Tables */
+.table-scroll { overflow-x: auto; max-width: 100%; margin: 0.5rem 0 1rem; border-radius: 8px; }
+table { border-collapse: collapse; width: 100%; font-size: 0.9375rem; }
+caption { text-align: left; font-weight: 700; padding: 0 0 0.4rem; color: var(--ink); }
+th, td { border: 1px solid var(--border); padding: 0.5rem 0.7rem; text-align: left; vertical-align: top; }
+thead th { background: var(--panel-2); font-size: 0.8125rem; text-transform: uppercase; letter-spacing: 0.04em; }
+.data-preview { max-width: 38rem; }
+.data-preview td:last-child, .data-preview th:last-child { text-align: right; white-space: nowrap; }
+
+.rubric td.pts, .rubric th.pts { text-align: center; white-space: nowrap; width: 4.5rem; font-weight: 700; }
+.rubric tr.group th {
+  background: var(--accent-bg); color: var(--brand-ink); font-size: 0.875rem;
+  text-transform: none; letter-spacing: 0; font-weight: 700;
+}
+.rubric tfoot td, .rubric tfoot th { background: var(--panel-2); font-weight: 700; }
+
+/* Submission */
+.submit-box {
+  border: 2px solid var(--brand); border-radius: var(--radius); background: var(--panel);
+  padding: 1rem 1.2rem; margin: 0 0 1.5rem;
+}
+.submit-box > :last-child { margin-bottom: 0; }
+.filename { font-size: 1.05rem; }
+
+.footnote { color: var(--muted); font-size: 0.875rem; border-top: 1px solid var(--border-soft); padding-top: 1rem; margin-top: 2.5rem; max-width: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
+}
+
+@media print {
+  .skip-link, .parts-tools, .copy-btn, .copy-status, .part__chev { display: none !important; }
+  .part__panel[hidden] { display: block !important; }
+  .part { break-inside: auto; }
+  .part__trigger { background: none; }
+  body { background: #fff; color: #000; }
+}
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to page content</a>
+
+<header class="page-head">
+  <div class="wrap">
+    <p class="eyebrow">CSC 104 · Week 6 · Word Project</p>
+    <h1>Word Project: Community Newsletter</h1>
+    <p class="lede">This is the end of the Word unit. You build a two-page newsletter, plus a cover page, from scratch, using
+      what you've learned in Word Modules 1 through 4. There's no start file and no walkthrough this time. Every skill here
+      is covered in the textbook and in the assignments you've already done, so if you don't remember how to do something,
+      look it up.</p>
+    <ul class="facts" aria-label="Project facts">
+      <li><span class="k">Worth:</span> 200 pts, not droppable</li>
+      <li><span class="k">Due:</span> Sun 10/11, 11:59 PM</li>
+      <li><span class="k">Submit to:</span> Canvas, not MindTap</li>
+      <li><span class="k">Covers:</span> Word Modules 1–4</li>
+      <li><span class="k">Late:</span> only if arranged before the due date</li>
+    </ul>
+  </div>
+</header>
+
+<main id="main" class="wrap" tabindex="-1">
+
+  <h2 id="before">Before you start</h2>
+
+  <p>You're a volunteer coordinator for <strong>Lakewood Community Center</strong>. The Center wants a newsletter announcing
+    this season's programs, how to register, and where the budget goes. You'll start from a <strong>new blank
+    document</strong> in the desktop version of Word. The web and phone versions of Word don't have all of these commands.</p>
+
+  <div class="callout">
+    <h3>Use only the text on this page</h3>
+    <p>Each part that needs text has a <span class="ui">Copy text</span> button. Paste into Word with
+      <span class="ui">Paste › Keep Text Only</span> (Mac: <span class="ui">Edit › Paste and Match Formatting</span>) so you
+      don't bring this web page's formatting along. Don't add,
+      reword or generate any content of your own. I grade the formatting, and that only works if everyone has the same words.</p>
+  </div>
+
+  <div class="callout">
+    <h3>Mac users</h3>
+    <p>Most of this works the same on a Mac. Where the Mac version doesn't have the exact option named, a blue note under that
+      task tells you what to use instead. If you're still stuck, message me through Canvas Inbox.</p>
+  </div>
+
+  <div class="callout callout--warn">
+    <h3>About AI on this project</h3>
+    <p>The course AI policy is <strong>limited</strong>. You can ask an AI tool to explain a command, tell you where something
+      is on the Mac ribbon, or help you figure out why a step isn't working. You can't have it build or edit the file you
+      submit. You make every change in Word yourself. Spelling and grammar check are ordinary Word features and always fine.</p>
+  </div>
+
+  <h3>Work in this order</h3>
+  <p>The order matters in two places: set up the Normal style <em>before</em> you paste any text, and insert the cover page
+    <em>last</em>, so it lands in front of everything you've built.</p>
+  <ol class="order" aria-label="Order of the seven parts">
+    <li>Document setup <span class="pts-inline">· 15 pts</span></li>
+    <li>Page 1 text and formatting <span class="pts-inline">· 40 pts</span></li>
+    <li>The two lists <span class="pts-inline">· 30 pts</span></li>
+    <li>Picture and page break <span class="pts-inline">· 30 pts</span></li>
+    <li>Budget table <span class="pts-inline">· 40 pts</span></li>
+    <li>SmartArt <span class="pts-inline">· 15 pts</span></li>
+    <li>Header, watermark, cover page <span class="pts-inline">· 25 pts</span></li>
+  </ol>
+  <p class="tip">Saving with the right file name is the last 5 points. Save early and often. A copy in OneDrive or on a USB drive
+    protects you if your laptop dies the night before.</p>
+
+  <h2 id="parts">The project, part by part</h2>
+  <div class="parts-tools">
+    <button type="button" class="btn" id="open-all">Open all parts</button>
+    <button type="button" class="btn" id="close-all">Close all parts</button>
+  </div>
+
+  <!-- ================= PART 1 ================= -->
+  <section class="part" aria-labelledby="t1">
+    <h3>
+      <button type="button" class="part__trigger" id="t1" aria-expanded="true" aria-controls="p1">
+        <span class="part__badge">Part 1</span>
+        <span class="part__title">Document setup</span>
+        <span class="part__pts">15 pts</span>
+        <svg class="part__chev" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="5 8 10 13 15 8"/></svg>
+      </button>
+    </h3>
+    <div class="part__panel" id="p1">
+      <p class="part__intro">Open a new blank document and do these three things <strong>before</strong> you paste any text.</p>
+      <ol class="tasks">
+        <li class="task">
+          <div class="task__body">
+            <p><strong>Theme colors:</strong> change the theme <em>colors</em> to <strong>Blue Warm</strong>. Change the
+              colors only. Leave the theme itself alone. Every "Accent 1" color later in this project comes from this palette.</p>
+            <p class="mac-note"><strong>Mac:</strong> if Blue Warm isn't in your Colors list, use <strong>Blue II</strong>.
+              The color positions used later stay the same.</p>
+          </div>
+          <div class="task__meta"><span class="task__pts">5 pts</span></div>
+        </li>
+        <li class="task">
+          <div class="task__body">
+            <p><strong>Modify the Normal style:</strong> font size <strong>11 pt</strong> and <strong>Spacing After 6 pt</strong>.
+              Change the style itself, not just the text.</p>
+          </div>
+          <div class="task__meta"><span class="task__pts">5 pts</span></div>
+        </li>
+        <li class="task">
+          <div class="task__body">
+            <p><strong>Page border:</strong> a <strong>Box</strong> border with a single solid line, color
+              <strong>Accent 1</strong>, width <strong>1½ pt</strong>, applied to the whole document.</p>
+            
+          </div>
+          <div class="task__meta"><span class="task__pts">5 pts</span></div>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ================= PART 2 ================= -->
+  <section class="part" aria-labelledby="t2">
+    <h3>
+      <button type="button" class="part__trigger" id="t2" aria-expanded="false" aria-controls="p2">
+        <span class="part__badge">Part 2</span>
+        <span class="part__title">Page 1 text and formatting</span>
+        <span class="part__pts">40 pts</span>
+        <svg class="part__chev" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="5 8 10 13 15 8"/></svg>
+      </button>
+    </h3>
+    <div class="part__panel" id="p2" hidden>
+      <p class="part__intro">Paste the text below into your document as plain text. It's every paragraph for page 1. Then
+        apply the formatting. Each task is graded on its own, so a miss in one doesn't cost you points in another. Leave the two
+        lists alone for now. They're Part 3.</p>
+
+      <div class="content-head">
+        <h4 id="blockA-label">Page 1 text</h4>
+        <button type="button" class="btn btn--primary copy-btn" data-copy="blockA" aria-label="Copy the page 1 text">Copy text</button>
+      </div>
+      <pre class="copy-block" id="blockA">Welcome to Our New Season!
+We are thrilled to announce another exciting season of programs and events at Lakewood Community Center. This newsletter covers everything you need to know about our upcoming offerings, how to register, and where our budget goes. Our programs are open to everyone: all ages and skill levels welcome.
+Programs offered this season include:
+Youth Soccer League — Saturdays, starting October 17
+Adult Fitness Boot Camp — Monday and Wednesday evenings
+Senior Art Workshop — Tuesday afternoons, all levels
+Family Movie Nights — last Friday of each month, free admission
+To register for any program, follow these steps:
+Create your free online account
+Go to the registration page on our website
+Choose a username and password
+Pick your programs
+Pay your fees
+Pay online by credit or debit card
+Pay in person at the front desk
+Watch for your confirmation email within two business days
+Space is limited in every program, so we encourage all interested community members to register by November 13. Program schedules are subject to change without notice.</pre>
+      <p class="copy-status" role="status" aria-live="polite" data-status-for="blockA"></p>
+
+      <ol class="tasks">
+        <li class="task">
+          <div class="task__body">
+            <p><strong>Title line</strong> (<em>Welcome to Our New Season!</em>): <strong>24 pt</strong>, <strong>Bold</strong>,
+              <strong>centered</strong>, font color <strong>Accent 1, Darker 25%</strong>.</p>
+          </div>
+          <div class="task__meta"><span class="task__pts">6 pts</span></div>
+        </li>
+        <li class="task">
+          <div class="task__body">
+            <p><strong>Character spacing:</strong> expand the character spacing of the title line by <strong>2 pt</strong>.</p>
+          </div>
+          <div class="task__meta"><span class="task__pts">4 pts</span></div>
+        </li>
+        <li class="task">
+          <div class="task__body">
+            <p><strong>Paragraph shading:</strong> shade the whole first body paragraph (it starts "We are thrilled to
+              announce…") <strong>Accent 1, Lighter 80%</strong>. Use paragraph shading, not text highlight.</p>
+          </div>
+          <div class="task__meta"><span class="task__pts">6 pts</span></div>
+        </li>
+        <li class="task">
+          <div class="task__body">
+            <p><strong>Small caps:</strong> format the words <strong>Lakewood Community Center</strong> in that same paragraph
+              as small caps.</p>
+          </div>
+          <div class="task__meta"><span class="task__pts">5 pts</span></div>
+        </li>
+        <li class="task">
+          <div class="task__body">
+            <p><strong>Underline</strong> the exact phrase <strong>register by November 13</strong> in the last paragraph.</p>
+          </div>
+          <div class="task__meta"><span class="task__pts">4 pts</span></div>
+        </li>
+        <li class="task">
+          <div class="task__body">
+            <p><strong>Italicize</strong> the exact phrase <strong>all ages and skill levels welcome</strong>. Leave the
+              period after it unformatted.</p>
+          </div>
+          <div class="task__meta"><span class="task__pts">4 pts</span></div>
+        </li>
+        <li class="task">
+          <div class="task__body">
+            <p><strong>Format Painter:</strong> make the line <em>Programs offered this season include:</em>
+              <strong>Bold</strong> with font color <strong>Accent 1, Darker 25%</strong>. Then use the
+              <strong>Format Painter</strong> to copy that formatting onto the line <em>To register for any program, follow
+              these steps:</em>. The two lines should look identical.</p>
+          </div>
+          <div class="task__meta"><span class="task__pts">5 pts</span></div>
+        </li>
+        <li class="task">
+          <div class="task__body">
+            <p><strong>Footnote:</strong> insert a footnote at the end of the last sentence, right after "…subject to change
+              without notice." The footnote text is:</p>
+            <p><code>Registration fees are non-refundable. Contact the front desk for exceptions.</code></p>
+          </div>
+          <div class="task__meta"><span class="task__pts">6 pts</span></div>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ================= PART 3 ================= -->
+  <section class="part" aria-labelledby="t3">
+    <h3>
+      <button type="button" class="part__trigger" id="t3" aria-expanded="false" aria-controls="p3">
+        <span class="part__badge">Part 3</span>
+        <span class="part__title">The two lists</span>
+        <span class="part__pts">30 pts</span>
+        <svg class="part__chev" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="5 8 10 13 15 8"/></svg>
+      </button>
+    </h3>
+    <div class="part__panel" id="p3" hidden>
+      <p class="part__intro">Both lists are already in your document from Part 2. Here you turn them into real Word lists.</p>
+      <ol class="tasks">
+        <li class="task">
+          <div class="task__body">
+            <p><strong>Bulleted list:</strong> make the four program lines (Youth Soccer League through Family Movie Nights)
+              a bulleted list with the default round bullet.</p>
+          </div>
+          <div class="task__meta"><span class="task__pts">5 pts</span></div>
+        </li>
+        <li class="task">
+          <div class="task__body">
+            <p><strong>Bullet color:</strong> change the color of those bullets, the bullet characters only, to
+              <strong>Accent 1, Darker 25%</strong>. The program text stays black.</p>
+          </div>
+          <div class="task__meta"><span class="task__pts">6 pts</span></div>
+        </li>
+        <li class="task">
+          <div class="task__body">
+            <p><strong>Sort:</strong> sort the four bulleted program paragraphs in <strong>ascending</strong> (A to Z) order.
+              When you're done, Adult Fitness Boot Camp is first and Youth Soccer League is last.</p>
+          </div>
+          <div class="task__meta"><span class="task__pts">7 pts</span></div>
+        </li>
+        <li class="task">
+          <div class="task__body">
+            <p><strong>Multilevel list:</strong> make the eight registration lines (Create your free online account through
+              Watch for your confirmation email…) a multilevel list using the <strong>1., a., i.</strong> numbering format.
+              Then demote the four second-level lines so the list looks like this:</p>
+            <div class="levels">
+              <ol>
+                <li>Create your free online account
+                  <ol>
+                    <li>Go to the registration page on our website</li>
+                    <li>Choose a username and password</li>
+                  </ol>
+                </li>
+                <li>Pick your programs</li>
+                <li>Pay your fees
+                  <ol>
+                    <li>Pay online by credit or debit card</li>
+                    <li>Pay in person at the front desk</li>
+                  </ol>
+                </li>
+                <li>Watch for your confirmation email within two business days</li>
+              </ol>
+            </div>
+          </div>
+          <div class="task__meta"><span class="task__pts">12 pts</span></div>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ================= PART 4 ================= -->
+  <section class="part" aria-labelledby="t4">
+    <h3>
+      <button type="button" class="part__trigger" id="t4" aria-expanded="false" aria-controls="p4">
+        <span class="part__badge">Part 4</span>
+        <span class="part__title">Picture and page break</span>
+        <span class="part__pts">30 pts</span>
+        <svg class="part__chev" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="5 8 10 13 15 8"/></svg>
+      </button>
+    </h3>
+    <div class="part__panel" id="p4" hidden>
+      <p class="part__intro">Add one picture to page 1, then push the budget onto its own page.</p>
+      <ol class="tasks">
+        <li class="task">
+          <div class="task__body">
+            <p><strong>Insert a picture</strong> of a park or an outdoor activity. Click at the start of the line
+              <em>Programs offered this season include:</em> and insert it there. The picture can be your own photo
+              or one from Word's own stock or online images. It has to be
+              appropriate for school.</p>
+          </div>
+          <div class="task__meta"><span class="task__pts">4 pts</span></div>
+        </li>
+        <li class="task">
+          <div class="task__body">
+            <p><strong>Size:</strong> make the picture exactly <strong>2.5" wide</strong>, with the height changing in
+              proportion. Lock aspect ratio stays checked.</p>
+          </div>
+          <div class="task__meta"><span class="task__pts">6 pts</span></div>
+        </li>
+        <li class="task">
+          <div class="task__body">
+            <p><strong>Picture style:</strong> apply <strong>Soft Edge Rectangle</strong>.</p>
+          </div>
+          <div class="task__meta"><span class="task__pts">6 pts</span></div>
+        </li>
+        <li class="task">
+          <div class="task__body">
+            <p><strong>Position and wrapping:</strong> <strong>Middle Right with Square Text Wrapping</strong>.
+              Text should wrap down the left side of the picture.</p>
+          </div>
+          <div class="task__meta"><span class="task__pts">6 pts</span></div>
+        </li>
+        <li class="task">
+          <div class="task__body">
+            <p><strong>Alt text:</strong> write one sentence that describes <em>your</em> picture for someone who can't see
+              it, ending with a period. For example: <code>Children kicking a soccer ball on a grassy field.</code> Don't
+              check "Mark as decorative."</p>
+          </div>
+          <div class="task__meta"><span class="task__pts">4 pts</span></div>
+        </li>
+        <li class="task">
+          <div class="task__body">
+            <p><strong>Page break:</strong> click at the very end of the last paragraph, after the footnote number, and
+              insert a <strong>manual page break</strong> . Don't press Enter until you
+              reach the next page. The empty page 2 is where the budget goes.</p>
+          </div>
+          <div class="task__meta"><span class="task__pts">4 pts</span></div>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ================= PART 5 ================= -->
+  <section class="part" aria-labelledby="t5">
+    <h3>
+      <button type="button" class="part__trigger" id="t5" aria-expanded="false" aria-controls="p5">
+        <span class="part__badge">Part 5</span>
+        <span class="part__title">Budget table</span>
+        <span class="part__pts">40 pts</span>
+        <svg class="part__chev" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="5 8 10 13 15 8"/></svg>
+      </button>
+    </h3>
+    <div class="part__panel" id="p5" hidden>
+      <p class="part__intro">On the new page, add a heading and a budget table. Do the tasks in the order listed.</p>
+
+      <div class="content-head">
+        <h4 id="blockB-label">Page 2 heading</h4>
+        <button type="button" class="btn btn--primary copy-btn" data-copy="blockB" aria-label="Copy the page 2 heading">Copy text</button>
+      </div>
+      <pre class="copy-block" id="blockB">Season Budget Overview</pre>
+      <p class="copy-status" role="status" aria-live="polite" data-status-for="blockB"></p>
+
+      <ol class="tasks">
+        <li class="task">
+          <div class="task__body">
+            <p><strong>Heading style:</strong> apply the built-in <strong>Heading 1</strong> style to <em>Season Budget
+              Overview</em>. Use only the style. Don't change its font, size or color by hand.</p>
+          </div>
+          <div class="task__meta"><span class="task__pts">4 pts</span></div>
+        </li>
+        <li class="task">
+          <div class="task__body">
+            <p><strong>Insert a table</strong> of <strong>3 columns × 4 rows</strong> on the blank line under the heading,
+              and type in the header row and the three data rows below. Type the amounts exactly as shown, dollar signs and
+              commas included.</p>
+            <div class="table-scroll data-preview" tabindex="0" role="region" aria-label="Budget data to type into the table">
+              <table>
+                <caption>Rows 1–4 (type these first)</caption>
+                <thead>
+                  <tr><th scope="col">Category</th><th scope="col">Item Description</th><th scope="col">Allocated Budget</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>Facilities</td><td>Building maintenance and repairs</td><td>$4,200</td></tr>
+                  <tr><td>Programs</td><td>Instructor fees and supplies</td><td>$5,800</td></tr>
+                  <tr><td>Events</td><td>Marketing and community events</td><td>$1,500</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="task__meta"><span class="task__pts">6 pts</span></div>
+        </li>
+        <li class="task">
+          <div class="task__body">
+            <p><strong>Table style:</strong> apply <strong>Grid Table 5 Dark – Accent 1</strong>.</p>
+            <p class="mac-note"><strong>Mac:</strong> if you can't find this exact one, pick the closest dark Accent 1 grid style and add a Word
+              comment on the table saying which style you used.</p>
+          </div>
+          <div class="task__meta"><span class="task__pts">6 pts</span></div>
+        </li>
+        <li class="task">
+          <div class="task__body">
+            <p><strong>Sort the table</strong> by <strong>Allocated Budget</strong>, Type: <strong>Number</strong>,
+              <strong>Descending</strong>, with "My list has a header row" selected. Programs ends up first and Events last.</p>
+          </div>
+          <div class="task__meta"><span class="task__pts">6 pts</span></div>
+        </li>
+        <li class="task">
+          <div class="task__body">
+            <p><strong>Total row:</strong> add a new last row, then
+              <strong>merge its first two cells</strong>. Type <code>Total Budget</code> in the merged cell and make it
+              <strong>Bold</strong>. The table now has 5 rows.</p>
+          </div>
+          <div class="task__meta"><span class="task__pts">6 pts</span></div>
+        </li>
+        <li class="task">
+          <div class="task__body">
+            <p><strong>Formula:</strong> in the last cell of the total row, insert the formula <code>=SUM(ABOVE)</code> with
+              the number format <code>$#,##0.00;($#,##0.00)</code>. It should show <strong>$11,500.00</strong>. Don't type
+              that number yourself. The grader checks that a formula is in the cell.</p>
+          </div>
+          <div class="task__meta"><span class="task__pts">8 pts</span></div>
+        </li>
+        <li class="task">
+          <div class="task__body">
+            <p><strong>Cell alignment:</strong> select the three data rows (rows 2–4, not the header or the total row) and
+              apply <strong>Align Center</strong>, which centers the text both horizontally and vertically in each cell.</p>
+          </div>
+          <div class="task__meta"><span class="task__pts">4 pts</span></div>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ================= PART 6 ================= -->
+  <section class="part" aria-labelledby="t6">
+    <h3>
+      <button type="button" class="part__trigger" id="t6" aria-expanded="false" aria-controls="p6">
+        <span class="part__badge">Part 6</span>
+        <span class="part__title">SmartArt</span>
+        <span class="part__pts">15 pts</span>
+        <svg class="part__chev" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="5 8 10 13 15 8"/></svg>
+      </button>
+    </h3>
+    <div class="part__panel" id="p6" hidden>
+      <p class="part__intro">Click on the blank line below the table and add a process diagram showing how a season comes
+        together.</p>
+      <ol class="tasks">
+        <li class="task">
+          <div class="task__body">
+            <p><strong>Insert SmartArt:</strong> <strong>Basic Process</strong>, from the Process category. It needs
+              <strong>exactly three</strong> shapes, in this order. Delete any extra shapes.</p>
+            <ol>
+              <li><code>Plan Programs</code></li>
+              <li><code>Open Registration</code></li>
+              <li><code>Host Events</code></li>
+            </ol>
+          </div>
+          <div class="task__meta"><span class="task__pts">8 pts</span></div>
+        </li>
+        <li class="task">
+          <div class="task__body">
+            <p><strong>SmartArt style and colors:</strong> with the <em>whole diagram</em> selected, not one box, apply the
+              SmartArt style <strong>Moderate Effect</strong> and change the colors to <strong>Colorful – Accent Colors</strong>,
+              the first choice under Colorful.</p>
+          </div>
+          <div class="task__meta"><span class="task__pts">7 pts</span></div>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ================= PART 7 ================= -->
+  <section class="part" aria-labelledby="t7">
+    <h3>
+      <button type="button" class="part__trigger" id="t7" aria-expanded="false" aria-controls="p7">
+        <span class="part__badge">Part 7</span>
+        <span class="part__title">Header, watermark and cover page</span>
+        <span class="part__pts">25 pts</span>
+        <svg class="part__chev" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="5 8 10 13 15 8"/></svg>
+      </button>
+    </h3>
+    <div class="part__panel" id="p7" hidden>
+      <p class="part__intro">These finishing touches apply to the whole document. Do the cover page last.</p>
+      <ol class="tasks">
+        <li class="task">
+          <div class="task__body">
+            <p><strong>Page-number header:</strong> a <strong>Plain Number 3</strong> page number at the top of the page. Then click
+              just in front of the number and type <code>Lakewood Newsletter</code> followed by a space,.</p>
+          </div>
+          <div class="task__meta"><span class="task__pts">7 pts</span></div>
+        </li>
+        <li class="task">
+          <div class="task__body">
+            <p><strong>Page number color:</strong> select the page number in the header and change its font color to
+              <strong>Accent 1, Darker 25%</strong>.</p>
+          </div>
+          <div class="task__meta"><span class="task__pts">4 pts</span></div>
+        </li>
+        <li class="task">
+          <div class="task__body">
+            <p><strong>Watermark:</strong> add the built-in <strong>DRAFT 1</strong> text watermark.</p>
+            <p class="mac-note"><strong>Mac:</strong> if DRAFT 1 isn't offered, use a text watermark reading
+              <strong>DRAFT</strong>, diagonal, semitransparent.</p>
+          </div>
+          <div class="task__meta"><span class="task__pts">6 pts</span></div>
+        </li>
+        <li class="task">
+          <div class="task__body">
+            <p><strong>Cover page (last):</strong> the <strong>Slice (Light)</strong> cover page. Fill in the two
+              placeholders:</p>
+            <ul>
+              <li>Title: <code>Lakewood Community Center</code></li>
+              <li>Subtitle: <code>Programs and Events Newsletter</code></li>
+            </ul>
+            <p class="tip">If the cover page has any other placeholders, you can leave them alone. Only the title and subtitle
+              are graded.</p>
+            <p class="mac-note"><strong>Mac:</strong> if Slice (Light) isn't listed, use Slice (Dark) or any built-in cover
+              page that has a title and subtitle.</p>
+          </div>
+          <div class="task__meta"><span class="task__pts">8 pts</span></div>
+        </li>
+      </ol>
+      <p>Last, run a spelling and grammar check. Ignore anything it flags in "Lakewood". Then
+        look over the whole document before you save. You should have three pages: the cover, the
+        newsletter page, and the budget page.</p>
+    </div>
+  </section>
+
+  <h2 id="submit">Saving and submitting</h2>
+  <div class="submit-box">
+    <p>Save your document as a Word document named</p>
+    <p class="filename"><code>Newsletter_LastName_FirstName.docx</code></p>
+    <p>For example, <code>Newsletter_Smith_Jane.docx</code>. Close Word, then upload that one <code>.docx</code> file to the
+      <strong>Word Project</strong> assignment in Canvas by <strong>Sunday 10/11, 11:59 PM</strong>. I open your Word file
+      and check every item in the rubric below.</p>
+    <p><strong>Mac:</strong> make sure the format is <em>Word Document (.docx)</em>, not
+      <em>.pages</em>.</p>
+    <p><strong>Late work:</strong> the Word Project isn't accepted late unless you arrange it with me <em>before</em> the due
+      date. Then there's no penalty. Ask early. Nothing is submitted from this page. Canvas is the only place your file goes.</p>
+  </div>
+
+  <h2 id="rubric">Grading rubric</h2>
+  <p>Every row is graded on its own. Missing one step doesn't cost you points anywhere else.</p>
+  <div class="table-scroll" tabindex="0" role="region" aria-label="Grading rubric, 200 points">
+    <table class="rubric">
+      <thead>
+        <tr><th scope="col">Task</th><th scope="col" class="pts">Pts</th></tr>
+      </thead>
+      <tbody>
+        <tr class="group"><th scope="rowgroup" colspan="2">Part 1: Document setup (15)</th></tr>
+        <tr><td>Theme colors set to Blue Warm (Mac: Blue II)</td><td class="pts">5</td></tr>
+        <tr><td>Normal style modified: 11 pt, Spacing After 6 pt</td><td class="pts">5</td></tr>
+        <tr><td>Box page border, single line, Accent 1, 1½ pt</td><td class="pts">5</td></tr>
+
+        <tr class="group"><th scope="rowgroup" colspan="2">Part 2: Page 1 text and formatting (40)</th></tr>
+        <tr><td>Title: 24 pt, Bold, centered, Accent 1 Darker 25%</td><td class="pts">6</td></tr>
+        <tr><td>Title character spacing expanded by 2 pt</td><td class="pts">4</td></tr>
+        <tr><td>First body paragraph shaded Accent 1 Lighter 80%</td><td class="pts">6</td></tr>
+        <tr><td>"Lakewood Community Center" in small caps</td><td class="pts">5</td></tr>
+        <tr><td>"register by November 13" underlined</td><td class="pts">4</td></tr>
+        <tr><td>"all ages and skill levels welcome" italicized</td><td class="pts">4</td></tr>
+        <tr><td>Both lead-in lines Bold, Accent 1 Darker 25% (Format Painter)</td><td class="pts">5</td></tr>
+        <tr><td>Footnote after "…without notice." with the exact text</td><td class="pts">6</td></tr>
+
+        <tr class="group"><th scope="rowgroup" colspan="2">Part 3: The two lists (30)</th></tr>
+        <tr><td>Four program lines bulleted</td><td class="pts">5</td></tr>
+        <tr><td>Bullet characters colored Accent 1 Darker 25%</td><td class="pts">6</td></tr>
+        <tr><td>Program list sorted ascending</td><td class="pts">7</td></tr>
+        <tr><td>Registration steps as a 1., a., i. multilevel list with correct levels</td><td class="pts">12</td></tr>
+
+        <tr class="group"><th scope="rowgroup" colspan="2">Part 4: Picture and page break (30)</th></tr>
+        <tr><td>Appropriate picture on page 1</td><td class="pts">4</td></tr>
+        <tr><td>Picture exactly 2.5" wide, aspect ratio locked</td><td class="pts">6</td></tr>
+        <tr><td>Soft Edge Rectangle picture style</td><td class="pts">6</td></tr>
+        <tr><td>Middle Right with Square Text Wrapping</td><td class="pts">6</td></tr>
+        <tr><td>Descriptive alt text, one sentence ending in a period</td><td class="pts">4</td></tr>
+        <tr><td>Manual page break after the last paragraph</td><td class="pts">4</td></tr>
+
+        <tr class="group"><th scope="rowgroup" colspan="2">Part 5: Budget table (40)</th></tr>
+        <tr><td>Heading 1 style on "Season Budget Overview"</td><td class="pts">4</td></tr>
+        <tr><td>Table with the correct header and data in every cell</td><td class="pts">6</td></tr>
+        <tr><td>Grid Table 5 Dark – Accent 1 (Mac: closest, with comment)</td><td class="pts">6</td></tr>
+        <tr><td>Data rows sorted by Allocated Budget, descending</td><td class="pts">6</td></tr>
+        <tr><td>Total row added; first two cells merged; "Total Budget" bold</td><td class="pts">6</td></tr>
+        <tr><td>=SUM(ABOVE) formula showing $11,500.00</td><td class="pts">8</td></tr>
+        <tr><td>Data rows 2–4 Align Center</td><td class="pts">4</td></tr>
+
+        <tr class="group"><th scope="rowgroup" colspan="2">Part 6: SmartArt (15)</th></tr>
+        <tr><td>Basic Process with exactly three shapes and the correct text</td><td class="pts">8</td></tr>
+        <tr><td>Moderate Effect style and Colorful – Accent Colors</td><td class="pts">7</td></tr>
+
+        <tr class="group"><th scope="rowgroup" colspan="2">Part 7: Header, watermark and cover page (25)</th></tr>
+        <tr><td>Plain Number 3 header reading "Lakewood Newsletter" and the number</td><td class="pts">7</td></tr>
+        <tr><td>Page number colored Accent 1 Darker 25%</td><td class="pts">4</td></tr>
+        <tr><td>DRAFT 1 watermark (Mac: diagonal DRAFT text)</td><td class="pts">6</td></tr>
+        <tr><td>Slice (Light) cover page with the correct title and subtitle</td><td class="pts">8</td></tr>
+
+        <tr class="group"><th scope="rowgroup" colspan="2">Submission (5)</th></tr>
+        <tr><td>Saved as a .docx named Newsletter_LastName_FirstName.docx</td><td class="pts">5</td></tr>
+      </tbody>
+      <tfoot>
+        <tr><th scope="row">Total</th><td class="pts">200</td></tr>
+      </tfoot>
+    </table>
+  </div>
+
+  <p class="footnote">CSC 104 · Computers and Computer Applications · Fall 2026 · Mendocino College. Questions go to Canvas
+    Inbox or dpai@mendocino.edu. Word Module 5 isn't part of this project, since we didn't cover it this semester.</p>
+</main>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ---------- Accordion: independent panels, aria-expanded + hidden ---------- */
+  var triggers = Array.prototype.slice.call(document.querySelectorAll(".part__trigger"));
+
+  function setOpen(btn, open) {
+    btn.setAttribute("aria-expanded", open ? "true" : "false");
+    document.getElementById(btn.getAttribute("aria-controls")).hidden = !open;
+  }
+  triggers.forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      setOpen(btn, btn.getAttribute("aria-expanded") !== "true");
+      postHeight();
+    });
+  });
+  document.getElementById("open-all").addEventListener("click", function () {
+    triggers.forEach(function (b) { setOpen(b, true); }); postHeight();
+  });
+  document.getElementById("close-all").addEventListener("click", function () {
+    triggers.forEach(function (b) { setOpen(b, false); }); postHeight();
+  });
+
+  /* ---------- Copy buttons (clipboard API, then execCommand fallback) ---------- */
+  function statusFor(id) { return document.querySelector('[data-status-for="' + id + '"]'); }
+  function say(id, msg) {
+    var s = statusFor(id); if (!s) return;
+    s.textContent = "";
+    setTimeout(function () { s.textContent = msg; }, 30);
+  }
+  function selectNode(node) {
+    var r = document.createRange(); r.selectNodeContents(node);
+    var sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(r);
+  }
+  function fallbackCopy(id, node) {
+    selectNode(node);
+    var ok = false;
+    try { ok = document.execCommand("copy"); } catch (e) { ok = false; }
+    if (ok) { say(id, "Copied. Paste it into Word with Keep Text Only."); }
+    else { say(id, "Your browser blocked copying. The text is selected now, so press Ctrl+C (Mac: Command+C)."); }
+  }
+  Array.prototype.forEach.call(document.querySelectorAll(".copy-btn"), function (btn) {
+    btn.addEventListener("click", function () {
+      var id = btn.getAttribute("data-copy");
+      var node = document.getElementById(id);
+      var text = node.textContent;
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(text).then(function () {
+          say(id, "Copied. Paste it into Word with Keep Text Only.");
+        }, function () { fallbackCopy(id, node); });
+      } else {
+        fallbackCopy(id, node);
+      }
+    });
+  });
+
+  /* ---------- Canvas iframe auto-resize ---------- */
+  function postHeight() {
+    setTimeout(function () {
+      var h = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
+      try {
+        window.parent.postMessage({ subject: "lti.frameResize", height: h }, "*");
+        window.parent.postMessage(h, "*");
+      } catch (e) { /* standalone */ }
+    }, 60);
+  }
+  postHeight();
+  window.addEventListener("load", postHeight);
+  window.addEventListener("resize", postHeight);
+}());
+</script>
+</body>
+</html>
