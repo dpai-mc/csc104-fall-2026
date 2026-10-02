@@ -42,6 +42,8 @@
   --code-bg:      #f1f4f9;
   --tag-bg:       #eef2f8;
   --tag-ink:      #2c3a55;
+  --hit:          #fff2b8;
+  --hit-ink:      #3a2c00;
   --radius:       10px;
   --maxw:         62rem;
   --readw:        46rem;
@@ -74,6 +76,8 @@
     --code-bg:      #111c30;
     --tag-bg:       #22314f;
     --tag-ink:      #d5e0f5;
+    --hit:          #5c4a10;
+    --hit-ink:      #ffeeb8;
   }
 }
 
@@ -257,21 +261,106 @@ thead th { background: var(--panel-2); font-size: 0.8125rem; text-transform: upp
 .rubric tfoot td, .rubric tfoot th { background: var(--panel-2); font-weight: 700; }
 
 /* Submission */
-/* ---------------- Intro video (placeholder until the recording is posted) ---------------- */
-.video-wrap { max-width: 48rem; margin: 0 0 1.5rem; }
+/* ---------------------- Video + transcript ---------------------- */
+.video-row { display: flex; flex-wrap: wrap; gap: 1.25rem; margin: 0 0 1.5rem; }
+.video-col { flex: 1 1 32rem; min-width: min(100%, 20rem); }
+.transcript-col { flex: 1 1 20rem; min-width: min(100%, 17rem); display: flex; flex-direction: column; }
+
 .video-frame {
   position: relative; width: 100%; padding-top: 56.25%;
-  background: var(--panel); border-radius: var(--radius); overflow: hidden;
+  background: #000; border-radius: var(--radius); overflow: hidden;
   border: 1px solid var(--field-border);
 }
 .video-frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
-.video-placeholder {
-  position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
-  gap: 0.5rem; padding: 1rem; text-align: center; color: var(--muted);
-}
-.video-placeholder svg { width: 3rem; height: 3rem; color: var(--brand); }
-.video-placeholder strong { color: var(--ink); font-size: 1.05rem; }
 .video-caption { font-size: 0.875rem; color: var(--muted); margin-top: 0.5rem; }
+
+.transcript-head { display: flex; flex-wrap: wrap; gap: 0.5rem 0.75rem; align-items: flex-end; margin-bottom: 0.5rem; }
+.transcript-head h3 { margin: 0 0 0.3rem; font-size: 1rem; flex: 0 1 auto; }
+.transcript-search { flex: 1 1 10rem; }
+.transcript-search label { display: block; font-size: 0.8125rem; font-weight: 600; color: var(--muted); }
+.transcript-search input {
+  font: inherit; width: 100%; min-height: 2.5rem; color: var(--ink);
+  background: var(--surface); border: 1px solid var(--field-border);
+  border-radius: 8px; padding: 0.35rem 0.55rem;
+}
+
+.transcript-panel {
+  height: 24rem; max-height: 24rem; overflow-y: auto;
+  border: 1px solid var(--field-border); border-radius: var(--radius);
+  background: var(--panel); padding: 0.4rem;
+}
+.transcript-line {
+  display: block; width: 100%; text-align: left; font: inherit;
+  font-size: 0.9375rem; line-height: 1.5; color: var(--ink);
+  background: transparent; border: 0; border-radius: 6px;
+  padding: 0.45rem 0.6rem; cursor: pointer;
+}
+.transcript-line:hover { background: var(--accent-bg); }
+.transcript-line .t {
+  display: inline-block; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.8125rem; font-weight: 700; color: var(--brand-ink); margin-right: 0.5rem;
+}
+.transcript-line.is-active {
+  background: var(--accent-bg);
+  box-shadow: inset 3px 0 0 0 var(--brand);
+  font-weight: 600;
+}
+.transcript-line[hidden] { display: none; }
+.transcript-line mark { background: var(--hit); color: var(--hit-ink); }
+.transcript-note { color: var(--muted); font-size: 0.875rem; padding: 0.6rem; margin: 0; }
+
+/* Static fallback when the player never loads */
+.no-player .transcript-line { cursor: default; }
+.no-player .transcript-line:hover { background: transparent; }
+
+/* ---------------------- Topic index ---------------------- */
+.topic-index { margin: 0 0 1.5rem; }
+.topic-index__group {
+  font-weight: 700; color: var(--brand-ink); margin: 1.25rem 0 0.4rem;
+  font-size: 0.9375rem; letter-spacing: 0.02em;
+}
+.topic-index__group:first-child { margin-top: 0; }
+.topic-index__list { list-style: none; padding: 0; margin: 0; max-width: none; }
+.topic-index__item {
+  display: flex; gap: 0.7rem; align-items: baseline;
+  padding: 0.28rem 0; margin: 0; border-bottom: 1px solid var(--border-soft);
+}
+.topic-index__list li:last-child { border-bottom: none; }
+.topic-index__time {
+  flex: 0 0 auto; font: inherit;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.875rem; font-weight: 700;
+  min-width: 4.25rem; min-height: 2rem; text-align: center;
+  color: var(--btn2-fg); background: var(--btn2-bg);
+  border: 1px solid var(--field-border); border-radius: 6px;
+  padding: 0.15rem 0.4rem; cursor: pointer;
+}
+.topic-index__time:hover { background: var(--accent-bg); }
+.topic-index__label { flex: 1 1 auto; }
+
+.topic-index--static .topic-index__time {
+  cursor: default; background: transparent; border-color: transparent;
+  color: var(--muted); text-align: left; padding-left: 0;
+}
+.topic-index--static .topic-index__time:hover { background: transparent; }
+
+@media (min-width: 52em) {
+  .topic-cols { column-count: 2; column-gap: 2.25rem; }
+  .topic-cols .topic-index__group { break-after: avoid; }
+  .topic-cols .topic-index__list { break-inside: avoid; }
+}
+
+.status {
+  min-height: 1.4rem; font-weight: 600; color: var(--ok); background: var(--ok-bg);
+  border-radius: 8px; padding: 0.3rem 0.55rem; margin: 0.5rem 0 0;
+  max-width: var(--readw); font-size: 0.9375rem;
+}
+.status:empty { background: transparent; padding: 0; min-height: 0; }
+.sr-only {
+  position: absolute !important; width: 1px; height: 1px; margin: -1px; padding: 0;
+  overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; border: 0;
+}
+.no-fv :focus { outline: 3px solid var(--focus); outline-offset: 2px; }
 
 .submit-box {
   border: 2px solid var(--brand); border-radius: var(--radius); background: var(--panel);
@@ -287,7 +376,9 @@ thead th { background: var(--panel-2); font-size: 0.8125rem; text-transform: upp
 }
 
 @media print {
-  .skip-link, .parts-tools, .copy-btn, .copy-status, .part__chev { display: none !important; }
+  .skip-link, .parts-tools, .copy-btn, .copy-status, .part__chev, .video-frame, .transcript-search { display: none !important; }
+  .transcript-panel { height: auto !important; max-height: none !important; overflow: visible; border: none; }
+  .topic-index__time { border: none; }
   .part__panel[hidden] { display: block !important; }
   .part { break-inside: auto; }
   .part__trigger { background: none; }
@@ -318,20 +409,73 @@ thead th { background: var(--panel-2); font-size: 0.8125rem; text-transform: upp
 
 <main id="main" class="wrap" tabindex="-1">
 
-  <h2 id="intro-video">Project intro video</h2>
-  <div class="video-wrap">
-    <!-- VIDEO PLACEHOLDER: when the intro is recorded, replace the .video-placeholder div below with the
-         YouTube iframe (src https://www.youtube.com/embed/<ID>?enablejsapi=1&cc_load_policy=1&iv_load_policy=3&modestbranding=1&rel=0,
-         title="Word Project intro video"), and add the corrected .vtt transcript panel per the CSC 104 video embed pattern. -->
-    <div class="video-frame">
-      <div class="video-placeholder" id="video-placeholder">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="2.5" y="5" width="13" height="14" rx="2"/><path d="M15.5 10l6-3.5v11l-6-3.5z"/></svg>
-        <strong>Intro video coming soon</strong>
-        <span>A short introduction to this project will be posted here. You can start on the project now.</span>
+  <section aria-labelledby="video-heading">
+    <h2 id="video-heading">Project intro video</h2>
+    <p>A three-minute introduction: what the project is, the file format Canvas accepts, and how to submit.</p>
+
+    <div class="video-row">
+      <div class="video-col">
+        <div class="video-frame" id="video-container">
+          <iframe id="youtube-player"
+                  src="https://www.youtube.com/embed/iq_Yf86kaaI?enablejsapi=1&amp;cc_load_policy=1&amp;iv_load_policy=3&amp;modestbranding=1&amp;rel=0"
+                  title="CSC 104 Word Project introduction"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  referrerpolicy="strict-origin-when-cross-origin"
+                  allowfullscreen loading="lazy"></iframe>
+        </div>
+        <p class="video-caption">Closed captions are on by default. Select any line of the transcript to jump the
+          video to that moment.</p>
+      </div>
+
+      <div class="transcript-col">
+        <div class="transcript-head">
+          <h3 id="transcript-heading">Transcript</h3>
+          <div class="transcript-search">
+            <label for="transcript-filter">Search the transcript</label>
+            <input type="search" id="transcript-filter" autocomplete="off" spellcheck="false"
+                   aria-describedby="transcript-filter-status">
+          </div>
+        </div>
+        <div class="transcript-panel" id="transcript-container" role="group" aria-labelledby="transcript-heading">
+          <p class="transcript-note">Loading transcript&hellip;</p>
+        </div>
+        <p class="sr-only" role="status" aria-live="polite" id="transcript-filter-status"></p>
+        <p class="sr-only" role="status" aria-live="polite" id="transcript-status"></p>
+        <p style="margin:0.5rem 0 0"><a href="#topic-index-heading">Skip past the transcript</a></p>
       </div>
     </div>
-    <p class="video-caption">Closed captions and a written transcript will be included with the video.</p>
-  </div>
+
+    <h3 id="topic-index-heading">Find a moment in the video</h3>
+    <p id="topic-index-fallback" class="status" hidden></p>
+    <div class="topic-index topic-cols" id="topic-index">
+      <div class="topic-index__group">The project</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="0.32">0:00</button><span class="topic-index__label">The due date</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="15.36">0:15</button><span class="topic-index__label">Like the 100-point homework, but from a blank document</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="35.16">0:35</button><span class="topic-index__label">Seven parts, all from Word 1 to Word 4</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="56.96">0:56</button><span class="topic-index__label">Save it as a .docx, nothing else</span></li>
+      </ul>
+      <div class="topic-index__group">Submitting in Canvas</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="72.2">1:12</button><span class="topic-index__label">Open it, do it and save it in Word, then upload</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="86.96">1:26</button><span class="topic-index__label">Me setting up Canvas Student View</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="146.96">2:26</button><span class="topic-index__label">Upload or drag in your .docx</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="172.4">2:52</button><span class="topic-index__label">Submit as many times as you like; I grade the last one</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="186.98">3:06</button><span class="topic-index__label">Closing</span></li>
+      </ul>
+    </div>
+
+    <div class="callout callout--warn">
+      <h3>Since this was recorded</h3>
+      <ul style="margin:0">
+        <li><strong>Late work (0:00).</strong> I say "no late submissions." The actual rule is on this page and in the
+          syllabus: the Word Project isn't accepted late <em>unless you arrange it with me before the due date</em>.
+          Where the video and this page disagree, this page is right.</li>
+        <li><strong>The Canvas set-up (1:26 to 2:26).</strong> That minute is me switching to Student View and
+          temporarily moving the assignment's dates so it would show. Skip ahead to 2:26 for how you submit.</li>
+      </ul>
+    </div>
+  </section>
 
   <h2 id="before">Before you start</h2>
 
@@ -833,6 +977,8 @@ Space is limited in every program, so we encourage all interested community memb
     <p>For example, <code>Newsletter_Smith_Jane.docx</code>. Close Word, then upload that one <code>.docx</code> file to the
       <strong>Word Project</strong> assignment in Canvas by <strong>Sunday 10/18, 11:59 PM</strong>. I open your Word file
       and check every item in the rubric below.</p>
+    <p>You can submit as many times as you like before the due date. I grade only the last file you submit. I grade
+      it myself, not MindTap, so it takes a little longer to get your score back.</p>
     <p><strong>Mac:</strong> make sure the format is <em>Word Document (.docx)</em>, not
       <em>.pages</em>.</p>
     <p><strong>Late work:</strong> the Word Project isn't accepted late unless you arrange it with me <em>before</em> the due
@@ -978,6 +1124,390 @@ Space is limited in every program, so we encourage all interested community memb
   window.addEventListener("load", postHeight);
   window.addEventListener("resize", postHeight);
 }());
+</script>
+<script>
+(function () {
+  "use strict";
+
+  var VIDEO_ID = "iq_Yf86kaaI";
+
+  /* Transcript source: weeks/projects/csc104-word-project-fall-26-corrected.vtt, the
+     cleaned Whisper output. Inlined so the page stays self-contained inside the
+     Canvas iframe; keep the two copies in step. */
+  var vttContent = `WEBVTT
+
+NOTE
+CSC 104 — Fall 2026 — Word Project intro (YouTube iq_Yf86kaaI)
+Corrected transcript. Source: csc104-word-project-fall-26.vtt (Whisper output).
+Cleanup applied: the repeated "then" cues at 2:23–2:26 collapsed; the
+unclear fragment "that's a minute" at 2:57 dropped; sentence casing and
+punctuation restored throughout; names corrected (MS Word Project, Word 1 to
+Word 4, .docx, Canvas, Submit Assignment, Upload); short cues merged into
+readable 1–2 sentence lines; timestamps normalized to HH:MM:SS.mmm. The
+instructor's voice is preserved, including the Canvas set-up he does on
+camera from 1:26 to 2:26 (switching to Student View and moving the
+assignment's availability for a few minutes so it shows).
+
+00:00:00.320 --> 00:00:14.160
+Aloha! This is a quick introduction to the MS Word Project, which is due on the date provided, and there are no late submissions, so please make sure you submit it on or by that date.
+
+00:00:15.360 --> 00:00:35.160
+The project itself is very similar to our regular 100-point assignments. The only difference is that you're going to start with a blank Word document, and you're going to create everything that goes
+
+00:00:35.160 --> 00:00:56.520
+into the project. All right, so there's like seven sections to it. It goes through and says do this, do that, do this, do that, and it tells you what to do. Okay, and it does stuff from — everything should be somewhere in the first four,
+
+00:00:56.960 --> 00:01:12.200
+you know, Word 1 to Word 4. And then make sure you save it as a Word document. Okay, a .docx, not any other format. Canvas will only let you submit a Word document.
+
+00:01:12.200 --> 00:01:26.760
+Okay, nothing else. So you open it in Word, you do it in Word, you save it in Word, and then you upload it. Upload the Word document. Okay, and then to upload the assignment when you're done —
+
+00:01:26.960 --> 00:01:51.920
+let me switch to... I don't know, let me — okay, so let me view it as a student. Because I didn't publish it, I'll publish it, and now I'll view it as a student. And it's in a thing that's not open yet.
+
+00:01:56.960 --> 00:02:12.220
+What a great thing. So how you submit it is at the end, when you do this submission. So let me — I'm just going to move it for five minutes.
+
+00:02:12.220 --> 00:02:26.020
+Let me move it over here; I'm going to move it back as soon as this video is done. But if I put it over here, then —
+
+00:02:26.960 --> 00:02:52.400
+I should be able to view it as a student. Okay, and how you submit it is: when you're done, there's a Submit Assignment, but basically you drop your file right here. You can click Upload and find it, or if you know where it is, you can drag and drop it right here. See, only .docx is allowed.
+
+00:02:52.400 --> 00:03:06.980
+"Submission reflects my own work," and then you click Submit Assignment. Okay. And you can submit it as many times as you want, and I will only grade the last one. Note: I grade it, it's not auto-graded, so it might take a little bit more time to get the response back.
+
+00:03:06.980 --> 00:03:21.160
+But hopefully it's fairly straightforward for you. I mean, if you've been doing the work, it should be fairly straightforward for you. Okay, so — thanks.`;
+
+  var player = null, timeUpdater = null, parsedTranscript = [], playerReady = false;
+
+  try {
+    if (!CSS.supports("selector(:focus-visible)")) { document.body.classList.add("no-fv"); }
+  } catch (e) { document.body.classList.add("no-fv"); }
+
+  /* ---------------- VTT parsing ---------------- */
+  function timeToSeconds(timeStr) {
+    if (!timeStr) { return 0; }
+    var parts = timeStr.trim().split(":");
+    if (parts.length === 2) {
+      return (parseInt(parts[0], 10) || 0) * 60 + (parseFloat(parts[1]) || 0);
+    }
+    if (parts.length === 3) {
+      return (parseInt(parts[0], 10) || 0) * 3600 + (parseInt(parts[1], 10) || 0) * 60 + (parseFloat(parts[2]) || 0);
+    }
+    return 0;
+  }
+
+  function formatTime(sec) {
+    sec = Math.max(0, Math.floor(sec));
+    var h = Math.floor(sec / 3600), m = Math.floor((sec % 3600) / 60), s = sec % 60;
+    var mm = (h > 0 && m < 10) ? "0" + m : String(m);
+    return (h > 0 ? h + ":" : "") + mm + ":" + (s < 10 ? "0" + s : s);
+  }
+
+  function parseVtt(vttText) {
+    var blocks = vttText.trim().split(/\n\n+/);
+    var cues = [];
+    blocks.forEach(function (block) {
+      var trimmed = block.trim();
+      if (!trimmed || trimmed.indexOf("WEBVTT") === 0 || trimmed.indexOf("NOTE") === 0) { return; }
+      var lines = trimmed.split("\n");
+      var timeLine = null, timeIndex = -1;
+      for (var i = 0; i < lines.length; i++) {
+        if (lines[i].indexOf("-->") !== -1) { timeLine = lines[i]; timeIndex = i; break; }
+      }
+      if (!timeLine) { return; }
+      var ends = timeLine.split("-->");
+      var text = lines.slice(timeIndex + 1).join(" ").trim();
+      if (!text) { return; }
+      cues.push({ start: timeToSeconds(ends[0]), end: timeToSeconds(ends[1]), text: text });
+    });
+    return cues;
+  }
+
+  /* ---------------- Transcript panel ---------------- */
+  function seek(seconds) {
+    if (!player || !player.seekTo) { return false; }
+    player.seekTo(seconds, true);
+    if (player.playVideo) { player.playVideo(); }
+    return true;
+  }
+
+  function scrollPlayerIntoView() {
+    var frame = document.getElementById("video-container");
+    if (frame && frame.scrollIntoView) { frame.scrollIntoView({ behavior: "smooth", block: "center" }); }
+  }
+
+  function populateTranscript() {
+    var container = document.getElementById("transcript-container");
+    if (!container) { return; }
+    container.innerHTML = "";
+    parsedTranscript.forEach(function (cue, i) {
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "transcript-line";
+      btn.dataset.start = cue.start;
+      btn.dataset.end = cue.end;
+      btn.dataset.index = i;
+
+      var stamp = document.createElement("span");
+      stamp.className = "t";
+      stamp.textContent = formatTime(cue.start);
+
+      var body = document.createElement("span");
+      body.className = "tx";
+      body.textContent = cue.text;
+
+      btn.appendChild(stamp);
+      btn.appendChild(body);
+      btn.setAttribute("aria-label", "Jump to " + formatTime(cue.start) + ". " + cue.text);
+
+      btn.addEventListener("click", function () {
+        if (seek(cue.start)) { scrollPlayerIntoView(); }
+      });
+      container.appendChild(btn);
+    });
+  }
+
+  /* ---------------- Active-line highlight ---------------- */
+  var lastAnnounced = null;
+  function announceLine(text) {
+    if (text === lastAnnounced) { return; }
+    lastAnnounced = text;
+    var s = document.getElementById("transcript-status");
+    if (s) { s.textContent = text || ""; }
+  }
+
+  function highlightCurrentLine() {
+    if (!player || !player.getCurrentTime) { return; }
+    var now = player.getCurrentTime();
+    var lines = document.querySelectorAll("#transcript-container .transcript-line");
+    var active = null;
+    Array.prototype.forEach.call(lines, function (line) {
+      var start = parseFloat(line.dataset.start), end = parseFloat(line.dataset.end);
+      if (now >= start && now < end) { active = line; }
+    });
+    var prev = document.querySelector("#transcript-container .is-active");
+    if (active === prev) { return; }
+    if (prev) { prev.classList.remove("is-active"); }
+    if (active) {
+      active.classList.add("is-active");
+      var body = active.querySelector(".tx");
+      announceLine(body ? body.textContent : active.textContent);
+      if (!active.hidden) { active.scrollIntoView({ behavior: "smooth", block: "center" }); }
+    }
+  }
+
+  /* ---------------- Panel height ---------------- */
+  function syncTranscriptHeight() {
+    var videoContainer = document.getElementById("video-container");
+    var panel = document.getElementById("transcript-container");
+    if (!videoContainer || !panel) { return; }
+    // Match the panel to the video only when the two columns actually sit side
+    // by side. Compared by rendered position rather than a viewport-width test,
+    // because in a Canvas iframe a media query measures the iframe, not the
+    // browser window, and can disagree with the flex-wrap result.
+    var videoCol = videoContainer.parentNode;
+    var transcriptCol = panel.parentNode;
+    var sideBySide = Math.abs(
+      transcriptCol.getBoundingClientRect().top - videoCol.getBoundingClientRect().top) < 40
+      && transcriptCol.getBoundingClientRect().left !== videoCol.getBoundingClientRect().left;
+    // Side by side, the panel should end level with the video, so subtract the
+    // heading/search row that sits above it inside the transcript column.
+    var head = transcriptCol.querySelector(".transcript-head");
+    var headH = head ? head.offsetHeight + 8 : 0;
+    var h = sideBySide ? Math.max(240, videoContainer.offsetHeight - headH) + "px" : "24rem";
+    panel.style.height = h;
+    panel.style.maxHeight = h;
+  }
+
+  /* ---------------- Transcript search ---------------- */
+  function escapeRe(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); }
+
+  function runFilter(term) {
+    var lines = document.querySelectorAll("#transcript-container .transcript-line");
+    var status = document.getElementById("transcript-filter-status");
+    var q = term.trim().toLowerCase();
+    var shown = 0;
+
+    Array.prototype.forEach.call(lines, function (line) {
+      var body = line.querySelector(".tx");
+      var cue = parsedTranscript[parseInt(line.dataset.index, 10)];
+      if (!body || !cue) { return; }
+      if (!q) {
+        body.textContent = cue.text;
+        line.hidden = false;
+        shown++;
+        return;
+      }
+      if (cue.text.toLowerCase().indexOf(q) === -1) {
+        body.textContent = cue.text;
+        line.hidden = true;
+        return;
+      }
+      line.hidden = false;
+      shown++;
+      // Rebuild with <mark> around the matches, without using innerHTML on
+      // user-supplied text.
+      body.textContent = "";
+      var re = new RegExp(escapeRe(term.trim()), "ig");
+      var last = 0, m;
+      while ((m = re.exec(cue.text)) !== null) {
+        if (m.index > last) { body.appendChild(document.createTextNode(cue.text.slice(last, m.index))); }
+        var mk = document.createElement("mark");
+        mk.textContent = m[0];
+        body.appendChild(mk);
+        last = m.index + m[0].length;
+        if (m[0].length === 0) { re.lastIndex++; }
+      }
+      if (last < cue.text.length) { body.appendChild(document.createTextNode(cue.text.slice(last))); }
+    });
+
+    if (status) {
+      status.textContent = q
+        ? (shown === 0 ? "No transcript lines match " + term : shown + " transcript line" + (shown === 1 ? "" : "s") + " match " + term)
+        : "Showing the whole transcript.";
+    }
+  }
+
+  function wireSearch() {
+    var input = document.getElementById("transcript-filter");
+    if (!input) { return; }
+    var t = null;
+    input.addEventListener("input", function () {
+      clearTimeout(t);
+      t = setTimeout(function () { runFilter(input.value); }, 250);
+    });
+  }
+
+  /* ---------------- Seek buttons (topic index + step pills) ----------------
+     Buttons wired to the embedded player, never youtu.be?t= links: a time link
+     would navigate the Canvas iframe away from this page. If the player never
+     comes up, the buttons are turned back into plain text so the index reads
+     as a reference list rather than as controls that silently do nothing. */
+  function wireSeekButtons() {
+    var btns = document.querySelectorAll("[data-seek]");
+    Array.prototype.forEach.call(btns, function (btn) {
+      var t = parseFloat(btn.getAttribute("data-seek")) || 0;
+      var item = btn.closest(".topic-index__item") || btn.closest(".todo > li");
+      var text = item ? item.querySelector(".topic-index__label, .todo__title") : null;
+      btn.setAttribute("aria-label", "Jump to " + formatTime(t) + (text ? " — " + text.textContent : "") + " in the video");
+      btn.addEventListener("click", function () {
+        if (seek(t)) { scrollPlayerIntoView(); }
+      });
+    });
+  }
+
+  function degradeToStatic(message) {
+    if (playerReady) { return; }
+    document.body.classList.add("no-player");
+    var idx = document.getElementById("topic-index");
+    if (idx) { idx.classList.add("topic-index--static"); }
+    Array.prototype.forEach.call(document.querySelectorAll("[data-seek]"), function (btn) {
+      btn.disabled = true;
+      btn.removeAttribute("aria-label");
+    });
+    var note = document.getElementById("topic-index-fallback");
+    if (note) { note.hidden = false; note.textContent = message; }
+  }
+
+  /* ---------------- Platform tabs ---------------- */
+  function wireTabs() {
+    var tablist = document.querySelector(".tablist");
+    if (!tablist) { return; }
+    var tabs = Array.prototype.slice.call(tablist.querySelectorAll('[role="tab"]'));
+
+    function select(tab, focus) {
+      tabs.forEach(function (t) {
+        var selected = t === tab;
+        t.setAttribute("aria-selected", selected ? "true" : "false");
+        t.tabIndex = selected ? 0 : -1;
+        var panel = document.getElementById(t.getAttribute("aria-controls"));
+        if (panel) { panel.hidden = !selected; }
+      });
+      if (focus) { tab.focus(); }
+    }
+
+    tabs.forEach(function (tab, i) {
+      tab.addEventListener("click", function () { select(tab, false); });
+      tab.addEventListener("keydown", function (e) {
+        var next = null;
+        if (e.key === "ArrowRight") { next = tabs[(i + 1) % tabs.length]; }
+        else if (e.key === "ArrowLeft") { next = tabs[(i - 1 + tabs.length) % tabs.length]; }
+        else if (e.key === "Home") { next = tabs[0]; }
+        else if (e.key === "End") { next = tabs[tabs.length - 1]; }
+        if (next) { e.preventDefault(); select(next, true); }
+      });
+    });
+  }
+
+  /* ---------------- YouTube player ---------------- */
+  window.onYouTubeIframeAPIReady = function () {
+    if (!VIDEO_ID || !document.getElementById("youtube-player")) { return; }
+    player = new YT.Player("youtube-player", {
+      events: {
+        onReady: function () {
+          playerReady = true;
+          syncTranscriptHeight();
+        },
+        onStateChange: function (event) {
+          clearInterval(timeUpdater);
+          if (event.data === YT.PlayerState.PLAYING) {
+            timeUpdater = setInterval(highlightCurrentLine, 300);
+          } else {
+            highlightCurrentLine();
+          }
+        }
+      }
+    });
+  };
+
+  document.addEventListener("DOMContentLoaded", function () {
+    parsedTranscript = parseVtt(vttContent);
+    populateTranscript();
+    wireSearch();
+    wireSeekButtons();
+    wireTabs();
+    setTimeout(syncTranscriptHeight, 100);
+
+    if (typeof YT === "undefined" || typeof YT.Player === "undefined") {
+      var tag = document.createElement("script");
+      tag.src = "https://www.youtube.com/iframe_api";
+      tag.onerror = function () {
+        degradeToStatic("The video player could not load, so the times below are listed for reference rather than as buttons. The full transcript is above.");
+      };
+      document.head.appendChild(tag);
+    } else {
+      window.onYouTubeIframeAPIReady();
+    }
+
+    // If the API never reports ready — blocked script, offline, restrictive
+    // network — fall back rather than leaving dead buttons on the page.
+    setTimeout(function () {
+      degradeToStatic("The video player did not load, so the times below are listed for reference rather than as buttons. The full transcript is above.");
+    }, 8000);
+  });
+
+  var resizeTimeout;
+  window.addEventListener("resize", function () {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(syncTranscriptHeight, 250);
+  });
+
+  /* Report height to a Canvas parent that listens for it. Harmless otherwise. */
+  function postHeight() {
+    try {
+      if (window.parent && window.parent !== window) {
+        var h = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
+        window.parent.postMessage({ subject: "lti.frameResize", height: h }, "*");
+      }
+    } catch (e) { /* cross-origin parent — ignore */ }
+  }
+  window.addEventListener("load", postHeight);
+  if (window.ResizeObserver) { new ResizeObserver(postHeight).observe(document.body); }
+})();
 </script>
 </body>
 </html>
