@@ -1,0 +1,1610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CSC 104 — Word Module 4 Guided Assignment</title>
+<style>
+/* ============================================================
+   CSC 104 — Week 6 — Word Module 4 Guided Assignment
+   Self-contained SPA for embedding in a Canvas iframe.
+   Vanilla CSS + vanilla JS, one file, no outbound links.
+   The only external resources are the YouTube player iframe and
+   the YouTube IFrame API (needed for click-to-seek); the page
+   degrades to a readable transcript and a plain topic list if
+   either is blocked.
+   Token block and layout match weeks/week03/01-guided-assign-word-1.html.
+   ============================================================ */
+
+:root {
+  color-scheme: light dark;
+  --surface:      #ffffff;
+  --panel:        #f6f8fb;
+  --panel-2:      #eef2f8;
+  --accent-bg:    #e8f0fe;
+  --ink:          #16202f;
+  --muted:        #46536b;
+  --brand:        #1d4ed8;
+  --brand-ink:    #17399c;
+  --border:       #c3cddc;
+  --border-soft:  #dde4ee;
+  --field-border: #6b7a92;
+  --btn-bg:       #1d4ed8;
+  --btn-fg:       #ffffff;
+  --btn-bg-hover: #17399c;
+  --btn2-bg:      #ffffff;
+  --btn2-fg:      #17399c;
+  --ok:           #1a6b3c;
+  --ok-bg:        #e6f4ec;
+  --warn-ink:     #7a4a06;
+  --warn-bg:      #fdf3e0;
+  --warn-rule:    #b8860b;
+  --focus:        #b4530a;
+  --hit:          #fff2b8;
+  --hit-ink:      #3a2c00;
+  --radius:       10px;
+  --maxw:         70rem;
+  --readw:        46rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --surface:      #0f1726;
+    --panel:        #17223a;
+    --panel-2:      #1e2b45;
+    --accent-bg:    #1a2a4d;
+    --ink:          #e9eefa;
+    --muted:        #b6c3d8;
+    --brand:        #9dbcff;
+    --brand-ink:    #bcd2ff;
+    --border:       #3a4a68;
+    --border-soft:  #2b3a56;
+    --field-border: #7b89a3;
+    --btn-bg:       #9dbcff;
+    --btn-fg:       #0b1424;
+    --btn-bg-hover: #c3d6ff;
+    --btn2-bg:      #17223a;
+    --btn2-fg:      #bcd2ff;
+    --ok:           #8fe0b0;
+    --ok-bg:        #123328;
+    --warn-ink:     #f6d59a;
+    --warn-bg:      #3a2c11;
+    --warn-rule:    #d9a441;
+    --focus:        #ffb066;
+    --hit:          #5c4a10;
+    --hit-ink:      #ffeeb8;
+  }
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--surface);
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; border-radius: 4px; }
+.no-fv :focus { outline: 3px solid var(--focus); outline-offset: 2px; }
+
+.skip-link {
+  position: absolute; left: -9999px; top: 0; z-index: 60;
+  background: var(--btn-bg); color: var(--btn-fg);
+  padding: 0.6rem 1rem; font-weight: 700; border-radius: 0 0 var(--radius) 0;
+}
+.skip-link:focus { left: 0; outline: 3px solid var(--focus); outline-offset: 2px; }
+
+.wrap { max-width: var(--maxw); margin: 0 auto; padding: 1rem 1rem 3rem; }
+.read { max-width: var(--readw); }
+
+/* ---------------------- Header ---------------------- */
+.page-head { background: var(--panel); border-bottom: 3px solid var(--brand); }
+.page-head .wrap { padding-bottom: 1.25rem; }
+
+.eyebrow {
+  font-size: 0.8125rem; letter-spacing: 0.09em; text-transform: uppercase;
+  font-weight: 700; color: var(--brand-ink); margin: 0.75rem 0 0.35rem;
+}
+h1 { font-size: clamp(1.5rem, 4.2vw, 2.15rem); line-height: 1.22; margin: 0 0 0.6rem; }
+.lede { margin: 0; color: var(--muted); max-width: var(--readw); }
+
+.facts { list-style: none; display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 1rem 0 0; padding: 0; }
+.facts li {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 999px; padding: 0.3rem 0.85rem; font-size: 0.875rem;
+}
+.facts .k { font-weight: 700; color: var(--brand-ink); }
+
+/* ---------------------- Typography ---------------------- */
+h2 {
+  font-size: clamp(1.25rem, 3.2vw, 1.6rem);
+  margin: 2.5rem 0 0.75rem; color: var(--brand-ink);
+  padding-bottom: 0.35rem; border-bottom: 2px solid var(--border-soft);
+}
+h3 { font-size: 1.125rem; margin: 1.75rem 0 0.5rem; }
+p { margin: 0 0 1rem; max-width: var(--readw); }
+ul, ol { margin: 0 0 1rem; padding-left: 1.35rem; max-width: var(--readw); }
+li { margin-bottom: 0.4rem; }
+.mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.9375em; }
+.ui { font-weight: 700; }
+
+.callout {
+  border-left: 5px solid var(--brand); background: var(--accent-bg);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding: 0.9rem 1.1rem; margin: 0 0 1.25rem; max-width: var(--readw);
+}
+.callout > :last-child { margin-bottom: 0; }
+.callout h3 { margin-top: 0; font-size: 1.05rem; }
+.callout--warn { border-left-color: var(--warn-rule); background: var(--warn-bg); color: var(--warn-ink); }
+.callout--wide { max-width: none; }
+
+/* ---------------------- Video + transcript ---------------------- */
+.video-row { display: flex; flex-wrap: wrap; gap: 1.25rem; margin: 0 0 1.5rem; }
+.video-col { flex: 1 1 32rem; min-width: min(100%, 20rem); }
+.transcript-col { flex: 1 1 20rem; min-width: min(100%, 17rem); display: flex; flex-direction: column; }
+
+.video-frame {
+  position: relative; width: 100%; padding-top: 56.25%;
+  background: #000; border-radius: var(--radius); overflow: hidden;
+  border: 1px solid var(--field-border);
+}
+.video-frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+.video-caption { font-size: 0.875rem; color: var(--muted); margin-top: 0.5rem; }
+
+.transcript-head { display: flex; flex-wrap: wrap; gap: 0.5rem 0.75rem; align-items: flex-end; margin-bottom: 0.5rem; }
+.transcript-head h3 { margin: 0 0 0.3rem; font-size: 1rem; flex: 0 1 auto; }
+.transcript-search { flex: 1 1 10rem; }
+.transcript-search label { display: block; font-size: 0.8125rem; font-weight: 600; color: var(--muted); }
+.transcript-search input {
+  font: inherit; width: 100%; min-height: 2.5rem; color: var(--ink);
+  background: var(--surface); border: 1px solid var(--field-border);
+  border-radius: 8px; padding: 0.35rem 0.55rem;
+}
+
+.transcript-panel {
+  height: 24rem; max-height: 24rem; overflow-y: auto;
+  border: 1px solid var(--field-border); border-radius: var(--radius);
+  background: var(--panel); padding: 0.4rem;
+}
+.transcript-line {
+  display: block; width: 100%; text-align: left; font: inherit;
+  font-size: 0.9375rem; line-height: 1.5; color: var(--ink);
+  background: transparent; border: 0; border-radius: 6px;
+  padding: 0.45rem 0.6rem; cursor: pointer;
+}
+.transcript-line:hover { background: var(--accent-bg); }
+.transcript-line .t {
+  display: inline-block; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.8125rem; font-weight: 700; color: var(--brand-ink); margin-right: 0.5rem;
+}
+.transcript-line.is-active {
+  background: var(--accent-bg);
+  box-shadow: inset 3px 0 0 0 var(--brand);
+  font-weight: 600;
+}
+.transcript-line[hidden] { display: none; }
+.transcript-line mark { background: var(--hit); color: var(--hit-ink); }
+.transcript-note { color: var(--muted); font-size: 0.875rem; padding: 0.6rem; margin: 0; }
+
+/* Static fallback when the player never loads */
+.no-player .transcript-line { cursor: default; }
+.no-player .transcript-line:hover { background: transparent; }
+
+/* ---------------------- Topic index ---------------------- */
+.topic-index { margin: 0 0 1.5rem; }
+.topic-index__group {
+  font-weight: 700; color: var(--brand-ink); margin: 1.25rem 0 0.4rem;
+  font-size: 0.9375rem; letter-spacing: 0.02em;
+}
+.topic-index__group:first-child { margin-top: 0; }
+.topic-index__list { list-style: none; padding: 0; margin: 0; max-width: none; }
+.topic-index__item {
+  display: flex; gap: 0.7rem; align-items: baseline;
+  padding: 0.28rem 0; margin: 0; border-bottom: 1px solid var(--border-soft);
+}
+.topic-index__list li:last-child { border-bottom: none; }
+.topic-index__time {
+  flex: 0 0 auto; font: inherit;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.875rem; font-weight: 700;
+  min-width: 4.25rem; min-height: 2rem; text-align: center;
+  color: var(--btn2-fg); background: var(--btn2-bg);
+  border: 1px solid var(--field-border); border-radius: 6px;
+  padding: 0.15rem 0.4rem; cursor: pointer;
+}
+.topic-index__time:hover { background: var(--accent-bg); }
+.topic-index__label { flex: 1 1 auto; }
+
+.topic-index--static .topic-index__time {
+  cursor: default; background: transparent; border-color: transparent;
+  color: var(--muted); text-align: left; padding-left: 0;
+}
+.topic-index--static .topic-index__time:hover { background: transparent; }
+
+@media (min-width: 52em) {
+  .topic-cols { column-count: 2; column-gap: 2.25rem; }
+  .topic-cols .topic-index__group { break-after: avoid; }
+  .topic-cols .topic-index__list { break-inside: avoid; }
+}
+
+/* ---------------------- To-do / step lists ---------------------- */
+.todo { list-style: none; padding: 0; margin: 0 0 1.5rem; max-width: none; }
+.todo > li {
+  background: var(--panel); border: 1px solid var(--border-soft);
+  border-radius: var(--radius); padding: 0.85rem 1rem;
+  margin: 0 0 0.75rem;
+}
+.todo__top { display: flex; flex-wrap: wrap; gap: 0.6rem; align-items: baseline; }
+.todo__num {
+  flex: 0 0 auto; min-width: 1.9rem; height: 1.9rem; padding: 0 0.4rem; border-radius: 999px;
+  background: var(--btn-bg); color: var(--btn-fg); font-weight: 700; font-size: 0.9375rem;
+  display: flex; align-items: center; justify-content: center; align-self: flex-start;
+}
+.todo__num--setup { background: var(--btn2-bg); color: var(--btn2-fg); border: 1px solid var(--field-border); }
+.todo__title { flex: 1 1 14rem; font-weight: 700; margin: 0; }
+.todo__body { margin: 0.35rem 0 0 2.5rem; max-width: var(--readw); }
+.todo__body p { margin: 0 0 0.5rem; }
+.todo__body ul { margin: 0 0 0.5rem; }
+.todo__body > :last-child { margin-bottom: 0; }
+.todo__meta { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0.5rem 0 0 2.5rem; }
+.pill {
+  font-size: 0.8125rem; font-weight: 700; border-radius: 999px;
+  padding: 0.1rem 0.6rem; border: 1px solid currentColor; white-space: nowrap;
+}
+.pill--graded { color: var(--ok); background: var(--ok-bg); }
+.pill--setup { color: var(--brand-ink); background: var(--accent-bg); }
+.pill--due { color: var(--warn-ink); background: var(--warn-bg); }
+.pill--time {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  color: var(--btn2-fg); background: var(--btn2-bg); border-color: var(--field-border);
+  cursor: pointer; font-size: 0.8125rem; min-height: 1.9rem;
+}
+.pill--time:hover { background: var(--accent-bg); }
+.no-player .pill--time { cursor: default; }
+
+/* ---------------------- Platform tabs ---------------------- */
+.tabs { margin: 0 0 1.5rem; }
+.tablist { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0 0 -1px; padding: 0; }
+.tab {
+  font: inherit; font-weight: 700; cursor: pointer;
+  color: var(--btn2-fg); background: var(--btn2-bg);
+  border: 1px solid var(--field-border); border-bottom-color: transparent;
+  border-radius: var(--radius) var(--radius) 0 0;
+  padding: 0.5rem 1rem; min-height: 2.5rem;
+}
+.tab[aria-selected="true"] { background: var(--accent-bg); border-bottom-color: var(--accent-bg); }
+.tab:hover { background: var(--accent-bg); }
+.tabpanel {
+  border: 1px solid var(--field-border); border-radius: 0 var(--radius) var(--radius) var(--radius);
+  background: var(--panel); padding: 1rem 1.1rem;
+}
+.tabpanel > :last-child { margin-bottom: 0; }
+.tabpanel h3:first-child { margin-top: 0; }
+
+/* ---------------------- Reference table ---------------------- */
+.table-scroll { overflow-x: auto; margin: 0 0 1.5rem; }
+table { border-collapse: collapse; width: 100%; min-width: 30rem; background: var(--surface); }
+caption { text-align: left; font-weight: 700; padding: 0 0 0.5rem; color: var(--muted); }
+th, td { border: 1px solid var(--border); padding: 0.6rem 0.7rem; text-align: left; vertical-align: top; }
+thead th { background: var(--panel-2); }
+tbody th { background: var(--panel); font-weight: 700; white-space: nowrap; }
+
+.status {
+  min-height: 1.4rem; font-weight: 600; color: var(--ok); background: var(--ok-bg);
+  border-radius: 8px; padding: 0.3rem 0.55rem; margin: 0.5rem 0 0;
+  max-width: var(--readw); font-size: 0.9375rem;
+}
+.status:empty { background: transparent; padding: 0; min-height: 0; }
+
+.footnote {
+  margin-top: 2.5rem; padding-top: 1rem; border-top: 1px solid var(--border-soft);
+  color: var(--muted); font-size: 0.9375rem; max-width: var(--readw);
+}
+
+.sr-only {
+  position: absolute !important; width: 1px; height: 1px; margin: -1px; padding: 0;
+  overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
+}
+
+@media print {
+  .skip-link, .video-frame, .transcript-search, .tablist { display: none !important; }
+  .transcript-panel { height: auto !important; max-height: none !important; overflow: visible; border: none; }
+  .topic-index__time, .pill--time { border: none; }
+  .tabpanel { display: block !important; border-radius: var(--radius); margin-bottom: 1rem; }
+  body { background: #fff; color: #000; }
+  .todo > li, .callout, table { break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+
+<a class="skip-link" href="#main">Skip to page content</a>
+
+<header class="page-head">
+  <div class="wrap">
+    <p class="eyebrow">CSC 104 &middot; Week 6 &middot; Guided Assignment</p>
+    <h1>Word Module 4 &mdash; Guided Assignment Walkthrough</h1>
+    <p class="lede">Week 6 is about multipage documents. The video below walks through a draft guide for SPK
+      Translation Services: expanded character spacing, removing a page break, small caps, a picture bullet, list
+      indents, bullet color, sorting, a multilevel list, colored page numbers, a watermark and a cover page. Every step
+      is listed on this page with a button that jumps the video straight to it, and the whole video is written out
+      here so you can read it instead of watching.</p>
+    <ul class="facts">
+      <li><span class="k">Video:</span> 17 minutes</li>
+      <li><span class="k">Week 6:</span> 10/5/2026 &ndash; 10/11/2026</li>
+      <li><span class="k">This assignment:</span> 25 pts in MindTap</li>
+      <li><span class="k">Attempts:</span> up to 10</li>
+      <li><span class="k">Due:</span> Sun 10/11, 11:59 PM</li>
+    </ul>
+  </div>
+</header>
+
+<main id="main" class="wrap" tabindex="-1">
+
+  <!-- ============ What to do this week ============ -->
+  <section aria-labelledby="todo-heading">
+    <h2 id="todo-heading" style="margin-top:1.25rem">What to do this week</h2>
+    <p>Same pattern as the last three weeks: a <strong>guided</strong> assignment we walk through together, then a
+      <strong>homework</strong> assignment you do on your own. Do them in that order. This is the last Word module
+      this semester, and most of this week's steps are about lists: bullets, indent levels, sorting and numbering.
+      Each time stamp below jumps the video to the part that explains it.</p>
+
+    <div class="callout">
+      <p style="margin:0"><strong>You get ten attempts at the guided assignment.</strong> The first time I did this
+        one, I lost a point on the page-number step because I colored only the number and not the word
+        <em>Page</em> in front of it. Read the Graded Summary Report, fix that one step and submit again. That's
+        exactly what the attempts are for. <em>(Video 16:07.)</em></p>
+    </div>
+
+    <ol class="todo">
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">1</span>
+          <p class="todo__title">Watch the walkthrough with Word open beside it</p>
+        </div>
+        <div class="todo__body">
+          <p>Pause after each step and do it in your own file. Turn on the formatting marks
+            (<span class="ui">Show/Hide &para;</span>) before you start. Step 2 is about deleting a page break and
+            blank paragraphs you can't see without them, and the list steps are much easier when you can see where
+            each paragraph ends.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="0.04">0:00</button>
+          <span class="pill pill--setup">Not graded</span>
+        </p>
+      </li>
+
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">2</span>
+          <p class="todo__title">Download the assignment files from MindTap</p>
+        </div>
+        <div class="todo__body">
+          <p>Three files this week: an instruction file, a start file with your name on it, and a support file. The
+            support file is a small PNG picture of a check mark in a circle, which becomes the bullet in step 3. Use
+            <span class="ui">Download All</span>, and say yes if your browser asks about downloading multiple
+            files.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="23.44">0:23</button>
+          <span class="pill pill--setup">Not graded</span>
+        </p>
+      </li>
+
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">3</span>
+          <p class="todo__title">Do the ten steps and submit the guided assignment</p>
+        </div>
+        <div class="todo__body">
+          <p>Every step is written out further down this page. Save as the <span class="mono">_2</span> version first,
+            work through the steps, then upload the file and select <span class="ui">Submit</span>. Check the
+            <span class="ui">Graded Summary Report</span> afterwards. It tells you exactly which steps earned
+            points.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="129.38">2:09</button>
+          <button type="button" class="pill pill--time" data-seek="931">15:31</button>
+          <span class="pill pill--graded">Graded &mdash; 25 pts</span>
+          <span class="pill pill--due">Due Sun 10/11, 11:59 PM</span>
+        </p>
+      </li>
+
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">4</span>
+          <p class="todo__title">Do the Word Module 4 homework on your own</p>
+        </div>
+        <div class="todo__body">
+          <p>The second MindTap assignment this week. It's a different document with the same commands, and there's
+            no walkthrough. That's the point. Start it right after the guided one is submitted, while you still
+            remember where the bullet, indent and sort commands are.</p>
+        </div>
+        <p class="todo__meta">
+          <span class="pill pill--graded">Graded &mdash; 100 pts</span>
+          <span class="pill pill--due">Due Sun 10/11, 11:59 PM</span>
+        </p>
+      </li>
+
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">5</span>
+          <p class="todo__title">Do the module reading</p>
+        </div>
+        <div class="todo__body">
+          <p>The Word Module 4 chapter in the Shelly Cashman text, on creating a multipage document. Skim it for
+            <em>what</em> Word can do, and come back to it as a step-by-step reference when an assignment names
+            something you haven't seen. Not graded.</p>
+        </div>
+        <p class="todo__meta">
+          <span class="pill pill--setup">Not graded</span>
+        </p>
+      </li>
+
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">6</span>
+          <p class="todo__title">Start the Word Project</p>
+        </div>
+        <div class="todo__body">
+          <p>The 200-point Word Project opens this week in Canvas. It covers everything from Word Modules 1 through 4,
+            and you have until the end of next week to finish it. Don't leave it for the last weekend.</p>
+        </div>
+        <p class="todo__meta">
+          <span class="pill pill--graded">Graded &mdash; 200 pts</span>
+          <span class="pill pill--due">Due Sun 10/18, 11:59 PM</span>
+        </p>
+      </li>
+    </ol>
+  </section>
+
+  <!-- ============ Video + transcript ============ -->
+  <section aria-labelledby="video-heading">
+    <h2 id="video-heading">The walkthrough video</h2>
+    <p>Seventeen minutes, start to finish. It covers downloading the files, saving your copy, all ten steps, and
+      submitting. If you're stuck on one step, use the topic index below rather than scrubbing through.</p>
+
+    <div class="video-row">
+      <div class="video-col">
+        <div class="video-frame" id="video-container">
+          <iframe id="youtube-player"
+                  src="https://www.youtube.com/embed/BAsdEzMKigI?enablejsapi=1&amp;cc_load_policy=1&amp;iv_load_policy=3&amp;modestbranding=1&amp;rel=0"
+                  title="CSC 104 Word Module 4 Guided Assignment Walkthrough"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  referrerpolicy="strict-origin-when-cross-origin"
+                  allowfullscreen loading="lazy"></iframe>
+        </div>
+        <p class="video-caption">Closed captions are on by default. Select any line of the transcript to jump the
+          video to that moment.</p>
+      </div>
+
+      <div class="transcript-col">
+        <div class="transcript-head">
+          <h3 id="transcript-heading">Transcript</h3>
+          <div class="transcript-search">
+            <label for="transcript-filter">Search the transcript</label>
+            <input type="search" id="transcript-filter" autocomplete="off" spellcheck="false"
+                   aria-describedby="transcript-filter-status">
+          </div>
+        </div>
+        <div class="transcript-panel" id="transcript-container" role="group" aria-labelledby="transcript-heading">
+          <p class="transcript-note">Loading transcript&hellip;</p>
+        </div>
+        <p class="sr-only" role="status" aria-live="polite" id="transcript-filter-status"></p>
+        <p class="sr-only" role="status" aria-live="polite" id="transcript-status"></p>
+        <p style="margin:0.5rem 0 0"><a href="#topic-index-heading">Skip past the transcript</a></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ Topic index ============ -->
+  <section aria-labelledby="topic-index-heading">
+    <h2 id="topic-index-heading">Find a moment in the video</h2>
+    <p><strong>Select any time below and the video jumps there.</strong> This is the detailed contents of the
+      walkthrough. If one step isn't working, find it here and watch just that minute.</p>
+
+    <p id="topic-index-fallback" class="status" hidden></p>
+
+    <div class="topic-index topic-cols" id="topic-index">
+
+      <div class="topic-index__group">Getting started</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="0.04">0:00</button><span class="topic-index__label">Module 4: Creating a Multipage Document</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="23.44">0:23</button><span class="topic-index__label">Three files: instructions, start file, and a PNG support file</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="53.44">0:53</button><span class="topic-index__label">Page Width and Enable Editing</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="90.38">1:30</button><span class="topic-index__label">Save As the _2 copy</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="113.06">1:53</button><span class="topic-index__label">Check the footer for your own name</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="129.38">2:09</button><span class="topic-index__label">The scenario: a guide for SPK Translation Services</span></li>
+      </ul>
+
+      <div class="topic-index__group">Step 1 &mdash; character spacing</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="139.62">2:19</button><span class="topic-index__label">What step 1 asks for: expand by 1.5 pt</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="162.9">2:42</button><span class="topic-index__label">Font dialog &rsaquo; Advanced &rsaquo; Spacing: Expanded</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="190.42">3:10</button><span class="topic-index__label">Watching the letters spread out</span></li>
+      </ul>
+
+      <div class="topic-index__group">Step 2 &mdash; the page break</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="200.5">3:20</button><span class="topic-index__label">What step 2 asks for</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="223.46">3:43</button><span class="topic-index__label">Turn on Show/Hide &para; so you can see them</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="241.54">4:01</button><span class="topic-index__label">Delete until the heading follows the picture</span></li>
+      </ul>
+
+      <div class="topic-index__group">Step 3 &mdash; small caps and the picture bullet</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="256.58">4:16</button><span class="topic-index__label">What step 3 asks for</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="290.82">4:50</button><span class="topic-index__label">Font dialog &rsaquo; Small caps on English to Korean</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="302.74">5:02</button><span class="topic-index__label">Define New Bullet &rsaquo; Picture &rsaquo; From a File</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="316.26">5:16</button><span class="topic-index__label">Choosing the check mark PNG</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="331.7">5:31</button><span class="topic-index__label">The other lists already use it</span></li>
+      </ul>
+
+      <div class="topic-index__group">Step 4 &mdash; indent levels</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="341.7">5:41</button><span class="topic-index__label">What step 4 asks for: Conferences to Medical Appointments</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="373.54">6:13</button><span class="topic-index__label">The Increase and Decrease Indent buttons</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="389.62">6:29</button><span class="topic-index__label">Moving Zoom Interpretation back one level</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="405.3">6:45</button><span class="topic-index__label">One click moves it one level</span></li>
+      </ul>
+
+      <div class="topic-index__group">Step 5 &mdash; bullet color</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="425.96">7:05</button><span class="topic-index__label">What step 5 asks for: Turquoise, Text 2</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="438.4">7:18</button><span class="topic-index__label">Which items are second-level</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="462.34">7:42</button><span class="topic-index__label">The final figure shows the text colored too</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="486.78">8:06</button><span class="topic-index__label">Select the whole items, then Font Color</span></li>
+      </ul>
+
+      <div class="topic-index__group">Step 6 &mdash; indent and sort</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="512.52">8:32</button><span class="topic-index__label">What step 6 asks for</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="530.58">8:50</button><span class="topic-index__label">This list sits at the margin; the others don't</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="554.72">9:14</button><span class="topic-index__label">Indenting it to match</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="571.72">9:31</button><span class="topic-index__label">The second part: sort ascending</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="578.84">9:38</button><span class="topic-index__label">Sort by Paragraphs, Type: Text, Ascending</span></li>
+      </ul>
+
+      <div class="topic-index__group">Step 7 &mdash; the multilevel list</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="608.84">10:08</button><span class="topic-index__label">What step 7 asks for: 1., a., i.</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="621.56">10:21</button><span class="topic-index__label">Multilevel List &rsaquo; Current List</span></li>
+      </ul>
+
+      <div class="topic-index__group">Step 8 &mdash; page number color</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="651.72">10:51</button><span class="topic-index__label">What step 8 asks for</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="663.96">11:03</button><span class="topic-index__label">Double-click into the header; select Page and the number</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="683.14">11:23</button><span class="topic-index__label">Font Color, then double-click back out</span></li>
+      </ul>
+
+      <div class="topic-index__group">Step 9 &mdash; the watermark</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="702.36">11:42</button><span class="topic-index__label">What step 9 asks for (I call it number eight)</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="715.68">11:55</button><span class="topic-index__label">On a Mac: make your own, 50% and diagonal</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="741.62">12:21</button><span class="topic-index__label">Design &rsaquo; Watermark</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="764.58">12:44</button><span class="topic-index__label">The built-in DRAFT 1, not the typed words</span></li>
+      </ul>
+
+      <div class="topic-index__group">Step 10 &mdash; the cover page</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="783.64">13:03</button><span class="topic-index__label">What step 10 asks for: Retrospect</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="806.62">13:26</button><span class="topic-index__label">Insert &rsaquo; Cover Page &rsaquo; Retrospect</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="828.3">13:48</button><span class="topic-index__label">Typing the Document Title</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="848.38">14:08</button><span class="topic-index__label">The subtitle, and why it shows in all caps</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="871.42">14:31</button><span class="topic-index__label">Leave the other placeholders alone</span></li>
+      </ul>
+
+      <div class="topic-index__group">Submitting</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="912.88">15:12</button><span class="topic-index__label">Save and close both files</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="931">15:31</button><span class="topic-index__label">Drag in the _2 file and Submit</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="948.76">15:48</button><span class="topic-index__label">The report tells you which step you missed</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="967.24">16:07</button><span class="topic-index__label">My first try: I colored only the number</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1007.94">16:47</button><span class="topic-index__label">Closing</span></li>
+      </ul>
+
+    </div>
+  </section>
+
+  <!-- ============ The steps ============ -->
+  <section aria-labelledby="steps-heading">
+    <h2 id="steps-heading">The assignment, step by step</h2>
+    <p>Four setup items, then the ten graded steps, then submitting. Each one says <em>what</em> to change; the
+      time button next to it shows you <em>how</em>. <strong>Always go by the instruction file MindTap gave you.</strong>
+      The wording below is a summary, and MindTap grades against its own file.</p>
+
+    <div class="callout">
+      <h3>Three details worth knowing</h3>
+      <ul style="margin:0 0 0.75rem">
+        <li><strong>Page numbers mean the whole thing.</strong> In step 8, select the word <em>Page</em> and the
+          number together. The first time I did this assignment I colored only the number and lost the point
+          <em>(16:07)</em>.</li>
+        <li><strong>DRAFT 1 is a built-in watermark.</strong> Pick it from the Watermark gallery. Don't type the
+          words "Draft 1" anywhere.</li>
+        <li><strong>Step 5 says "bullets," but the final figure shows the text colored too.</strong> In the video I
+          select the whole second-level items so the bullets and the text both change, to match the final figure
+          <em>(7:42)</em>. Compare your result to the final figure at the end of your instruction file.</li>
+      </ul>
+      <p style="margin:0">The video says most step numbers out loud. The numbers below follow the order of the
+        instruction file. If your file groups or numbers something differently, go by your file.</p>
+    </div>
+
+    <h3>Before you start</h3>
+    <ol class="todo">
+      <li>
+        <div class="todo__top">
+          <span class="todo__num todo__num--setup" aria-hidden="true">A</span>
+          <p class="todo__title">Download all three files</p>
+        </div>
+        <div class="todo__body">
+          <p>The instruction file, a start file with your name in it ending in <span class="mono">_1</span>, and the
+            check-mark support file ending in <span class="mono">.png</span>. They land in your Downloads folder.</p>
+        </div>
+        <p class="todo__meta"><button type="button" class="pill pill--time" data-seek="23.44">0:23</button></p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num todo__num--setup" aria-hidden="true">B</span>
+          <p class="todo__title">Open the instruction file and read it</p>
+        </div>
+        <div class="todo__body">
+          <p>Select <span class="ui">Enable Editing</span>, then <span class="ui">View &rsaquo; Page Width</span> to
+            make it readable. Keep it open in a second window. <strong>The final figure is at the very end of the
+            file</strong>. Look at it before you start, and again after step 5 and step 10.</p>
+        </div>
+        <p class="todo__meta"><button type="button" class="pill pill--time" data-seek="53.44">0:53</button></p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num todo__num--setup" aria-hidden="true">C</span>
+          <p class="todo__title">Open the start file and save it as the _2 version</p>
+        </div>
+        <div class="todo__body">
+          <p><span class="ui">Enable Editing</span>, then <span class="ui">File &rsaquo; Save As</span>. Leave it in
+            Downloads, change the <span class="mono">1</span> in the file name to a <span class="mono">2</span>, and
+            save. <strong>Everything you do from here goes in the <span class="mono">_2</span> file.</strong> That's
+            the one you submit. The <span class="mono">_1</span> file stays clean in case you want to restart.</p>
+        </div>
+        <p class="todo__meta"><button type="button" class="pill pill--time" data-seek="90.38">1:30</button></p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num todo__num--setup" aria-hidden="true">D</span>
+          <p class="todo__title">Check that it's your file</p>
+        </div>
+        <div class="todo__body">
+          <p>Scroll to the footer. It should show that the file was created specifically for <em>you</em>, by name.
+            If it doesn't, delete it and download it again.</p>
+        </div>
+        <p class="todo__meta"><button type="button" class="pill pill--time" data-seek="113.06">1:53</button></p>
+      </li>
+    </ol>
+
+    <h3>The ten graded steps</h3>
+    <ol class="todo">
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">1</span>
+          <p class="todo__title">Expand the title's character spacing by 1.5 pt</p>
+        </div>
+        <div class="todo__body">
+          <p>Select the <strong>SPK Translation Services</strong> title. In the <span class="ui">Font</span> dialog's
+            <span class="ui">Advanced</span> tab, set Spacing to <strong>Expanded</strong>, By:
+            <strong>1.5 pt</strong>. The letters spread out.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="139.62">2:19</button>
+          <button type="button" class="pill pill--time" data-seek="162.9">2:42</button>
+        </p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">2</span>
+          <p class="todo__title">Delete the page break and the blank paragraphs at the bottom of page 1</p>
+        </div>
+        <div class="todo__body">
+          <p>With <span class="ui">Show/Hide &para;</span> on, delete the page break and any empty paragraph marks
+            after the picture, until the <strong>Why Choose SPK Translation Services</strong> heading sits directly
+            under the picture. No blank lines left in between.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="200.5">3:20</button>
+          <button type="button" class="pill pill--time" data-seek="223.46">3:43</button>
+        </p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">3</span>
+          <p class="todo__title">Small caps on one item, then a picture bullet on the list</p>
+        </div>
+        <div class="todo__body">
+          <p>In the <strong>Language Translation Services</strong> section:</p>
+          <ul>
+            <li>Format <strong>English to Korean</strong> in <strong>Small caps</strong> (Font dialog) so it matches
+              the other items.</li>
+            <li>Select the whole list, then <span class="ui">Bullets &rsaquo; Define New Bullet &rsaquo; Picture
+              &rsaquo; From a File</span>, and choose the check-mark PNG you downloaded.</li>
+          </ul>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="256.58">4:16</button>
+          <button type="button" class="pill pill--time" data-seek="290.82">4:50</button>
+          <button type="button" class="pill pill--time" data-seek="302.74">5:02</button>
+        </p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">4</span>
+          <p class="todo__title">Fix the indent levels in Interpretation Services</p>
+        </div>
+        <div class="todo__body">
+          <ul>
+            <li><strong>Increase</strong> the indent of the five items from <strong>Conferences</strong> through
+              <strong>Medical Appointments</strong> by one level.</li>
+            <li><strong>Decrease</strong> the indent of <strong>Zoom Interpretation</strong> by one level, so it's
+              level with Phone Interpretation and Consecutive Interpretation.</li>
+          </ul>
+          <p>One click on <span class="ui">Increase Indent</span> or <span class="ui">Decrease Indent</span> moves an
+            item one level.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="341.7">5:41</button>
+          <button type="button" class="pill pill--time" data-seek="373.54">6:13</button>
+          <button type="button" class="pill pill--time" data-seek="389.62">6:29</button>
+        </p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">5</span>
+          <p class="todo__title">Turquoise, Text 2 on the second-level items in Legal Translation Services</p>
+        </div>
+        <div class="todo__body">
+          <p>Select the second-level items (the ones indented under a top-level item) in the <strong>Legal
+            Translation Services</strong> section, then <span class="ui">Font Color &rsaquo;</span>
+            <strong>Turquoise, Text 2</strong>. Selecting the whole items colors the bullets and the text together,
+            which is what the final figure shows.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="425.96">7:05</button>
+          <button type="button" class="pill pill--time" data-seek="462.34">7:42</button>
+          <button type="button" class="pill pill--time" data-seek="486.78">8:06</button>
+        </p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">6</span>
+          <p class="todo__title">Indent and sort the Accurate Technical Translations list</p>
+        </div>
+        <div class="todo__body">
+          <ul>
+            <li>Indent the list one level (about half an inch) so it matches the level-one lists in the rest of the
+              document.</li>
+            <li>Then <span class="ui">Sort</span> it: Sort by <strong>Paragraphs</strong>, Type
+              <strong>Text</strong>, <strong>Ascending</strong> (A to Z).</li>
+          </ul>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="512.52">8:32</button>
+          <button type="button" class="pill pill--time" data-seek="554.72">9:14</button>
+          <button type="button" class="pill pill--time" data-seek="578.84">9:38</button>
+        </p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">7</span>
+          <p class="todo__title">A 1., a., i. multilevel list in the Questions section</p>
+        </div>
+        <div class="todo__body">
+          <p>Select the list from <strong>Text and phone</strong> down to the company's address, then
+            <span class="ui">Multilevel List</span> and the <strong>1., a., i.</strong> format. The sub-items pick up
+            letters automatically. There's no <em>i</em> level in this list.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="608.84">10:08</button>
+          <button type="button" class="pill pill--time" data-seek="621.56">10:21</button>
+        </p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">8</span>
+          <p class="todo__title">Color the page numbers in the header Turquoise, Text 2</p>
+        </div>
+        <div class="todo__body">
+          <p>Double-click in the header, select <strong>the word Page and the number</strong>, and set the font color
+            to <strong>Turquoise, Text 2</strong>. Double-click in the body to get back out.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="651.72">10:51</button>
+          <button type="button" class="pill pill--time" data-seek="663.96">11:03</button>
+          <button type="button" class="pill pill--time" data-seek="967.24">16:07</button>
+        </p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">9</span>
+          <p class="todo__title">Add the DRAFT 1 watermark</p>
+        </div>
+        <div class="todo__body">
+          <p><span class="ui">Design &rsaquo; Watermark &rsaquo;</span> <strong>DRAFT 1</strong>, the built-in one.
+            It appears on every page. On a Mac there's no built-in DRAFT 1, so follow the Mac note in your instruction
+            file. In the video that means a text watermark reading DRAFT, set to 50% and diagonal.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="702.36">11:42</button>
+          <button type="button" class="pill pill--time" data-seek="715.68">11:55</button>
+          <button type="button" class="pill pill--time" data-seek="741.62">12:21</button>
+        </p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">10</span>
+          <p class="todo__title">Insert the Retrospect cover page</p>
+        </div>
+        <div class="todo__body">
+          <p><span class="ui">Insert &rsaquo; Cover Page &rsaquo;</span> <strong>Retrospect</strong>. Then fill in:</p>
+          <ul>
+            <li>Document Title: <span class="mono">SPK Translation</span></li>
+            <li>Document Subtitle: <span class="mono">Services for Companies and Individuals</span></li>
+          </ul>
+          <p>Retrospect shows the subtitle in all caps however you type it. Leave the other placeholders alone, the
+            way the final figure does.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="783.64">13:03</button>
+          <button type="button" class="pill pill--time" data-seek="806.62">13:26</button>
+          <button type="button" class="pill pill--time" data-seek="848.38">14:08</button>
+        </p>
+      </li>
+    </ol>
+
+    <h3>Submitting</h3>
+    <ol class="todo">
+      <li>
+        <div class="todo__top">
+          <span class="todo__num todo__num--setup" aria-hidden="true">E</span>
+          <p class="todo__title">Save and close both files</p>
+        </div>
+        <div class="todo__body">
+          <p>Save the <span class="mono">_2</span> file, close it, and close the instruction file too. A file still
+            open in Word can upload incomplete.</p>
+        </div>
+        <p class="todo__meta"><button type="button" class="pill pill--time" data-seek="912.88">15:12</button></p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num todo__num--setup" aria-hidden="true">F</span>
+          <p class="todo__title">Upload the _2 file and select Submit</p>
+        </div>
+        <div class="todo__body">
+          <p>Drag and drop it into MindTap. Sorting your Downloads folder by <strong>Date Modified</strong> puts the
+            file you just saved at the top.</p>
+        </div>
+        <p class="todo__meta"><button type="button" class="pill pill--time" data-seek="931">15:31</button></p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num todo__num--setup" aria-hidden="true">G</span>
+          <p class="todo__title">Open the Graded Summary Report, and fix anything it flags</p>
+        </div>
+        <div class="todo__body">
+          <p>It lists every step with the points it earned, and tells you which ones you missed. Fix that step in
+            your <span class="mono">_2</span> file, save and close it, then reopen the guided assignment in MindTap
+            to start a new attempt, and upload again.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="948.76">15:48</button>
+          <button type="button" class="pill pill--time" data-seek="967.24">16:07</button>
+        </p>
+      </li>
+    </ol>
+  </section>
+
+  <!-- ============ Platform tabs ============ -->
+  <section aria-labelledby="platform-heading">
+    <h2 id="platform-heading">Windows and Mac differences</h2>
+    <p>The steps are the same on both, except the watermark. Most of this week's commands are on the Home tab, and
+      those look nearly the same on Mac and Windows. The differences are mostly in dialogs, menus and keyboard
+      shortcuts. Pick your platform.</p>
+
+    <div class="tabs">
+      <div class="tablist" role="tablist" aria-label="Choose your platform">
+        <button type="button" class="tab" role="tab" id="tab-win" aria-controls="panel-win" aria-selected="true">Windows</button>
+        <button type="button" class="tab" role="tab" id="tab-mac" aria-controls="panel-mac" aria-selected="false" tabindex="-1">Mac</button>
+      </div>
+
+      <div class="tabpanel" role="tabpanel" id="panel-win" aria-labelledby="tab-win" tabindex="0">
+        <h3>On Windows</h3>
+        <ul style="max-width:none">
+          <li><strong>Enable Editing.</strong> Downloaded files open in Protected View with a yellow bar across the
+            top. You must select <span class="ui">Enable Editing</span> before anything works.</li>
+          <li><strong>Show/Hide &para;:</strong> the &para; button in the Home tab's Paragraph group, or
+            <span class="mono">Ctrl+Shift+8</span>.</li>
+          <li><strong>Font dialog:</strong> the small arrow at the corner of the Home tab's Font group, or
+            <span class="mono">Ctrl+D</span>. Character spacing is on the <span class="ui">Advanced</span> tab; Small
+            caps is on the <span class="ui">Font</span> tab.</li>
+          <li><strong>Picture bullet:</strong> the arrow beside the Bullets button &rsaquo; <span class="ui">Define New
+            Bullet</span> &rsaquo; <span class="ui">Picture</span> &rsaquo; <span class="ui">From a file</span>.</li>
+          <li><strong>Sort:</strong> the A&rarr;Z button in the Home tab's Paragraph group.</li>
+          <li><strong>Watermark:</strong> <span class="ui">Design &rsaquo; Watermark</span>, on the right end of the
+            ribbon.</li>
+          <li><strong>Finding your file:</strong> File Explorer, <span class="ui">View &rsaquo; Details</span>, then
+            click the <span class="ui">Date modified</span> heading to sort newest first.</li>
+        </ul>
+      </div>
+
+      <div class="tabpanel" role="tabpanel" id="panel-mac" aria-labelledby="tab-mac" tabindex="0" hidden>
+        <h3>On Mac</h3>
+        <p>Cengage's material is written for Windows. Most of this assignment matches, but check these before you
+          decide something is broken. I've done these assignments on a Mac myself. If a command genuinely isn't where
+          I say it is, message me through the Canvas Inbox rather than guessing at a substitute.</p>
+        <ul style="max-width:none">
+          <li><strong>No Protected View.</strong> There's no Enable Editing bar. The file opens ready to edit.</li>
+          <li><strong>Show/Hide &para;:</strong> the &para; button on the Home tab, or
+            <span class="mono">&#8984;+8</span>.</li>
+          <li><strong>Font dialog:</strong> <span class="ui">Format &rsaquo; Font</span> in the menu bar, or
+            <span class="mono">&#8984;+D</span>. Character spacing is on the <span class="ui">Advanced</span>
+            tab.</li>
+          <li><strong>Picture bullet:</strong> the arrow beside the Bullets button &rsaquo; <span class="ui">Define New
+            Bullet</span>. The Mac dialog is laid out differently. If you can't find the picture option, check your
+            instruction file for a Mac note, then message me.</li>
+          <li><strong>Watermark:</strong> <span class="ui">Design &rsaquo; Watermark</span> opens a dialog instead of
+            a gallery. Choose <strong>Text</strong>, type <strong>DRAFT</strong>, and set the transparency and
+            orientation your instruction file asks for (50% and diagonal in the video).</li>
+          <li><strong>Right-click</strong> is Control-click, or a two-finger click on a trackpad.</li>
+          <li><strong>Finding your file:</strong> Finder &rsaquo; Downloads, switch to
+            <span class="ui">List</span> view, then click <span class="ui">Date Modified</span> to sort newest
+            first.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ Corrections ============ -->
+  <section aria-labelledby="corrections-heading">
+    <h2 id="corrections-heading">Since this was recorded</h2>
+    <p>A few things will look different on your screen than they do on mine. <strong>Where this page and the video
+      disagree, this page is right.</strong></p>
+
+    <div class="callout callout--warn callout--wide">
+      <ul style="margin:0; max-width:none">
+        <li><strong>"Number eight," twice.</strong> At 11:42 I call the watermark "number eight." It's step 9. Step 8
+          is the page numbers, just before it.</li>
+        <li><strong>The page-number mistake.</strong> At 16:07 I explain that my first attempt lost a point because
+          I colored only the number and not the word <em>Page</em>. In the video I select both, which is right.</li>
+        <li><strong>Quiet stretches.</strong> From 0:53 to 1:08 I'm humming while files open, and at 15:28 I'm
+          closing windows. The transcript skips those spots, so it has small gaps there, but no instructions are
+          missing.</li>
+        <li><strong>Text as spoken.</strong> I read the instructions out loud, and the audio garbles some of them.
+          Go by your instruction file for the exact wording.</li>
+        <li><strong>Module release.</strong> Modules post on the Friday before the week begins, so Week 6 opened
+          <strong>Friday 10/2</strong>. You can start early.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ AI policy ============ -->
+  <section aria-labelledby="ai-heading">
+    <h2 id="ai-heading">Using AI on this assignment</h2>
+    <p>The course AI policy is <strong>Limited</strong>. You can ask an AI tool to explain what a command does, to
+      tell you where something is on the Mac ribbon when the video shows Windows, to troubleshoot an error, or to
+      quiz you afterward. <strong>You build the Word file yourself.</strong> Spell check and grammar check are
+      ordinary Word features and are always allowed.</p>
+    <p>The practical reason: the 200-point Word Project expects you to handle lists, indents, sorting and page
+      formatting on your own. Watching someone else do it isn't the same as doing it.</p>
+  </section>
+
+  <!-- ============ What's next ============ -->
+  <section aria-labelledby="next-heading">
+    <h2 id="next-heading">What's next</h2>
+    <p>Once the guided assignment is submitted, go straight to the <strong>Word Module 4 homework</strong> in MindTap.
+      It's the same commands on a different document, with no walkthrough, for 100 points. Both are due
+      <strong>Sunday 10/11</strong>.</p>
+    <p>That finishes the Word modules for this semester. The 200-point <strong>Word Project</strong>, submitted in
+      Canvas, is due <strong>Sunday 10/18 at 11:59 PM</strong>. It can't be dropped, and it isn't accepted late unless
+      you arrange it before the due date.</p>
+    <p>Stuck on a step after re-watching it? Send me a message in the Canvas Inbox and say which step number and what
+      you tried. That's faster than burning attempts.</p>
+  </section>
+
+  <!-- ============ Quick reference ============ -->
+  <section aria-labelledby="reference-heading">
+    <h2 id="reference-heading">Quick reference</h2>
+    <div class="table-scroll" tabindex="0" role="region" aria-label="Quick reference table, scrollable">
+      <table>
+        <caption>Every value this assignment asks for, in one place. Confirm each one against your own instruction
+          file.</caption>
+        <thead>
+          <tr><th scope="col">Step</th><th scope="col">Where it lives</th><th scope="col">Exact setting</th></tr>
+        </thead>
+        <tbody>
+          <tr><th scope="row">1. Title spacing</th><td>Font dialog &rsaquo; Advanced</td><td>"SPK Translation Services": Spacing Expanded by 1.5 pt</td></tr>
+          <tr><th scope="row">2. Page break</th><td>Show/Hide &para;, then Delete</td><td>No page break or blank paragraphs between the picture and "Why Choose SPK Translation Services"</td></tr>
+          <tr><th scope="row">3a. Small caps</th><td>Font dialog &rsaquo; Font</td><td>"English to Korean" in Small caps</td></tr>
+          <tr><th scope="row">3b. Picture bullet</th><td>Bullets &rsaquo; Define New Bullet &rsaquo; Picture</td><td>The check-mark PNG support file, on the Language Translation Services list</td></tr>
+          <tr><th scope="row">4. Indents</th><td>Home &rsaquo; Increase / Decrease Indent</td><td>Conferences&hellip;Medical Appointments up one level; Zoom Interpretation down one level</td></tr>
+          <tr><th scope="row">5. Color</th><td>Home &rsaquo; Font Color</td><td>Turquoise, Text 2 on the second-level items in Legal Translation Services</td></tr>
+          <tr><th scope="row">6a. Indent</th><td>Home &rsaquo; Increase Indent</td><td>Accurate Technical Translations list, one level, to match level-one lists</td></tr>
+          <tr><th scope="row">6b. Sort</th><td>Home &rsaquo; Sort</td><td>Paragraphs, Text, Ascending</td></tr>
+          <tr><th scope="row">7. Multilevel list</th><td>Home &rsaquo; Multilevel List</td><td>1., a., i. on the Questions list ("Text and phone" to the address)</td></tr>
+          <tr><th scope="row">8. Page numbers</th><td>Header, then Font Color</td><td>"Page" and the number, Turquoise, Text 2</td></tr>
+          <tr><th scope="row">9. Watermark</th><td>Design &rsaquo; Watermark</td><td>Built-in DRAFT 1 (Mac: DRAFT text, 50%, diagonal, per your file)</td></tr>
+          <tr><th scope="row">10. Cover page</th><td>Insert &rsaquo; Cover Page</td><td>Retrospect; Title <span class="mono">SPK Translation</span>; Subtitle <span class="mono">Services for Companies and Individuals</span></td></tr>
+          <tr><th scope="row">File name</th><td>File &rsaquo; Save As</td><td>The <span class="mono">_2</span> version, in Downloads</td></tr>
+          <tr><th scope="row">Submission</th><td>MindTap</td><td>Upload the <span class="mono">_2</span> file, select Submit, read the Graded Summary Report</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <p class="footnote">CSC 104 &middot; Computers and Computer Applications &middot; Fall 2026, Section 0840 &middot;
+    Mendocino College &middot; Instructor: David Pai &middot; <span class="mono">dpai@mendocino.edu</span>.
+    Nothing you type on this page is saved or submitted. Use the Canvas navigation outside this page to get back to
+    the Week 6 module.</p>
+</main>
+
+
+<script>
+(function () {
+  "use strict";
+
+  var VIDEO_ID = "BAsdEzMKigI";
+
+  /* Transcript source: weeks/week06/csc104-word-4-guided-corrected.vtt — the
+     Whisper output with its hallucinated and non-English passages removed, its
+     repeated and duplicate cues collapsed, and its Word command names, proper
+     nouns and punctuation restored. Inlined rather than fetched so this page
+     stays self-contained inside the Canvas iframe. Keep the two copies in step:
+     if the YouTube captions are re-uploaded from the .vtt, re-paste it here
+     too. */
+  var vttContent = `WEBVTT
+
+NOTE
+CSC 104 — Week 6 — Word Module 4 Guided Assignment Walkthrough (YouTube BAsdEzMKigI)
+Corrected transcript. Source: csc104-wk6-word-4.vtt (Whisper output).
+Cleanup applied: hallucinated and non-English word-salad blocks removed (the
+humming and "you you" filler at 0:53–1:08, the stray "you" at 1:23, the
+invented "in our next video we're going to do a test" phrase at 2:19, the
+invented "you can see that the text is in the second level" line at 7:42, the
+Chinese character at 13:03, and the Japanese/English garble while the files
+are closed at 15:28–15:31); rolling duplicate cues collapsed (5:46 and the
+whole run from 6:16 to 6:45); stutter duplicates collapsed; sentence casing
+and punctuation restored throughout; Word command names and proper nouns
+corrected (Cengage, MindTap, Module 4, Creating a Multipage Document, Page
+Width, Enable Editing, Save As, SPK Translation Services, Font dialog,
+Advanced, Expanded, Show/Hide, Language Translation Services, English to
+Korean, Small caps, Define New Bullet, Picture, From a File, Interpretation
+Services, Conferences, Medical Appointments, Zoom Interpretation, Phone
+Interpretation, Consecutive Interpretation, Increase Indent, Decrease Indent,
+Turquoise, Text 2, Legal Translation Services, Accurate Technical
+Translations, Sort, Paragraphs, Ascending, Questions section, Multilevel
+List, Current List, DRAFT 1, Design, Watermark, Retrospect, Cover Page,
+Document Title, Document Subtitle, Graded Summary Report); short cues merged
+into readable 1–2 sentence lines; timestamps normalized to HH:MM:SS.mmm.
+Text the instructor reads from the instruction file is garbled in places and
+is given here as a recognizable description rather than reconstructed word
+for word. The instructor's voice and hedges are preserved, including saying
+"number eight" for the watermark step at 11:42 (it is step 9) and the
+page-number mistake he describes at 16:07.
+
+00:00:00.040 --> 00:00:14.560
+Aloha. So this week we are working on Module 4, which is Creating a Multipage Document, and I'm going to walk through the guided assignment. Okay?
+
+00:00:14.560 --> 00:00:23.440
+As usual, open it the same way we always do in Cengage. Okay, it's gonna come up,
+
+00:00:23.440 --> 00:00:45.500
+and after we start it, there's going to be three files. So there's the instruction file, the start file, and a support file, which is a PNG, meaning it's an image file. We'll download them all, and we'll open that up.
+
+00:00:46.500 --> 00:00:53.200
+Back to the top. So I have our instructions here.
+
+00:00:53.440 --> 00:01:16.620
+Page Width. Okay, and then we also have our initial document. Okay, and so we want to Enable Editing of our initial document.
+
+00:01:16.620 --> 00:01:30.380
+We will go Page Width, so we're seeing the whole page. And here's our instruction page, so we'll flip between them. Okay?
+
+00:01:30.380 --> 00:01:53.060
+As usual, we want to change the name from 1 to 2, by changing the 1 to a 2. So I'll go back to my file and I will do a Save As, and I will just basically backspace over the 1 and make it a 2, so that we have the correct file name.
+
+00:01:53.060 --> 00:02:09.380
+I will scroll down and verify that it has my name in the footer. Okay, and then we need this — we see this PNG file that we downloaded. Okay, so our first step, number one.
+
+00:02:09.380 --> 00:02:19.620
+We're a marketing manager for this company that does translation services, and we are creating a draft of a guide describing our business and the services that we offer.
+
+00:02:19.620 --> 00:02:30.100
+So what we want to do is expand the spacing of the SPK Translation Services text by 1.5 points, to make the title more distinctive.
+
+00:02:32.420 --> 00:02:40.020
+Okay, so here we are, and this text here is what we want to change.
+
+00:02:42.900 --> 00:02:54.100
+Okay, so we can go into our Font dialog, and I believe it's under Advanced. Spacing is Condensed, and we want to make it Expanded by
+
+00:02:57.380 --> 00:03:09.220
+1.5 point. And what you'll see when we do this — let me put this right here, so the right end is right under where the S is now — and when I say OK,
+
+00:03:10.420 --> 00:03:17.140
+it moved everything out, because it shifted the spacing. It spaced out all the letters.
+
+00:03:20.500 --> 00:03:30.420
+Delete the page break and any extra paragraph marks at the bottom of page 1, so that the "Why Choose SPK Translation Services" heading appears directly after the picture.
+
+00:03:31.540 --> 00:03:43.460
+Okay, so right now we have our picture, and then you can see we have this paragraph here, and then we have a page break. If you don't see them, that means you're not showing all of your—
+
+00:03:43.460 --> 00:03:59.140
+If it looks like this, it means you're not showing all of your formatting characters. So you want to make sure you click on this on the Home tab, to show all the formatting characters so it's easy to see. And then "Why Choose SPK Translation Services" is going to appear
+
+00:04:01.540 --> 00:04:14.580
+right after the picture. Okay, so you can highlight them both and hit Delete, or do them one at a time — delete that again — because you want no blank paragraph lines.
+
+00:04:16.580 --> 00:04:30.820
+Okay. In the Language Translation Services section, format the bulleted item "English to Korean" in small caps to match the formatting of the other bulleted items.
+
+00:04:33.460 --> 00:04:41.220
+And then we're going to change the bullet character to that picture that we have — a check mark that we downloaded.
+
+00:04:41.220 --> 00:04:50.820
+Okay, so here are our items. Here's English to Spanish, English to Chinese, and we have this English to Korean that's in a different format.
+
+00:04:50.820 --> 00:05:02.740
+Okay, so we're going to go to our Font dialog, and we're going to make it Small caps. I'm going to say OK, and now it looks like all the rest.
+
+00:05:02.740 --> 00:05:16.260
+And then we can highlight them all, and we can go up into our bullets, okay, and Define New Bullet. And we're going to base it on a picture, and we'll do that From a File.
+
+00:05:16.260 --> 00:05:29.140
+And here's that file we downloaded, the check mark PNG file. Insert that, and you can see it's going to be a circle with a check mark. Say OK, and there we are: a circle with a check mark.
+
+00:05:31.700 --> 00:05:37.620
+And if you scroll down, you'll see all the other ones already have that circle with a check mark.
+
+00:05:41.700 --> 00:05:53.860
+All right, number four. In the Interpretation Services section, increase the indent of the five list items beginning "Conferences" and ending "Medical Appointments" by one level. So let's do that first.
+
+00:05:53.860 --> 00:06:13.540
+Interpretation Services. Okay, so this is Conferences to Medical Appointments. Okay — increase the indent of those items by one level, so let's do that.
+
+00:06:13.540 --> 00:06:29.620
+Up here in the Paragraph group you have these little left arrow and right arrow buttons. The left arrow is Decrease Indent, the right arrow is Increase Indent, and so we click it once to increase by one level.
+
+00:06:29.620 --> 00:06:45.300
+Decrease the indent of the "Zoom Interpretation" list item by one level, so it's the same level as "Phone Interpretation" and "Consecutive Interpretation."
+
+00:06:45.300 --> 00:07:05.960
+So Zoom — we just click on the Zoom one, anywhere in the Zoom one. We want to move it to the same level as Phone and Consecutive, and so for this one we're going to decrease the indent to move it left. So click on that once; it moves it one indentation to the left.
+
+00:07:05.960 --> 00:07:18.400
+Okay. Apply the color Turquoise, Text 2 to the bullets for the second-level list items in the Legal Translation Services section, to add visual appeal to the list.
+
+00:07:18.400 --> 00:07:42.340
+Okay, so this is in Legal Translation Services. What it wants is these — I believe all these, okay — bullets for the second-level list items. So they're not the top level, but they're one below it. Okay, to Turquoise, Text 2.
+
+00:07:42.340 --> 00:08:06.780
+Now, it doesn't actually mean just the bullets, because if we scroll down to the sample so you can see what it looks like, you can see all the text and the bullets are that teal color. Okay?
+
+00:08:06.780 --> 00:08:18.800
+So what we want to do is make sure we get all the text, because otherwise it all won't be that color. And then we're gonna
+
+00:08:18.800 --> 00:08:32.520
+just change our font color to Turquoise, Text 2. And you can see it changed the bullets: because we selected the paragraphs as well as the text, it did the bullets and the text itself. Okay, so let's go back to our next
+
+00:08:32.520 --> 00:08:50.580
+instruction. So that was number five. Number six: in the Accurate Technical Translations section, apply a left indent to the list so it uses the same formatting as a level-one list in the rest of the document.
+
+00:08:50.580 --> 00:09:14.720
+Okay, so we go to Accurate Technical Translations, and what you'll see is all these are all the way to the left, but all the other ones are indented one level. Even though they're top level, they're indented one level, so they're indented underneath.
+
+00:09:14.720 --> 00:09:31.720
+So all we're gonna do is indent them one level, and so they're just indented — I think it's a half inch — so it looks just like all the ones above it.
+
+00:09:31.720 --> 00:09:38.340
+All right, the second part: sort the items in the list in ascending order, to make it easier for readers to find information. Okay, so right now it's Software, Security, Financial, E-commerce and Clean,
+
+00:09:38.840 --> 00:10:08.840
+and we want them in ascending order. So what we can do is just sort them, and we want to sort Paragraphs, because these are all different paragraphs, Type: Text, in Ascending order, meaning alphabetical from A to Z. Okay, so now it's Clean, E, F, S and S. All right, number seven:
+
+00:10:08.840 --> 00:10:21.480
+format the list in the Questions section — beginning with "Text and phone" and ending with the company's address — as a multilevel list using 1., a., i. number formatting.
+
+00:10:21.560 --> 00:10:46.840
+Okay, so in the Questions section, "Text and phone" down to the address, and we want to use Multilevel List. We'll click the little down arrow, okay, and it says Current List: 1., a., i. We can use the current list, and now it's 1 a b, 2 a b, 3 a. There's no i, because that would be the third level.
+
+00:10:51.720 --> 00:11:03.960
+All right, number eight: change the color of the page numbers (Page 1, Page 2) in the header to Turquoise, Text 2. Okay, so what we need to do is we need to go to —
+
+00:11:03.960 --> 00:11:23.140
+and double-click in the header area. We need to highlight everything, "Page 3" — the word Page and the 3 — and then we can go to our font color, and because the last time we changed it, it was Turquoise, Text 2, that's what we use.
+
+00:11:23.140 --> 00:11:42.360
+We could just click it, and then we'll change it to Turquoise, Text 2. All right, and I double-click on the page to get out of the header. You could also select it from the color list. All right, number eight:
+
+00:11:42.360 --> 00:11:55.680
+add the DRAFT 1 text watermark to the document, to clarify that you're creating a draft for review. All right, so if you are on a Mac — this is the built-in style. Don't add
+
+00:11:55.680 --> 00:12:21.620
+the words "Draft 1"; it's the built-in style DRAFT 1, and I'll show what that is. The Mac does not have those built-in styles, so you need to create your own. Basically you insert a watermark, and then you have options for transparency and orientation of the text, and you're gonna change them to be 50% and diagonal. Okay?
+
+00:12:21.620 --> 00:12:44.580
+And I'll show you what that looks like in a second here. So if we're on our page, we go to Insert — Insert? No, we go to Design, sorry. You go to Design, we can go to Watermark and click on the drop-down, and we'll get Confidential or Disclaimers,
+
+00:12:44.580 --> 00:13:03.400
+and so we want DRAFT 1. We want DRAFT 1 — not the words "Draft 1", we want the style DRAFT 1. DRAFT 2 goes across. See, with the style DRAFT 1, if I scroll down, you'll see it puts it on every page. It puts this white text, the word DRAFT, in the background. Okay?
+
+00:13:03.640 --> 00:13:26.620
+All right: insert the Retrospect cover page to add professional polish to the document. Use "SPK Translation" as the title and "Services for Companies and Individuals" as the subtitle.
+
+00:13:26.620 --> 00:13:48.300
+Okay, so we're gonna add a cover page. So we're gonna go to Insert, and we're gonna add a Cover Page, and then we're gonna scroll down till we find Retrospect and select that, and it puts it at the very beginning. Okay?
+
+00:13:48.300 --> 00:14:08.380
+And so our Document Title is SPK Translation, so you just click on Document Title — oops — and you just type in SPK Translation. Yeah.
+
+00:14:08.380 --> 00:14:31.000
+And then use "Services for Companies and Individuals" as the subtitle, so Document Subtitle: Services for Companies and Individuals. Now notice it's all caps. That's because that's the style in Retrospect, the default style. Okay?
+
+00:14:31.420 --> 00:14:47.520
+However you type it in, it'll still always show up in all caps. Now, typically with cover pages there's also going to be a place for the company name and the company address. It doesn't tell us to do anything with that.
+
+00:14:47.520 --> 00:15:12.880
+All right, and so if you look at this figure, the final figure, notice they didn't change that, so you just leave it. If you actually did this for real, you'd put your name, maybe your address, maybe a contact name, maybe not. Okay?
+
+00:15:12.880 --> 00:15:28.700
+Okay, so are we done? We've got the ten; that's our last thing. And we can go to our document here. Here is our document; we can save it. Make sure we save it, we have all our stuff saved, then we close it. Here, I can close the instructions,
+
+00:15:31.000 --> 00:15:48.760
+and then I'm going to grab the one that says _2, and I'm going to drag and drop it for submission, and then I'm going to Submit it for a grade, and then I'll get the Graded Summary Report.
+
+00:15:48.760 --> 00:16:07.240
+And hopefully we get 25 out of 25, because we did everything correct. If you didn't do everything correct, it'll tell you on the side which one you didn't get, okay, and
+
+00:16:07.240 --> 00:16:29.740
+then you can fix it. I can tell you that the first time I did it, I missed number eight, the page numbers, because I didn't look. It just says color the page numbers, so I only colored the number. I didn't color the word Page; I just colored the number,
+
+00:16:29.740 --> 00:16:47.940
+and it wanted the whole thing, Page and the number, not just the number. Okay, so if I had looked, I'd have gotten it right to start with. But you can always just fix it and resubmit it.
+
+00:16:47.940 --> 00:16:53.940
+All right, so that's this week's guided assignment, and hopefully it helps you. Good luck.`;
+
+  var player = null, timeUpdater = null, parsedTranscript = [], playerReady = false;
+
+  try {
+    if (!CSS.supports("selector(:focus-visible)")) { document.body.classList.add("no-fv"); }
+  } catch (e) { document.body.classList.add("no-fv"); }
+
+  /* ---------------- VTT parsing ---------------- */
+  function timeToSeconds(timeStr) {
+    if (!timeStr) { return 0; }
+    var parts = timeStr.trim().split(":");
+    if (parts.length === 2) {
+      return (parseInt(parts[0], 10) || 0) * 60 + (parseFloat(parts[1]) || 0);
+    }
+    if (parts.length === 3) {
+      return (parseInt(parts[0], 10) || 0) * 3600 + (parseInt(parts[1], 10) || 0) * 60 + (parseFloat(parts[2]) || 0);
+    }
+    return 0;
+  }
+
+  function formatTime(sec) {
+    sec = Math.max(0, Math.floor(sec));
+    var h = Math.floor(sec / 3600), m = Math.floor((sec % 3600) / 60), s = sec % 60;
+    var mm = (h > 0 && m < 10) ? "0" + m : String(m);
+    return (h > 0 ? h + ":" : "") + mm + ":" + (s < 10 ? "0" + s : s);
+  }
+
+  function parseVtt(vttText) {
+    var blocks = vttText.trim().split(/\n\n+/);
+    var cues = [];
+    blocks.forEach(function (block) {
+      var trimmed = block.trim();
+      if (!trimmed || trimmed.indexOf("WEBVTT") === 0 || trimmed.indexOf("NOTE") === 0) { return; }
+      var lines = trimmed.split("\n");
+      var timeLine = null, timeIndex = -1;
+      for (var i = 0; i < lines.length; i++) {
+        if (lines[i].indexOf("-->") !== -1) { timeLine = lines[i]; timeIndex = i; break; }
+      }
+      if (!timeLine) { return; }
+      var ends = timeLine.split("-->");
+      var text = lines.slice(timeIndex + 1).join(" ").trim();
+      if (!text) { return; }
+      cues.push({ start: timeToSeconds(ends[0]), end: timeToSeconds(ends[1]), text: text });
+    });
+    return cues;
+  }
+
+  /* ---------------- Transcript panel ---------------- */
+  function seek(seconds) {
+    if (!player || !player.seekTo) { return false; }
+    player.seekTo(seconds, true);
+    if (player.playVideo) { player.playVideo(); }
+    return true;
+  }
+
+  function scrollPlayerIntoView() {
+    var frame = document.getElementById("video-container");
+    if (frame && frame.scrollIntoView) { frame.scrollIntoView({ behavior: "smooth", block: "center" }); }
+  }
+
+  function populateTranscript() {
+    var container = document.getElementById("transcript-container");
+    if (!container) { return; }
+    container.innerHTML = "";
+    parsedTranscript.forEach(function (cue, i) {
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "transcript-line";
+      btn.dataset.start = cue.start;
+      btn.dataset.end = cue.end;
+      btn.dataset.index = i;
+
+      var stamp = document.createElement("span");
+      stamp.className = "t";
+      stamp.textContent = formatTime(cue.start);
+
+      var body = document.createElement("span");
+      body.className = "tx";
+      body.textContent = cue.text;
+
+      btn.appendChild(stamp);
+      btn.appendChild(body);
+      btn.setAttribute("aria-label", "Jump to " + formatTime(cue.start) + ". " + cue.text);
+
+      btn.addEventListener("click", function () {
+        if (seek(cue.start)) { scrollPlayerIntoView(); }
+      });
+      container.appendChild(btn);
+    });
+  }
+
+  /* ---------------- Active-line highlight ---------------- */
+  var lastAnnounced = null;
+  function announceLine(text) {
+    if (text === lastAnnounced) { return; }
+    lastAnnounced = text;
+    var s = document.getElementById("transcript-status");
+    if (s) { s.textContent = text || ""; }
+  }
+
+  function highlightCurrentLine() {
+    if (!player || !player.getCurrentTime) { return; }
+    var now = player.getCurrentTime();
+    var lines = document.querySelectorAll("#transcript-container .transcript-line");
+    var active = null;
+    Array.prototype.forEach.call(lines, function (line) {
+      var start = parseFloat(line.dataset.start), end = parseFloat(line.dataset.end);
+      if (now >= start && now < end) { active = line; }
+    });
+    var prev = document.querySelector("#transcript-container .is-active");
+    if (active === prev) { return; }
+    if (prev) { prev.classList.remove("is-active"); }
+    if (active) {
+      active.classList.add("is-active");
+      var body = active.querySelector(".tx");
+      announceLine(body ? body.textContent : active.textContent);
+      if (!active.hidden) { active.scrollIntoView({ behavior: "smooth", block: "center" }); }
+    }
+  }
+
+  /* ---------------- Panel height ---------------- */
+  function syncTranscriptHeight() {
+    var videoContainer = document.getElementById("video-container");
+    var panel = document.getElementById("transcript-container");
+    if (!videoContainer || !panel) { return; }
+    // Match the panel to the video only when the two columns actually sit side
+    // by side. Compared by rendered position rather than a viewport-width test,
+    // because in a Canvas iframe a media query measures the iframe, not the
+    // browser window, and can disagree with the flex-wrap result.
+    var videoCol = videoContainer.parentNode;
+    var transcriptCol = panel.parentNode;
+    var sideBySide = Math.abs(
+      transcriptCol.getBoundingClientRect().top - videoCol.getBoundingClientRect().top) < 40
+      && transcriptCol.getBoundingClientRect().left !== videoCol.getBoundingClientRect().left;
+    // Side by side, the panel should end level with the video, so subtract the
+    // heading/search row that sits above it inside the transcript column.
+    var head = transcriptCol.querySelector(".transcript-head");
+    var headH = head ? head.offsetHeight + 8 : 0;
+    var h = sideBySide ? Math.max(240, videoContainer.offsetHeight - headH) + "px" : "24rem";
+    panel.style.height = h;
+    panel.style.maxHeight = h;
+  }
+
+  /* ---------------- Transcript search ---------------- */
+  function escapeRe(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); }
+
+  function runFilter(term) {
+    var lines = document.querySelectorAll("#transcript-container .transcript-line");
+    var status = document.getElementById("transcript-filter-status");
+    var q = term.trim().toLowerCase();
+    var shown = 0;
+
+    Array.prototype.forEach.call(lines, function (line) {
+      var body = line.querySelector(".tx");
+      var cue = parsedTranscript[parseInt(line.dataset.index, 10)];
+      if (!body || !cue) { return; }
+      if (!q) {
+        body.textContent = cue.text;
+        line.hidden = false;
+        shown++;
+        return;
+      }
+      if (cue.text.toLowerCase().indexOf(q) === -1) {
+        body.textContent = cue.text;
+        line.hidden = true;
+        return;
+      }
+      line.hidden = false;
+      shown++;
+      // Rebuild with <mark> around the matches, without using innerHTML on
+      // user-supplied text.
+      body.textContent = "";
+      var re = new RegExp(escapeRe(term.trim()), "ig");
+      var last = 0, m;
+      while ((m = re.exec(cue.text)) !== null) {
+        if (m.index > last) { body.appendChild(document.createTextNode(cue.text.slice(last, m.index))); }
+        var mk = document.createElement("mark");
+        mk.textContent = m[0];
+        body.appendChild(mk);
+        last = m.index + m[0].length;
+        if (m[0].length === 0) { re.lastIndex++; }
+      }
+      if (last < cue.text.length) { body.appendChild(document.createTextNode(cue.text.slice(last))); }
+    });
+
+    if (status) {
+      status.textContent = q
+        ? (shown === 0 ? "No transcript lines match " + term : shown + " transcript line" + (shown === 1 ? "" : "s") + " match " + term)
+        : "Showing the whole transcript.";
+    }
+  }
+
+  function wireSearch() {
+    var input = document.getElementById("transcript-filter");
+    if (!input) { return; }
+    var t = null;
+    input.addEventListener("input", function () {
+      clearTimeout(t);
+      t = setTimeout(function () { runFilter(input.value); }, 250);
+    });
+  }
+
+  /* ---------------- Seek buttons (topic index + step pills) ----------------
+     Buttons wired to the embedded player, never youtu.be?t= links: a time link
+     would navigate the Canvas iframe away from this page. If the player never
+     comes up, the buttons are turned back into plain text so the index reads
+     as a reference list rather than as controls that silently do nothing. */
+  function wireSeekButtons() {
+    var btns = document.querySelectorAll("[data-seek]");
+    Array.prototype.forEach.call(btns, function (btn) {
+      var t = parseFloat(btn.getAttribute("data-seek")) || 0;
+      var item = btn.closest(".topic-index__item") || btn.closest(".todo > li");
+      var text = item ? item.querySelector(".topic-index__label, .todo__title") : null;
+      btn.setAttribute("aria-label", "Jump to " + formatTime(t) + (text ? " — " + text.textContent : "") + " in the video");
+      btn.addEventListener("click", function () {
+        if (seek(t)) { scrollPlayerIntoView(); }
+      });
+    });
+  }
+
+  function degradeToStatic(message) {
+    if (playerReady) { return; }
+    document.body.classList.add("no-player");
+    var idx = document.getElementById("topic-index");
+    if (idx) { idx.classList.add("topic-index--static"); }
+    Array.prototype.forEach.call(document.querySelectorAll("[data-seek]"), function (btn) {
+      btn.disabled = true;
+      btn.removeAttribute("aria-label");
+    });
+    var note = document.getElementById("topic-index-fallback");
+    if (note) { note.hidden = false; note.textContent = message; }
+  }
+
+  /* ---------------- Platform tabs ---------------- */
+  function wireTabs() {
+    var tablist = document.querySelector(".tablist");
+    if (!tablist) { return; }
+    var tabs = Array.prototype.slice.call(tablist.querySelectorAll('[role="tab"]'));
+
+    function select(tab, focus) {
+      tabs.forEach(function (t) {
+        var selected = t === tab;
+        t.setAttribute("aria-selected", selected ? "true" : "false");
+        t.tabIndex = selected ? 0 : -1;
+        var panel = document.getElementById(t.getAttribute("aria-controls"));
+        if (panel) { panel.hidden = !selected; }
+      });
+      if (focus) { tab.focus(); }
+    }
+
+    tabs.forEach(function (tab, i) {
+      tab.addEventListener("click", function () { select(tab, false); });
+      tab.addEventListener("keydown", function (e) {
+        var next = null;
+        if (e.key === "ArrowRight") { next = tabs[(i + 1) % tabs.length]; }
+        else if (e.key === "ArrowLeft") { next = tabs[(i - 1 + tabs.length) % tabs.length]; }
+        else if (e.key === "Home") { next = tabs[0]; }
+        else if (e.key === "End") { next = tabs[tabs.length - 1]; }
+        if (next) { e.preventDefault(); select(next, true); }
+      });
+    });
+  }
+
+  /* ---------------- YouTube player ---------------- */
+  window.onYouTubeIframeAPIReady = function () {
+    if (!VIDEO_ID || !document.getElementById("youtube-player")) { return; }
+    player = new YT.Player("youtube-player", {
+      events: {
+        onReady: function () {
+          playerReady = true;
+          syncTranscriptHeight();
+        },
+        onStateChange: function (event) {
+          clearInterval(timeUpdater);
+          if (event.data === YT.PlayerState.PLAYING) {
+            timeUpdater = setInterval(highlightCurrentLine, 300);
+          } else {
+            highlightCurrentLine();
+          }
+        }
+      }
+    });
+  };
+
+  document.addEventListener("DOMContentLoaded", function () {
+    parsedTranscript = parseVtt(vttContent);
+    populateTranscript();
+    wireSearch();
+    wireSeekButtons();
+    wireTabs();
+    setTimeout(syncTranscriptHeight, 100);
+
+    if (typeof YT === "undefined" || typeof YT.Player === "undefined") {
+      var tag = document.createElement("script");
+      tag.src = "https://www.youtube.com/iframe_api";
+      tag.onerror = function () {
+        degradeToStatic("The video player could not load, so the times below are listed for reference rather than as buttons. The full transcript is above.");
+      };
+      document.head.appendChild(tag);
+    } else {
+      window.onYouTubeIframeAPIReady();
+    }
+
+    // If the API never reports ready — blocked script, offline, restrictive
+    // network — fall back rather than leaving dead buttons on the page.
+    setTimeout(function () {
+      degradeToStatic("The video player did not load, so the times below are listed for reference rather than as buttons. The full transcript is above.");
+    }, 8000);
+  });
+
+  var resizeTimeout;
+  window.addEventListener("resize", function () {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(syncTranscriptHeight, 250);
+  });
+
+  /* Report height to a Canvas parent that listens for it. Harmless otherwise. */
+  function postHeight() {
+    try {
+      if (window.parent && window.parent !== window) {
+        var h = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
+        window.parent.postMessage({ subject: "lti.frameResize", height: h }, "*");
+      }
+    } catch (e) { /* cross-origin parent — ignore */ }
+  }
+  window.addEventListener("load", postHeight);
+  if (window.ResizeObserver) { new ResizeObserver(postHeight).observe(document.body); }
+})();
+</script>
+</body>
+</html>
