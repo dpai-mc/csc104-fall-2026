@@ -1,0 +1,1639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CSC 104 — Excel Module 1 Guided Assignment</title>
+<style>
+/* ============================================================
+   CSC 104 — Week 7 — Excel Module 1 Guided Assignment
+   Self-contained SPA for embedding in a Canvas iframe.
+   Vanilla CSS + vanilla JS, one file, no outbound links.
+   The only external resources are the YouTube player iframe and
+   the YouTube IFrame API (needed for click-to-seek); the page
+   degrades to a readable transcript and a plain topic list if
+   either is blocked.
+   Token block and layout match weeks/week03/01-guided-assign-word-1.html.
+   ============================================================ */
+
+:root {
+  color-scheme: light dark;
+  --surface:      #ffffff;
+  --panel:        #f6f8fb;
+  --panel-2:      #eef2f8;
+  --accent-bg:    #e8f0fe;
+  --ink:          #16202f;
+  --muted:        #46536b;
+  --brand:        #1d4ed8;
+  --brand-ink:    #17399c;
+  --border:       #c3cddc;
+  --border-soft:  #dde4ee;
+  --field-border: #6b7a92;
+  --btn-bg:       #1d4ed8;
+  --btn-fg:       #ffffff;
+  --btn-bg-hover: #17399c;
+  --btn2-bg:      #ffffff;
+  --btn2-fg:      #17399c;
+  --ok:           #1a6b3c;
+  --ok-bg:        #e6f4ec;
+  --warn-ink:     #7a4a06;
+  --warn-bg:      #fdf3e0;
+  --warn-rule:    #b8860b;
+  --focus:        #b4530a;
+  --hit:          #fff2b8;
+  --hit-ink:      #3a2c00;
+  --radius:       10px;
+  --maxw:         70rem;
+  --readw:        46rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --surface:      #0f1726;
+    --panel:        #17223a;
+    --panel-2:      #1e2b45;
+    --accent-bg:    #1a2a4d;
+    --ink:          #e9eefa;
+    --muted:        #b6c3d8;
+    --brand:        #9dbcff;
+    --brand-ink:    #bcd2ff;
+    --border:       #3a4a68;
+    --border-soft:  #2b3a56;
+    --field-border: #7b89a3;
+    --btn-bg:       #9dbcff;
+    --btn-fg:       #0b1424;
+    --btn-bg-hover: #c3d6ff;
+    --btn2-bg:      #17223a;
+    --btn2-fg:      #bcd2ff;
+    --ok:           #8fe0b0;
+    --ok-bg:        #123328;
+    --warn-ink:     #f6d59a;
+    --warn-bg:      #3a2c11;
+    --warn-rule:    #d9a441;
+    --focus:        #ffb066;
+    --hit:          #5c4a10;
+    --hit-ink:      #ffeeb8;
+  }
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--surface);
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; border-radius: 4px; }
+.no-fv :focus { outline: 3px solid var(--focus); outline-offset: 2px; }
+
+.skip-link {
+  position: absolute; left: -9999px; top: 0; z-index: 60;
+  background: var(--btn-bg); color: var(--btn-fg);
+  padding: 0.6rem 1rem; font-weight: 700; border-radius: 0 0 var(--radius) 0;
+}
+.skip-link:focus { left: 0; outline: 3px solid var(--focus); outline-offset: 2px; }
+
+.wrap { max-width: var(--maxw); margin: 0 auto; padding: 1rem 1rem 3rem; }
+.read { max-width: var(--readw); }
+
+/* ---------------------- Header ---------------------- */
+.page-head { background: var(--panel); border-bottom: 3px solid var(--brand); }
+.page-head .wrap { padding-bottom: 1.25rem; }
+
+.eyebrow {
+  font-size: 0.8125rem; letter-spacing: 0.09em; text-transform: uppercase;
+  font-weight: 700; color: var(--brand-ink); margin: 0.75rem 0 0.35rem;
+}
+h1 { font-size: clamp(1.5rem, 4.2vw, 2.15rem); line-height: 1.22; margin: 0 0 0.6rem; }
+.lede { margin: 0; color: var(--muted); max-width: var(--readw); }
+
+.facts { list-style: none; display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 1rem 0 0; padding: 0; }
+.facts li {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 999px; padding: 0.3rem 0.85rem; font-size: 0.875rem;
+}
+.facts .k { font-weight: 700; color: var(--brand-ink); }
+
+/* ---------------------- Typography ---------------------- */
+h2 {
+  font-size: clamp(1.25rem, 3.2vw, 1.6rem);
+  margin: 2.5rem 0 0.75rem; color: var(--brand-ink);
+  padding-bottom: 0.35rem; border-bottom: 2px solid var(--border-soft);
+}
+h3 { font-size: 1.125rem; margin: 1.75rem 0 0.5rem; }
+p { margin: 0 0 1rem; max-width: var(--readw); }
+ul, ol { margin: 0 0 1rem; padding-left: 1.35rem; max-width: var(--readw); }
+li { margin-bottom: 0.4rem; }
+.mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.9375em; }
+.ui { font-weight: 700; }
+
+.callout {
+  border-left: 5px solid var(--brand); background: var(--accent-bg);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding: 0.9rem 1.1rem; margin: 0 0 1.25rem; max-width: var(--readw);
+}
+.callout > :last-child { margin-bottom: 0; }
+.callout h3 { margin-top: 0; font-size: 1.05rem; }
+.callout--warn { border-left-color: var(--warn-rule); background: var(--warn-bg); color: var(--warn-ink); }
+.callout--wide { max-width: none; }
+
+/* ---------------------- Video + transcript ---------------------- */
+.video-row { display: flex; flex-wrap: wrap; gap: 1.25rem; margin: 0 0 1.5rem; }
+.video-col { flex: 1 1 32rem; min-width: min(100%, 20rem); }
+.transcript-col { flex: 1 1 20rem; min-width: min(100%, 17rem); display: flex; flex-direction: column; }
+
+.video-frame {
+  position: relative; width: 100%; padding-top: 56.25%;
+  background: #000; border-radius: var(--radius); overflow: hidden;
+  border: 1px solid var(--field-border);
+}
+.video-frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+.video-caption { font-size: 0.875rem; color: var(--muted); margin-top: 0.5rem; }
+
+.transcript-head { display: flex; flex-wrap: wrap; gap: 0.5rem 0.75rem; align-items: flex-end; margin-bottom: 0.5rem; }
+.transcript-head h3 { margin: 0 0 0.3rem; font-size: 1rem; flex: 0 1 auto; }
+.transcript-search { flex: 1 1 10rem; }
+.transcript-search label { display: block; font-size: 0.8125rem; font-weight: 600; color: var(--muted); }
+.transcript-search input {
+  font: inherit; width: 100%; min-height: 2.5rem; color: var(--ink);
+  background: var(--surface); border: 1px solid var(--field-border);
+  border-radius: 8px; padding: 0.35rem 0.55rem;
+}
+
+.transcript-panel {
+  height: 24rem; max-height: 24rem; overflow-y: auto;
+  border: 1px solid var(--field-border); border-radius: var(--radius);
+  background: var(--panel); padding: 0.4rem;
+}
+.transcript-line {
+  display: block; width: 100%; text-align: left; font: inherit;
+  font-size: 0.9375rem; line-height: 1.5; color: var(--ink);
+  background: transparent; border: 0; border-radius: 6px;
+  padding: 0.45rem 0.6rem; cursor: pointer;
+}
+.transcript-line:hover { background: var(--accent-bg); }
+.transcript-line .t {
+  display: inline-block; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.8125rem; font-weight: 700; color: var(--brand-ink); margin-right: 0.5rem;
+}
+.transcript-line.is-active {
+  background: var(--accent-bg);
+  box-shadow: inset 3px 0 0 0 var(--brand);
+  font-weight: 600;
+}
+.transcript-line[hidden] { display: none; }
+.transcript-line mark { background: var(--hit); color: var(--hit-ink); }
+.transcript-note { color: var(--muted); font-size: 0.875rem; padding: 0.6rem; margin: 0; }
+
+/* Static fallback when the player never loads */
+.no-player .transcript-line { cursor: default; }
+.no-player .transcript-line:hover { background: transparent; }
+
+/* ---------------------- Topic index ---------------------- */
+.topic-index { margin: 0 0 1.5rem; }
+.topic-index__group {
+  font-weight: 700; color: var(--brand-ink); margin: 1.25rem 0 0.4rem;
+  font-size: 0.9375rem; letter-spacing: 0.02em;
+}
+.topic-index__group:first-child { margin-top: 0; }
+.topic-index__list { list-style: none; padding: 0; margin: 0; max-width: none; }
+.topic-index__item {
+  display: flex; gap: 0.7rem; align-items: baseline;
+  padding: 0.28rem 0; margin: 0; border-bottom: 1px solid var(--border-soft);
+}
+.topic-index__list li:last-child { border-bottom: none; }
+.topic-index__time {
+  flex: 0 0 auto; font: inherit;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.875rem; font-weight: 700;
+  min-width: 4.25rem; min-height: 2rem; text-align: center;
+  color: var(--btn2-fg); background: var(--btn2-bg);
+  border: 1px solid var(--field-border); border-radius: 6px;
+  padding: 0.15rem 0.4rem; cursor: pointer;
+}
+.topic-index__time:hover { background: var(--accent-bg); }
+.topic-index__label { flex: 1 1 auto; }
+
+.topic-index--static .topic-index__time {
+  cursor: default; background: transparent; border-color: transparent;
+  color: var(--muted); text-align: left; padding-left: 0;
+}
+.topic-index--static .topic-index__time:hover { background: transparent; }
+
+@media (min-width: 52em) {
+  .topic-cols { column-count: 2; column-gap: 2.25rem; }
+  .topic-cols .topic-index__group { break-after: avoid; }
+  .topic-cols .topic-index__list { break-inside: avoid; }
+}
+
+/* ---------------------- To-do / step lists ---------------------- */
+.todo { list-style: none; padding: 0; margin: 0 0 1.5rem; max-width: none; }
+.todo > li {
+  background: var(--panel); border: 1px solid var(--border-soft);
+  border-radius: var(--radius); padding: 0.85rem 1rem;
+  margin: 0 0 0.75rem;
+}
+.todo__top { display: flex; flex-wrap: wrap; gap: 0.6rem; align-items: baseline; }
+.todo__num {
+  flex: 0 0 auto; min-width: 1.9rem; height: 1.9rem; padding: 0 0.4rem; border-radius: 999px;
+  background: var(--btn-bg); color: var(--btn-fg); font-weight: 700; font-size: 0.9375rem;
+  display: flex; align-items: center; justify-content: center; align-self: flex-start;
+}
+.todo__num--setup { background: var(--btn2-bg); color: var(--btn2-fg); border: 1px solid var(--field-border); }
+.todo__title { flex: 1 1 14rem; font-weight: 700; margin: 0; }
+.todo__body { margin: 0.35rem 0 0 2.5rem; max-width: var(--readw); }
+.todo__body p { margin: 0 0 0.5rem; }
+.todo__body ul { margin: 0 0 0.5rem; }
+.todo__body > :last-child { margin-bottom: 0; }
+.todo__meta { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0.5rem 0 0 2.5rem; }
+.pill {
+  font-size: 0.8125rem; font-weight: 700; border-radius: 999px;
+  padding: 0.1rem 0.6rem; border: 1px solid currentColor; white-space: nowrap;
+}
+.pill--graded { color: var(--ok); background: var(--ok-bg); }
+.pill--setup { color: var(--brand-ink); background: var(--accent-bg); }
+.pill--due { color: var(--warn-ink); background: var(--warn-bg); }
+.pill--time {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  color: var(--btn2-fg); background: var(--btn2-bg); border-color: var(--field-border);
+  cursor: pointer; font-size: 0.8125rem; min-height: 1.9rem;
+}
+.pill--time:hover { background: var(--accent-bg); }
+.no-player .pill--time { cursor: default; }
+
+/* ---------------------- Platform tabs ---------------------- */
+.tabs { margin: 0 0 1.5rem; }
+.tablist { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0 0 -1px; padding: 0; }
+.tab {
+  font: inherit; font-weight: 700; cursor: pointer;
+  color: var(--btn2-fg); background: var(--btn2-bg);
+  border: 1px solid var(--field-border); border-bottom-color: transparent;
+  border-radius: var(--radius) var(--radius) 0 0;
+  padding: 0.5rem 1rem; min-height: 2.5rem;
+}
+.tab[aria-selected="true"] { background: var(--accent-bg); border-bottom-color: var(--accent-bg); }
+.tab:hover { background: var(--accent-bg); }
+.tabpanel {
+  border: 1px solid var(--field-border); border-radius: 0 var(--radius) var(--radius) var(--radius);
+  background: var(--panel); padding: 1rem 1.1rem;
+}
+.tabpanel > :last-child { margin-bottom: 0; }
+.tabpanel h3:first-child { margin-top: 0; }
+
+/* ---------------------- Reference table ---------------------- */
+.table-scroll { overflow-x: auto; margin: 0 0 1.5rem; }
+table { border-collapse: collapse; width: 100%; min-width: 30rem; background: var(--surface); }
+caption { text-align: left; font-weight: 700; padding: 0 0 0.5rem; color: var(--muted); }
+th, td { border: 1px solid var(--border); padding: 0.6rem 0.7rem; text-align: left; vertical-align: top; }
+thead th { background: var(--panel-2); }
+tbody th { background: var(--panel); font-weight: 700; white-space: nowrap; }
+
+.status {
+  min-height: 1.4rem; font-weight: 600; color: var(--ok); background: var(--ok-bg);
+  border-radius: 8px; padding: 0.3rem 0.55rem; margin: 0.5rem 0 0;
+  max-width: var(--readw); font-size: 0.9375rem;
+}
+.status:empty { background: transparent; padding: 0; min-height: 0; }
+
+.footnote {
+  margin-top: 2.5rem; padding-top: 1rem; border-top: 1px solid var(--border-soft);
+  color: var(--muted); font-size: 0.9375rem; max-width: var(--readw);
+}
+
+.sr-only {
+  position: absolute !important; width: 1px; height: 1px; margin: -1px; padding: 0;
+  overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
+}
+
+@media print {
+  .skip-link, .video-frame, .transcript-search, .tablist { display: none !important; }
+  .transcript-panel { height: auto !important; max-height: none !important; overflow: visible; border: none; }
+  .topic-index__time, .pill--time { border: none; }
+  .tabpanel { display: block !important; border-radius: var(--radius); margin-bottom: 1rem; }
+  body { background: #fff; color: #000; }
+  .todo > li, .callout, table { break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+
+<a class="skip-link" href="#main">Skip to page content</a>
+
+<header class="page-head">
+  <div class="wrap">
+    <p class="eyebrow">CSC 104 &middot; Week 7 &middot; Guided Assignment</p>
+    <h1>Excel Module 1 &mdash; Guided Assignment Walkthrough</h1>
+    <p class="lede">Week 7 is our first week in Excel. The video below walks through a client worksheet for Anywhere
+      Fitness: cut, copy and clear cells, a new column heading, font formatting, AutoFit, the Text number format,
+      AutoComplete, your first formula, the fill handle, a SUM function, and landscape printing on one page. Every
+      step is listed on this page with a button that jumps the video straight to it, and the whole video is written
+      out here so you can read it instead of watching.</p>
+    <ul class="facts">
+      <li><span class="k">Video:</span> 17 minutes</li>
+      <li><span class="k">Week 7:</span> 10/12/2026 &ndash; 10/18/2026</li>
+      <li><span class="k">This assignment:</span> 25 pts in MindTap</li>
+      <li><span class="k">Attempts:</span> up to 10</li>
+      <li><span class="k">Due:</span> Sun 10/18, 11:59 PM</li>
+    </ul>
+  </div>
+</header>
+
+<main id="main" class="wrap" tabindex="-1">
+
+  <!-- ============ What to do this week ============ -->
+  <section aria-labelledby="todo-heading">
+    <h2 id="todo-heading" style="margin-top:1.25rem">What to do this week</h2>
+    <p>Same pattern as the Word weeks: a <strong>guided</strong> assignment we walk through together, then a
+      <strong>homework</strong> assignment you do on your own. Do them in that order. What's new is the program.
+      Excel has its own vocabulary (workbooks, worksheets, cells, ranges, formulas), so this week also has a couple of
+      extra readings. Each time stamp below jumps the video to the part that explains it.</p>
+
+    <div class="callout">
+      <p style="margin:0"><strong>The Word Project is due this Sunday too.</strong> The 200-point Word Project is
+        due <strong>Sunday 10/18 at 11:59 PM</strong>, the same night as this week's Excel work. It can't be dropped
+        and it isn't accepted late unless you arrange it with me before the due date. Plan your week around both.</p>
+    </div>
+
+    <ol class="todo">
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">1</span>
+          <p class="todo__title">Read the two extra Excel readings</p>
+        </div>
+        <div class="todo__body">
+          <p>Because this is our first time in Excel, the module has two extra readings: <strong>Embracing Change in
+            Excel</strong>, for everyone, and <strong>Introduction to Excel for Mac</strong>, if you're on a Mac. If
+            you're on Windows, you can skip the Mac one.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="12.24">0:12</button>
+          <span class="pill pill--setup">Not graded</span>
+        </p>
+      </li>
+
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">2</span>
+          <p class="todo__title">Watch the walkthrough with Excel open beside it</p>
+        </div>
+        <div class="todo__body">
+          <p>Pause after each step and do it in your own file. If the worksheet looks too small to read, drag the zoom
+            slider in the bottom-right corner of the Excel window. That changes only how it looks on your screen, not
+            the file.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="0.04">0:00</button>
+          <button type="button" class="pill pill--time" data-seek="108.28">1:48</button>
+          <span class="pill pill--setup">Not graded</span>
+        </p>
+      </li>
+
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">3</span>
+          <p class="todo__title">Download the assignment files from MindTap</p>
+        </div>
+        <div class="todo__body">
+          <p>Only two files this week: an instruction file and an Excel start file with your name on it. There's no
+            support file. Use <span class="ui">Download All</span> anyway, the same as in Word.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="55.02">0:55</button>
+          <span class="pill pill--setup">Not graded</span>
+        </p>
+      </li>
+
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">4</span>
+          <p class="todo__title">Do the twelve steps and submit the guided assignment</p>
+        </div>
+        <div class="todo__body">
+          <p>Every step is written out further down this page. Save as the <span class="mono">_2</span> version first,
+            work through the steps, then upload the file and select <span class="ui">Submit</span>. Check the
+            <span class="ui">Graded Summary Report</span> afterwards. It tells you exactly which steps earned
+            points.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="241.4">4:01</button>
+          <button type="button" class="pill pill--time" data-seek="906.64">15:06</button>
+          <span class="pill pill--graded">Graded &mdash; 25 pts</span>
+          <span class="pill pill--due">Due Sun 10/18, 11:59 PM</span>
+        </p>
+      </li>
+
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">5</span>
+          <p class="todo__title">Do the Excel Module 1 homework on your own</p>
+        </div>
+        <div class="todo__body">
+          <p>The second MindTap assignment this week. It's a different workbook with the same commands, and there's
+            no walkthrough. That's the point. Start it right after the guided one is submitted, while you still
+            remember where AutoFit, AutoSum and the fill handle are.</p>
+        </div>
+        <p class="todo__meta">
+          <span class="pill pill--graded">Graded &mdash; 100 pts</span>
+          <span class="pill pill--due">Due Sun 10/18, 11:59 PM</span>
+        </p>
+      </li>
+
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">6</span>
+          <p class="todo__title">Do the module reading</p>
+        </div>
+        <div class="todo__body">
+          <p>The Excel Module 1 chapter in the Shelly Cashman text, on creating a worksheet and a chart. Skim it for
+            <em>what</em> Excel can do, and come back to it as a step-by-step reference when an assignment names
+            something you haven't seen. Not graded.</p>
+        </div>
+        <p class="todo__meta">
+          <span class="pill pill--setup">Not graded</span>
+        </p>
+      </li>
+
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">7</span>
+          <p class="todo__title">Finish and submit the Word Project</p>
+        </div>
+        <div class="todo__body">
+          <p>The 200-point Word Project in Canvas covers Word Modules 1 through 4. It's due the same night as this
+            week's Excel work.</p>
+        </div>
+        <p class="todo__meta">
+          <span class="pill pill--graded">Graded &mdash; 200 pts</span>
+          <span class="pill pill--due">Due Sun 10/18, 11:59 PM</span>
+        </p>
+      </li>
+    </ol>
+  </section>
+
+  <!-- ============ Video + transcript ============ -->
+  <section aria-labelledby="video-heading">
+    <h2 id="video-heading">The walkthrough video</h2>
+    <p>Seventeen minutes, start to finish. It covers the readings, downloading the files, saving your copy, all
+      twelve steps, and submitting. If you're stuck on one step, use the topic index below rather than scrubbing
+      through.</p>
+
+    <div class="video-row">
+      <div class="video-col">
+        <div class="video-frame" id="video-container">
+          <iframe id="youtube-player"
+                  src="https://www.youtube.com/embed/pJ6BA_dQt8Q?enablejsapi=1&amp;cc_load_policy=1&amp;iv_load_policy=3&amp;modestbranding=1&amp;rel=0"
+                  title="CSC 104 Excel Module 1 Guided Assignment Walkthrough"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  referrerpolicy="strict-origin-when-cross-origin"
+                  allowfullscreen loading="lazy"></iframe>
+        </div>
+        <p class="video-caption">Closed captions are on by default. Select any line of the transcript to jump the
+          video to that moment.</p>
+      </div>
+
+      <div class="transcript-col">
+        <div class="transcript-head">
+          <h3 id="transcript-heading">Transcript</h3>
+          <div class="transcript-search">
+            <label for="transcript-filter">Search the transcript</label>
+            <input type="search" id="transcript-filter" autocomplete="off" spellcheck="false"
+                   aria-describedby="transcript-filter-status">
+          </div>
+        </div>
+        <div class="transcript-panel" id="transcript-container" role="group" aria-labelledby="transcript-heading">
+          <p class="transcript-note">Loading transcript&hellip;</p>
+        </div>
+        <p class="sr-only" role="status" aria-live="polite" id="transcript-filter-status"></p>
+        <p class="sr-only" role="status" aria-live="polite" id="transcript-status"></p>
+        <p style="margin:0.5rem 0 0"><a href="#topic-index-heading">Skip past the transcript</a></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ Topic index ============ -->
+  <section aria-labelledby="topic-index-heading">
+    <h2 id="topic-index-heading">Find a moment in the video</h2>
+    <p><strong>Select any time below and the video jumps there.</strong> This is the detailed contents of the
+      walkthrough. If one step isn't working, find it here and watch just that minute.</p>
+
+    <p id="topic-index-fallback" class="status" hidden></p>
+
+    <div class="topic-index topic-cols" id="topic-index">
+
+      <div class="topic-index__group">Getting started</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="0.04">0:00</button><span class="topic-index__label">Week 7: halfway through, and moving to Excel</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="12.24">0:12</button><span class="topic-index__label">Two extra readings, one just for Mac</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="30">0:30</button><span class="topic-index__label">Module 1: Creating a Worksheet and a Chart</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="55.02">0:55</button><span class="topic-index__label">No support file: just instructions and a start file</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="89.64">1:29</button><span class="topic-index__label">Enable Editing and Page Width on the instructions</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="108.28">1:48</button><span class="topic-index__label">The zoom slider, bottom right</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="130.68">2:10</button><span class="topic-index__label">Save As the _2 copy (.xlsx)</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="182.04">3:02</button><span class="topic-index__label">Your name in B6 of the Documentation worksheet</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="194.2">3:14</button><span class="topic-index__label">Workbooks and worksheets: the sheet tabs</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="216.68">3:36</button><span class="topic-index__label">Columns, rows and the Name Box</span></li>
+      </ul>
+
+      <div class="topic-index__group">Step 1 &mdash; move the title</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="241.4">4:01</button><span class="topic-index__label">The scenario: Anywhere Fitness, and what step 1 asks for</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="268.44">4:28</button><span class="topic-index__label">The Current Accounts sheet tab</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="286.76">4:46</button><span class="topic-index__label">Cut C2, paste in A2; it spills over B</span></li>
+      </ul>
+
+      <div class="topic-index__group">Step 2 &mdash; copy, then clear</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="311.6">5:11</button><span class="topic-index__label">What step 2 asks for</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="319.2">5:19</button><span class="topic-index__label">Copy G2, paste in C11, right-click &rsaquo; Clear Contents</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="349.2">5:49</button><span class="topic-index__label">Why Clear Contents and not something else</span></li>
+      </ul>
+
+      <div class="topic-index__group">Steps 3 and 4 &mdash; heading and font</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="359.64">5:59</button><span class="topic-index__label">Type Goal in C3</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="377.7">6:17</button><span class="topic-index__label">A3 to J3: 12 point and Bold</span></li>
+      </ul>
+
+      <div class="topic-index__group">Step 5 &mdash; AutoFit</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="409.2">6:49</button><span class="topic-index__label">What step 5 asks for: columns G and H</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="426.24">7:06</button><span class="topic-index__label">Format &rsaquo; AutoFit Column Width</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="461.58">7:41</button><span class="topic-index__label">The other way: double-click the column border</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="499.2">8:19</button><span class="topic-index__label">AutoFit doesn't keep updating itself</span></li>
+      </ul>
+
+      <div class="topic-index__group">Steps 6 and 7 &mdash; Text format and AutoComplete</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="534.96">8:54</button><span class="topic-index__label">Text number format on D4 to D9</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="554.56">9:14</button><span class="topic-index__label">The phone numbers, and the Number Format drop-down</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="579.76">9:39</button><span class="topic-index__label">Social Media in E5</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="592.48">9:52</button><span class="topic-index__label">Excel finishes the entry for you</span></li>
+      </ul>
+
+      <div class="topic-index__group">Steps 8 and 9 &mdash; a formula, then fill</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="610.16">10:10</button><span class="topic-index__label">What step 8 asks for: seven days after G4</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="636.4">10:36</button><span class="topic-index__label">Every formula starts with =</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="654.38">10:54</button><span class="topic-index__label">=G4+7</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="668.9">11:08</button><span class="topic-index__label">What step 9 asks for: H5 to H9</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="684.84">11:24</button><span class="topic-index__label">Drag the fill handle</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="705.46">11:45</button><span class="topic-index__label">It copies the formula, not the value</span></li>
+      </ul>
+
+      <div class="topic-index__group">Steps 10 and 11 &mdash; a number and a SUM</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="728.9">12:08</button><span class="topic-index__label">2500 in J9 for Robert Bennett</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="749.56">12:29</button><span class="topic-index__label">What step 11 asks for: SUM in J10</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="769.46">12:49</button><span class="topic-index__label">AutoSum</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="786.74">13:06</button><span class="topic-index__label">Check the range, press Enter: 11,700</span></li>
+      </ul>
+
+      <div class="topic-index__group">Step 12 &mdash; printing on one page</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="802.4">13:22</button><span class="topic-index__label">Page Layout &rsaquo; Orientation &rsaquo; Landscape</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="822.88">13:42</button><span class="topic-index__label">Scale to Fit: Width 1 page, Height 1 page</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="846.66">14:06</button><span class="topic-index__label">Check it in File &rsaquo; Print</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="866.16">14:26</button><span class="topic-index__label">Fit Sheet on One Page in Print, and why we didn't use it</span></li>
+      </ul>
+
+      <div class="topic-index__group">Submitting</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="897.14">14:57</button><span class="topic-index__label">Compare with the final figure</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="906.64">15:06</button><span class="topic-index__label">Save, close, drag in the _2 file and Submit</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="936.64">15:36</button><span class="topic-index__label">Open the Graded Summary Report</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="946.48">15:46</button><span class="topic-index__label">I forget we're in Excel, not Word</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="974.56">16:14</button><span class="topic-index__label">25 out of 25, and how to read the report</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="988.96">16:28</button><span class="topic-index__label">Closing: four Excel modules, this was the first</span></li>
+      </ul>
+
+    </div>
+  </section>
+
+  <!-- ============ New vocabulary ============ -->
+  <section aria-labelledby="vocab-heading">
+    <h2 id="vocab-heading">New words for Excel</h2>
+    <p>Word and Excel share a lot (the ribbon, Save As, the file names, MindTap's grading), but Excel has its own
+      vocabulary. The instruction file uses these words without explaining them, so here they are in one place.</p>
+
+    <div class="table-scroll" tabindex="0" role="region" aria-label="Excel vocabulary table, scrollable">
+      <table>
+        <caption>The Excel words this assignment uses, with the moment in the video where each one comes up.</caption>
+        <thead>
+          <tr><th scope="col">Word</th><th scope="col">What it means</th><th scope="col">In the video</th></tr>
+        </thead>
+        <tbody>
+          <tr><th scope="row">Workbook</th><td>An Excel file. This week's workbook has two worksheets in it.</td><td><button type="button" class="pill pill--time" data-seek="194.2">3:14</button></td></tr>
+          <tr><th scope="row">Worksheet (sheet)</th><td>One page of the workbook, chosen with the tabs along the bottom: <em>Documentation</em> and <em>Current Accounts</em>.</td><td><button type="button" class="pill pill--time" data-seek="194.2">3:14</button></td></tr>
+          <tr><th scope="row">Cell, cell reference</th><td>One box in the grid, named by its column letter and row number. <span class="mono">B6</span> is column B, row 6.</td><td><button type="button" class="pill pill--time" data-seek="216.68">3:36</button></td></tr>
+          <tr><th scope="row">Name Box</th><td>The box at the upper left, above column A. It shows which cell you're in.</td><td><button type="button" class="pill pill--time" data-seek="216.68">3:36</button></td></tr>
+          <tr><th scope="row">Range</th><td>A block of cells, written first cell to last: <span class="mono">A3:J3</span> is the instructions' "A3 to J3".</td><td><button type="button" class="pill pill--time" data-seek="377.7">6:17</button></td></tr>
+          <tr><th scope="row">AutoFit</th><td>Sizes a column to fit what's in it right now. It doesn't resize again later when you type more.</td><td><button type="button" class="pill pill--time" data-seek="499.2">8:19</button></td></tr>
+          <tr><th scope="row">Number format</th><td>How Excel treats and displays a value. <em>Text</em> tells Excel to treat it as text, not a number to calculate with.</td><td><button type="button" class="pill pill--time" data-seek="534.96">8:54</button></td></tr>
+          <tr><th scope="row">AutoComplete</th><td>Excel offering to finish an entry that matches one already in the column. Press Enter to accept it. (In the video I call this "auto fill.")</td><td><button type="button" class="pill pill--time" data-seek="592.48">9:52</button></td></tr>
+          <tr><th scope="row">Formula</th><td>A calculation in a cell. It always starts with <span class="mono">=</span>, and the cell shows the result.</td><td><button type="button" class="pill pill--time" data-seek="636.4">10:36</button></td></tr>
+          <tr><th scope="row">Formula Bar</th><td>The long box above the column letters. It shows the formula behind the result in the selected cell.</td><td><button type="button" class="pill pill--time" data-seek="705.46">11:45</button></td></tr>
+          <tr><th scope="row">Fill handle</th><td>The small square at the bottom-right corner of the selected cell. Drag it to copy a formula into the cells next to it.</td><td><button type="button" class="pill pill--time" data-seek="684.84">11:24</button></td></tr>
+          <tr><th scope="row">Function</th><td>A built-in formula with a name, such as <span class="mono">SUM</span>. A formula "without a function" is plain arithmetic like <span class="mono">=G4+7</span>.</td><td><button type="button" class="pill pill--time" data-seek="749.56">12:29</button></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ============ The steps ============ -->
+  <section aria-labelledby="steps-heading">
+    <h2 id="steps-heading">The assignment, step by step</h2>
+    <p>Four setup items, then the twelve graded steps, then submitting. Each one says <em>what</em> to change; the
+      time button next to it shows you <em>how</em>. <strong>Always go by the instruction file MindTap gave you.</strong>
+      The wording below is a summary, and MindTap grades against its own file.</p>
+
+    <div class="callout">
+      <h3>Three details worth knowing</h3>
+      <ul style="margin:0 0 0.75rem">
+        <li><strong>Watch which worksheet you're on.</strong> Your name goes on the <em>Documentation</em> sheet.
+          Every graded step happens on the <em>Current Accounts</em> sheet. Check the tabs at the bottom before you
+          start step 1.</li>
+        <li><strong>Formulas copy as formulas.</strong> When you fill <span class="mono">=G4+7</span> down from H4,
+          each row adds 7 to its <em>own</em> row's date: H5 uses G5, H6 uses G6, and so on. Select a cell and look at
+          the Formula Bar to see it <em>(11:45)</em>.</li>
+        <li><strong>Step 2 says Clear Contents, so use Clear Contents.</strong> There are other ways to empty a cell,
+          but the instructions name this one <em>(5:49)</em>.</li>
+      </ul>
+      <p style="margin:0">The video says some step numbers out loud. The numbers below follow the order of the
+        instruction file. If your file groups or numbers something differently, go by your file.</p>
+    </div>
+
+    <h3>Before you start</h3>
+    <ol class="todo">
+      <li>
+        <div class="todo__top">
+          <span class="todo__num todo__num--setup" aria-hidden="true">A</span>
+          <p class="todo__title">Download both files</p>
+        </div>
+        <div class="todo__body">
+          <p>The instruction file and an Excel start file with your name in it ending in <span class="mono">_1</span>.
+            No support file this week. They land in your Downloads folder.</p>
+        </div>
+        <p class="todo__meta"><button type="button" class="pill pill--time" data-seek="55.02">0:55</button></p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num todo__num--setup" aria-hidden="true">B</span>
+          <p class="todo__title">Open the instruction file and read it</p>
+        </div>
+        <div class="todo__body">
+          <p>Select <span class="ui">Enable Editing</span>, then <span class="ui">View &rsaquo; Page Width</span> to
+            make it readable. Keep it open in a second window. <strong>The final figure is at the end of the
+            file</strong>. It shows what your worksheet should look like when you're done.</p>
+        </div>
+        <p class="todo__meta"><button type="button" class="pill pill--time" data-seek="89.64">1:29</button></p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num todo__num--setup" aria-hidden="true">C</span>
+          <p class="todo__title">Open the start file and save it as the _2 version</p>
+        </div>
+        <div class="todo__body">
+          <p><span class="ui">Enable Editing</span>, then <span class="ui">File &rsaquo; Save As</span>. Leave it in
+            Downloads, change the <span class="mono">1</span> at the end of the file name to a
+            <span class="mono">2</span>, and save. If you can't see the <span class="mono">.xlsx</span> extension,
+            don't type it; Excel adds it. The title bar should now show the <span class="mono">_2</span> name.
+            <strong>Everything you do from here goes in the <span class="mono">_2</span> file.</strong></p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="130.68">2:10</button>
+          <button type="button" class="pill pill--time" data-seek="154.12">2:34</button>
+        </p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num todo__num--setup" aria-hidden="true">D</span>
+          <p class="todo__title">Check that it's your file</p>
+        </div>
+        <div class="todo__body">
+          <p>Click the <strong>Documentation</strong> sheet tab at the bottom. Your first and last name should be in
+            cell <strong>B6</strong>. Click B6 and the Name Box at the upper left confirms where you are. If it isn't
+            your name, delete the file and download it again.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="182.04">3:02</button>
+          <button type="button" class="pill pill--time" data-seek="216.68">3:36</button>
+        </p>
+      </li>
+    </ol>
+
+    <h3>The twelve graded steps</h3>
+    <p>All twelve happen on the <strong>Current Accounts</strong> worksheet.</p>
+    <ol class="todo">
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">1</span>
+          <p class="todo__title">Move the worksheet title from C2 to A2</p>
+        </div>
+        <div class="todo__body">
+          <p><strong>Cut</strong> the title <strong>Current Accounts</strong> from cell <strong>C2</strong> and
+            <strong>paste</strong> it into cell <strong>A2</strong>. It spills over column B, which is fine because B2
+            is empty.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="241.4">4:01</button>
+          <button type="button" class="pill pill--time" data-seek="286.76">4:46</button>
+        </p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">2</span>
+          <p class="todo__title">Copy Emmy Larson's name from G2 to C11, then clear G2</p>
+        </div>
+        <div class="todo__body">
+          <p><strong>Copy</strong> Emmy Larson's name in <strong>G2</strong> and paste it into <strong>C11</strong>. Then use
+            <strong>Clear Contents</strong> on <strong>G2</strong>, so the name is only in C11.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="311.6">5:11</button>
+          <button type="button" class="pill pill--time" data-seek="319.2">5:19</button>
+        </p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">3</span>
+          <p class="todo__title">Type Goal in C3</p>
+        </div>
+        <div class="todo__body">
+          <p>Enter <span class="mono">Goal</span> as the column heading in the empty cell <strong>C3</strong>.</p>
+        </div>
+        <p class="todo__meta"><button type="button" class="pill pill--time" data-seek="359.64">5:59</button></p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">4</span>
+          <p class="todo__title">Make the headings in A3:J3 12 point and bold</p>
+        </div>
+        <div class="todo__body">
+          <p>Select the range <strong>A3</strong> through <strong>J3</strong> and set the font size to
+            <strong>12</strong> and apply <strong>Bold</strong>. Some headings won't fit their columns afterward. Step
+            5 takes care of that.</p>
+        </div>
+        <p class="todo__meta"><button type="button" class="pill pill--time" data-seek="377.7">6:17</button></p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">5</span>
+          <p class="todo__title">AutoFit columns G and H</p>
+        </div>
+        <div class="todo__body">
+          <p>Resize columns <strong>G</strong> and <strong>H</strong> to their best fit with
+            <strong>AutoFit Column Width</strong>. Either way in the video works: the Format menu with both columns
+            selected, or a double-click on each column's right border.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="409.2">6:49</button>
+          <button type="button" class="pill pill--time" data-seek="426.24">7:06</button>
+          <button type="button" class="pill pill--time" data-seek="461.58">7:41</button>
+        </p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">6</span>
+          <p class="todo__title">Apply the Text number format to D4:D9</p>
+        </div>
+        <div class="todo__body">
+          <p>The phone numbers. Select <strong>D4</strong> through <strong>D9</strong> and change the number format
+            from <em>Number</em> to <strong>Text</strong>. Nothing changes on screen. That's expected.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="534.96">8:54</button>
+          <button type="button" class="pill pill--time" data-seek="554.56">9:14</button>
+        </p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">7</span>
+          <p class="todo__title">Enter Social Media in E5</p>
+        </div>
+        <div class="todo__body">
+          <p>In the empty cell <strong>E5</strong>, start typing. Excel offers <span class="mono">Social Media</span>
+            from elsewhere in the column; press Enter to accept the complete entry.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="579.76">9:39</button>
+          <button type="button" class="pill pill--time" data-seek="592.48">9:52</button>
+        </p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">8</span>
+          <p class="todo__title">In H4, a formula that adds 7 days to G4</p>
+        </div>
+        <div class="todo__body">
+          <p>Anywhere Fitness contacts each client once a week, so the follow-up date is seven days after the last
+            contact. In <strong>H4</strong>, enter a formula <em>without a function</em> that adds 7 to
+            <strong>G4</strong>.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="610.16">10:10</button>
+          <button type="button" class="pill pill--time" data-seek="636.4">10:36</button>
+          <button type="button" class="pill pill--time" data-seek="654.38">10:54</button>
+        </p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">9</span>
+          <p class="todo__title">Fill H5:H9 with the formula from H4</p>
+        </div>
+        <div class="todo__body">
+          <p>Drag the <strong>fill handle</strong> on H4 down to <strong>H9</strong>. Each row should show a date a
+            week after its own last-contact date.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="668.9">11:08</button>
+          <button type="button" class="pill pill--time" data-seek="684.84">11:24</button>
+          <button type="button" class="pill pill--time" data-seek="705.46">11:45</button>
+        </p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">10</span>
+          <p class="todo__title">Enter 2500 in J9</p>
+        </div>
+        <div class="todo__body">
+          <p>The plan amount for <strong>Robert Bennett</strong>, the last client row. Type
+            <span class="mono">2500</span> and press Enter. Excel picks up the number formatting from the cells
+            above.</p>
+        </div>
+        <p class="todo__meta"><button type="button" class="pill pill--time" data-seek="728.9">12:08</button></p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">11</span>
+          <p class="todo__title">SUM the plan amounts in J10</p>
+        </div>
+        <div class="todo__body">
+          <p>In <strong>J10</strong>, enter a formula that uses the <strong>SUM</strong> function to add
+            <strong>J4</strong> through <strong>J9</strong>. <span class="ui">AutoSum</span> builds it for you; check
+            that it picked J4 to J9 before pressing Enter.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="749.56">12:29</button>
+          <button type="button" class="pill pill--time" data-seek="769.46">12:49</button>
+        </p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">12</span>
+          <p class="todo__title">Landscape, and scale the sheet to fit on one page</p>
+        </div>
+        <div class="todo__body">
+          <ul>
+            <li>Change the worksheet's <strong>Orientation</strong> to <strong>Landscape</strong>.</li>
+            <li>Change the print scaling so the sheet fits on <strong>one page</strong>: in the
+              <span class="ui">Scale to Fit</span> group, set Width and Height to <strong>1 page</strong> instead of
+              Automatic.</li>
+          </ul>
+          <p><span class="ui">File &rsaquo; Print</span> shows a preview if you want to check it.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="802.4">13:22</button>
+          <button type="button" class="pill pill--time" data-seek="822.88">13:42</button>
+          <button type="button" class="pill pill--time" data-seek="846.66">14:06</button>
+        </p>
+      </li>
+    </ol>
+
+    <h3>Submitting</h3>
+    <ol class="todo">
+      <li>
+        <div class="todo__top">
+          <span class="todo__num todo__num--setup" aria-hidden="true">E</span>
+          <p class="todo__title">Compare with the final figure, then save and close</p>
+        </div>
+        <div class="todo__body">
+          <p>Check your worksheet against the final figure in the instruction file. Save the
+            <span class="mono">_2</span> file and close it. A file still open in Excel can upload incomplete.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="897.14">14:57</button>
+          <button type="button" class="pill pill--time" data-seek="906.64">15:06</button>
+        </p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num todo__num--setup" aria-hidden="true">F</span>
+          <p class="todo__title">Upload the _2 file and select Submit</p>
+        </div>
+        <div class="todo__body">
+          <p>Drag and drop it into the MindTap assignment and submit it for grading. Make sure it's the
+            <span class="mono">_2</span> file, not the <span class="mono">_1</span>.</p>
+        </div>
+        <p class="todo__meta"><button type="button" class="pill pill--time" data-seek="906.64">15:06</button></p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num todo__num--setup" aria-hidden="true">G</span>
+          <p class="todo__title">Open the Graded Summary Report, and fix anything it flags</p>
+        </div>
+        <div class="todo__body">
+          <p>Your score is at the top. Read down the list to see which steps lost points. Fix those in your
+            <span class="mono">_2</span> file, save and close it, then reopen the guided assignment in MindTap to start
+            a new attempt, and upload again. You have up to ten attempts.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="936.64">15:36</button>
+          <button type="button" class="pill pill--time" data-seek="974.56">16:14</button>
+        </p>
+      </li>
+    </ol>
+  </section>
+
+  <!-- ============ Platform tabs ============ -->
+  <section aria-labelledby="platform-heading">
+    <h2 id="platform-heading">Windows and Mac differences</h2>
+    <p>The steps are the same on both. Most of this week's commands are on the Home and Page Layout tabs, and those
+      look nearly the same on Mac and Windows. The differences are mostly in menus, right-clicking and keyboard
+      shortcuts. Pick your platform.</p>
+
+    <div class="tabs">
+      <div class="tablist" role="tablist" aria-label="Choose your platform">
+        <button type="button" class="tab" role="tab" id="tab-win" aria-controls="panel-win" aria-selected="true">Windows</button>
+        <button type="button" class="tab" role="tab" id="tab-mac" aria-controls="panel-mac" aria-selected="false" tabindex="-1">Mac</button>
+      </div>
+
+      <div class="tabpanel" role="tabpanel" id="panel-win" aria-labelledby="tab-win" tabindex="0">
+        <h3>On Windows</h3>
+        <ul style="max-width:none">
+          <li><strong>Enable Editing.</strong> Downloaded files open in Protected View with a yellow bar across the
+            top. You must select <span class="ui">Enable Editing</span> before anything works.</li>
+          <li><strong>Cut, Copy, Paste:</strong> the buttons at the left end of the Home tab, or
+            <span class="mono">Ctrl+X</span>, <span class="mono">Ctrl+C</span>, <span class="mono">Ctrl+V</span>.</li>
+          <li><strong>Clear Contents:</strong> right-click the cell &rsaquo; <span class="ui">Clear Contents</span>.</li>
+          <li><strong>AutoFit:</strong> <span class="ui">Home &rsaquo; Format &rsaquo; AutoFit Column Width</span> (in
+            the Cells group), or double-click the column's right border.</li>
+          <li><strong>Number format:</strong> the drop-down box in the Home tab's Number group.</li>
+          <li><strong>AutoSum:</strong> the &Sigma; button at the right end of the Home tab, or
+            <span class="mono">Alt+=</span>.</li>
+          <li><strong>Orientation and Scale to Fit:</strong> both on the Page Layout tab.</li>
+          <li><strong>Print preview:</strong> <span class="ui">File &rsaquo; Print</span>, or
+            <span class="mono">Ctrl+P</span>.</li>
+          <li><strong>Finding your file:</strong> File Explorer, <span class="ui">View &rsaquo; Details</span>, then
+            click the <span class="ui">Date modified</span> heading to sort newest first.</li>
+        </ul>
+      </div>
+
+      <div class="tabpanel" role="tabpanel" id="panel-mac" aria-labelledby="tab-mac" tabindex="0" hidden>
+        <h3>On Mac</h3>
+        <p>Read <strong>Introduction to Excel for Mac</strong> in this week's module first. Cengage's material is
+          written for Windows. Most of this assignment matches, but check these before you decide something is
+          broken. I've done these assignments on a Mac myself. If a command genuinely isn't where I say it is,
+          message me through the Canvas Inbox rather than guessing at a substitute.</p>
+        <ul style="max-width:none">
+          <li><strong>No Protected View.</strong> There's no Enable Editing bar. The file opens ready to edit.</li>
+          <li><strong>Cut, Copy, Paste:</strong> the Home tab buttons, or <span class="mono">&#8984;+X</span>,
+            <span class="mono">&#8984;+C</span>, <span class="mono">&#8984;+V</span>.</li>
+          <li><strong>Right-click</strong> is Control-click, or a two-finger click on a trackpad. That's how you reach
+            <span class="ui">Clear Contents</span>. It's also under <span class="ui">Edit &rsaquo; Clear</span> in the
+            menu bar.</li>
+          <li><strong>AutoFit:</strong> double-clicking the column's right border works the same. The menu route is
+            <span class="ui">Format &rsaquo; Column &rsaquo; AutoFit Selection</span> in the menu bar.</li>
+          <li><strong>Number format and AutoSum:</strong> both on the Home tab, as on Windows.</li>
+          <li><strong>Scale to Fit:</strong> on the Page Layout tab. If you don't see Width and Height boxes there,
+            use <span class="ui">Page Setup</span> and set Fit to 1 page wide by 1 tall.</li>
+          <li><strong>Print preview:</strong> <span class="ui">File &rsaquo; Print</span>, or
+            <span class="mono">&#8984;+P</span>.</li>
+          <li><strong>Finding your file:</strong> Finder &rsaquo; Downloads, switch to
+            <span class="ui">List</span> view, then click <span class="ui">Date Modified</span> to sort newest
+            first.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ Corrections ============ -->
+  <section aria-labelledby="corrections-heading">
+    <h2 id="corrections-heading">Since this was recorded</h2>
+    <p>A few things will look different on your screen than they do on mine. <strong>Where this page and the video
+      disagree, this page is right.</strong></p>
+
+    <div class="callout callout--warn callout--wide">
+      <ul style="margin:0; max-width:none">
+        <li><strong>Clear G2, not C2.</strong> At 5:11, when I read step 2, the cell to clear can sound like "C2."
+          It's <strong>G2</strong>, the cell you just copied the name from. That's the one I clear on screen at
+          5:35.</li>
+        <li><strong>"Go back to Canvas."</strong> At 15:16 I say we go back to Canvas to drop the file in. I mean the
+          MindTap assignment page, which you open through Canvas. That's where the upload and Submit button are.</li>
+        <li><strong>The Word mix-up.</strong> From 15:46 to 16:10 I try to change the view of the Graded Summary
+          Report, forgetting we're in Excel and not Word. It isn't a step; nothing you need to do there.</li>
+        <li><strong>"A worksheet and a chart."</strong> The module is called Creating a Worksheet and a Chart, but
+          this guided assignment has no chart step. Charts are covered in the module reading.</li>
+        <li><strong>Text as spoken.</strong> I read the instructions out loud, and the audio garbles some of them.
+          Go by your instruction file for the exact wording.</li>
+        <li><strong>One garbled spot.</strong> At 4:46, while I expand the window, the automatic captions invented a
+          sentence that wasn't said. The transcript leaves it out; no instructions are missing.</li>
+        <li><strong>Module release.</strong> Modules post on the Friday before the week begins, so Week 7 opened
+          <strong>Friday 10/9</strong>. You can start early.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ AI policy ============ -->
+  <section aria-labelledby="ai-heading">
+    <h2 id="ai-heading">Using AI on this assignment</h2>
+    <p>The course AI policy is <strong>Limited</strong>. You can ask an AI tool to explain what a formula does, to
+      tell you where something is in Mac Excel when the video shows Windows, to troubleshoot an error, or to quiz you
+      afterward. <strong>You build the Excel file yourself.</strong> Spell check is an ordinary Excel feature and is
+      always allowed.</p>
+    <p>The practical reason: the 200-point Excel Project in Week 11 expects you to enter formulas, fill them and
+      format a worksheet on your own. Watching someone else do it isn't the same as doing it.</p>
+  </section>
+
+  <!-- ============ What's next ============ -->
+  <section aria-labelledby="next-heading">
+    <h2 id="next-heading">What's next</h2>
+    <p>Once the guided assignment is submitted, go straight to the <strong>Excel Module 1 homework</strong> in
+      MindTap. It's the same commands on a different workbook, with no walkthrough, for 100 points. Both are due
+      <strong>Sunday 10/18</strong>.</p>
+    <p>The 200-point <strong>Word Project</strong>, submitted in Canvas, is due the same night,
+      <strong>Sunday 10/18 at 11:59 PM</strong>. Next week is Excel Module 2. There are four Excel modules in all,
+      then the Excel Project in Week 11.</p>
+    <p>Stuck on a step after re-watching it? Send me a message in the Canvas Inbox and say which step number and what
+      you tried. That's faster than burning attempts.</p>
+  </section>
+
+  <!-- ============ Quick reference ============ -->
+  <section aria-labelledby="reference-heading">
+    <h2 id="reference-heading">Quick reference</h2>
+    <div class="table-scroll" tabindex="0" role="region" aria-label="Quick reference table, scrollable">
+      <table>
+        <caption>Every value this assignment asks for, in one place. Confirm each one against your own instruction
+          file.</caption>
+        <thead>
+          <tr><th scope="col">Step</th><th scope="col">Where it lives</th><th scope="col">Exact setting</th></tr>
+        </thead>
+        <tbody>
+          <tr><th scope="row">Your name</th><td>Documentation sheet</td><td>Your first and last name in B6</td></tr>
+          <tr><th scope="row">1. Title</th><td>Home &rsaquo; Cut, Paste</td><td>"Current Accounts" cut from C2, pasted in A2</td></tr>
+          <tr><th scope="row">2. Name</th><td>Home &rsaquo; Copy, Paste; right-click &rsaquo; Clear Contents</td><td>Emmy Larson's name in G2 copied to C11; G2 cleared</td></tr>
+          <tr><th scope="row">3. Heading</th><td>Type in the cell</td><td><span class="mono">Goal</span> in C3</td></tr>
+          <tr><th scope="row">4. Font</th><td>Home &rsaquo; Font Size, Bold</td><td>A3:J3, 12 pt, Bold</td></tr>
+          <tr><th scope="row">5. AutoFit</th><td>Home &rsaquo; Format &rsaquo; AutoFit Column Width</td><td>Columns G and H</td></tr>
+          <tr><th scope="row">6. Number format</th><td>Home &rsaquo; Number Format</td><td>Text, on D4:D9</td></tr>
+          <tr><th scope="row">7. AutoComplete</th><td>Type in the cell, press Enter</td><td><span class="mono">Social Media</span> in E5</td></tr>
+          <tr><th scope="row">8. Formula</th><td>Type in the cell</td><td>H4: <span class="mono">=G4+7</span> (no function)</td></tr>
+          <tr><th scope="row">9. Fill</th><td>Fill handle</td><td>H4's formula filled to H5:H9</td></tr>
+          <tr><th scope="row">10. Plan amount</th><td>Type in the cell</td><td><span class="mono">2500</span> in J9 (Robert Bennett)</td></tr>
+          <tr><th scope="row">11. Total</th><td>Home &rsaquo; AutoSum</td><td>J10: <span class="mono">=SUM(J4:J9)</span></td></tr>
+          <tr><th scope="row">12. Printing</th><td>Page Layout &rsaquo; Orientation; Scale to Fit</td><td>Landscape; Width 1 page, Height 1 page</td></tr>
+          <tr><th scope="row">File name</th><td>File &rsaquo; Save As</td><td>The <span class="mono">_2</span> version (.xlsx), in Downloads</td></tr>
+          <tr><th scope="row">Submission</th><td>MindTap</td><td>Upload the <span class="mono">_2</span> file, select Submit, read the Graded Summary Report</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <p class="footnote">CSC 104 &middot; Computers and Computer Applications &middot; Fall 2026, Section 0840 &middot;
+    Mendocino College &middot; Instructor: David Pai &middot; <span class="mono">dpai@mendocino.edu</span>.
+    Nothing you type on this page is saved or submitted. Use the Canvas navigation outside this page to get back to
+    the Week 7 module.</p>
+</main>
+
+
+
+<script>
+(function () {
+  "use strict";
+
+  var VIDEO_ID = "pJ6BA_dQt8Q";
+
+  /* Transcript source: weeks/week07/csc104-excel-1-guided-corrected.vtt — the
+     Whisper output with its hallucinated passage removed, its repeated and
+     duplicate cues collapsed, and its Excel command names, cell references, proper
+     nouns and punctuation restored. Inlined rather than fetched so this page
+     stays self-contained inside the Canvas iframe. Keep the two copies in step:
+     if the YouTube captions are re-uploaded from the .vtt, re-paste it here
+     too. */
+  var vttContent = `WEBVTT
+
+NOTE
+CSC 104 — Week 7 — Excel Module 1 Guided Assignment Walkthrough (YouTube pJ6BA_dQt8Q)
+Corrected transcript. Source: csc104-wk7-guided-excel1.vtt (Whisper output).
+Cleanup applied: the hallucinated word-salad at 4:46 ("already here except
+that one is in your source code somewhere...") removed; the rolling duplicate
+cue at 1:24 ("and my instruction file and my those are the two files")
+collapsed; stutter duplicates collapsed; sentence casing and punctuation
+restored throughout (Whisper dropped both from about 1:29 on); Excel command
+names and proper nouns corrected (Week 7, Excel, Word, Mac, Embracing Change
+in Excel, Introduction to Excel for Mac, Module 1, Creating a Worksheet and a
+Chart, Download All, Enable Editing, Page Width, Save As, .xlsx,
+Documentation worksheet, Name Box, Anywhere Fitness, Current Accounts, Home,
+Cut, Copy, Clear Contents, Goal, Font, Bold, AutoFit Column Width, Format,
+Cells, Text number format, Social Media, Formula Bar, Robert Bennett, SUM,
+AutoSum, Page Layout, Orientation, Landscape, Scale to Fit, Width, Height,
+Automatic, File, Print, Fit Sheet on One Page, Downloads, Canvas, Submit,
+Graded Summary Report). "Induction introduction" → Introduction; "sales C2"
+→ cell C2; "doublehead arrow" → double-headed arrow; "auto sum" → AutoSum.
+Cell references are written in capitals (B6, A3 to J3, H4). In step 2 the
+audio of the cell to clear sounds like "C2"; it is G2, the cell the name was
+copied from, as the instructor does on screen at 5:35. The trainer's name,
+Emmy Larson, confirmed by the instructor (Whisper also heard "Emory"). The year of the last-contact date is not reconstructed.
+Short cues merged into readable 1–2 sentence lines; timestamps normalized to
+HH:MM:SS.mmm. The instructor's voice and hedges are preserved, including
+"this is a bad number format, I don't really like that term", "it's super
+hard", calling AutoComplete "auto fill", and the Word/Excel mix-up while
+opening the Graded Summary Report at 15:46.
+
+00:00:00.040 --> 00:00:12.240
+Aloha, and we are now starting Week 7 of 15, so it's about halfway done, and we're moving to Excel.
+
+00:00:12.240 --> 00:00:30.000
+It's our first time in Excel, so I have a couple of extra readings for you. The first is Embracing Change in Excel, and the second, if you're on a Mac, you should read the Introduction to Excel for Mac. If you're not on a Mac, don't worry about it. Okay?
+
+00:00:30.000 --> 00:00:43.860
+And then we have our first module here, Module 1, Creating a Worksheet and a Chart, and we are going to walk through the guided assignment on creating a worksheet and a chart. All right, so we'll open those up
+
+00:00:43.860 --> 00:00:55.020
+the same way we did for Word. It's just now it's Excel.
+
+00:00:55.020 --> 00:01:07.520
+And when it opens, there's no... nothing to download. I mean, there's no new downloads. Let's go ahead and start. There's no new downloads: there's an instruction page, and then there's the file that you're going to use.
+
+00:01:07.520 --> 00:01:29.640
+So again, I just always use Download All, and then I will open up that folder, and here's my two files. This one I don't need. There's my instruction file and my Excel file. So let me open up the instruction file.
+
+00:01:29.640 --> 00:01:46.760
+And here it is. So I'll Enable Editing, I'll view Page Width, I will maximize it so that we can read it. Then let me go back to here and open up the Excel file.
+
+00:01:48.280 --> 00:02:10.680
+Okay, and so let me, uh, increase the magnification. And we want to Enable Editing so we can edit it. If you're in Excel and it's looking too small, you can go down here in the right-hand corner. There's a slider bar for zooming, and you can just drag it to the right until you get to something that you feel comfortable with.
+
+00:02:10.680 --> 00:02:33.400
+All right, so let's go back to our instructions. So the first instruction says, the same as Word, change it from _1 to _2, with the .xlsx file extension. If you don't see it, don't add it; it'll add it automatically. So let's go to our Excel file
+
+00:02:34.120 --> 00:02:58.920
+and do a File, Save As, just like we did in Word. And then, it's in my Downloads folder, I'll keep it in my Downloads folder. I'll change the 1 at the end to a 2 and click Save. And now up in our title bar it should say _2.xlsx, for an Excel file. All right, still part of getting started.
+
+00:03:02.040 --> 00:03:14.200
+Make sure your first and last name is displayed in cell B6 of the Documentation worksheet. Okay, so we're going to go here in Excel.
+
+00:03:14.200 --> 00:03:36.680
+Down at the bottom, there's these little tab-looking things. These are worksheets, and we have two worksheets in this workbook. So Excel files are called workbooks, and we can have multiple worksheets in a workbook, where each sheet can have different information, related or unrelated.
+
+00:03:36.680 --> 00:03:59.480
+All right, so anyway, on Documentation your name should be in B6. Here's column B, here's row 6, so here's B6. Okay, whenever you click in a cell, up in this upper left-hand corner it should automatically say what cell you're in, in the Name Box. Mm-hmm, B6. Okay, so this is my file. All right, project step 1.
+
+00:04:01.400 --> 00:04:26.680
+Emmy Larson is a personal trainer for Anywhere Fitness, a virtual fitness consulting company. She created a worksheet to keep in touch with her clients. This is like a client information, um, worksheet, and she wants some help. So what we want to do is go to the Current Accounts worksheet and cut the worksheet title, Current Accounts, which is in cell C2, and paste it into cell A2.
+
+00:04:28.440 --> 00:04:43.960
+So first we want to go to our Current Accounts worksheet, so on the bottom, find that tab called Current Accounts, and we'll click on it. And again, we might have to expand this. I'm going to expand this so that... oops, let's see, I want to see the whole thing.
+
+00:04:46.760 --> 00:05:11.600
+Okay, and so it has Current Accounts. Right now it's in cell C2, so we want to go up here under Home and go Cut, and then we want to go to A2 and we want to paste it. Okay, it crosses over top of B, but there's nothing in B, so we'll still be able to see it. So that's okay.
+
+00:05:11.600 --> 00:05:19.200
+All right, step 2: copy Emmy's name in cell G2 and paste it in cell C11, and then clear the contents of cell G2.
+
+00:05:19.200 --> 00:05:48.960
+Okay, so we're gonna go over here to G2, and we'll go Copy. Okay, we just want regular Copy. And we're gonna go down to C11 and we're going to paste it in. And then we're gonna go back up to G2, and what I do is I just right-click and I go Clear Contents, because we want to do Clear Contents.
+
+00:05:49.200 --> 00:05:58.260
+Contents are gone; there's nothing else there. You could use Delete and some other things, but they ask you to clear the contents, so let's clear the contents.
+
+00:05:59.640 --> 00:06:17.200
+All right: in cell C3, enter Goal as the column heading. So see, column C, row 3 is empty. You want to put in the word Goal, G-O-A-L. These are their fitness goals, apparently.
+
+00:06:17.700 --> 00:06:48.800
+Change the font size of A3 to J3 to 12 point, and bold. So A3 to J3: we're gonna click on A3, click and drag over to J3, which is all the green text. We're gonna go up under our Font and we're gonna change it to 12 point. Okay, and then we're gonna click on the Bold to apply bold formatting.
+
+00:06:49.200 --> 00:07:06.240
+Okay, so they're all bold. Don't worry that you can't read everything; we'll get to that in a second. Okay: use AutoFit to resize columns G and H to their best fit.
+
+00:07:06.240 --> 00:07:30.200
+Okay, so you can go over here, you can click in G and H, and go up into Cells, go Format, and what we want to do is AutoFit Column Width. And it will AutoFit those two for their width. You could also use Format to AutoFit the row height, but we don't need to; everything's in it.
+
+00:07:30.200 --> 00:07:41.580
+All right, there is another way to do it. So we did both of them at the same time just by selecting them both. Let's undo that.
+
+00:07:41.580 --> 00:08:02.500
+Okay, the other way to do this, if you don't want to use Format, is you can go up in between G and H. So if I want to AutoFit column G, I go to the right side of G, between G and H. When I get this vertical bar with arrows going left and right as my icon, I can double-click
+
+00:08:02.500 --> 00:08:18.800
+and it will AutoFit column G. Same for H: go over here between H and I, get the vertical bar with a double-headed arrow, double-click, and it will AutoFit column H. All right, that's it.
+
+00:08:19.200 --> 00:08:32.720
+AutoFit is only based on what's in there. It doesn't automatically grow and shrink when I add stuff, okay? It's sort of manual from that perspective.
+
+00:08:32.720 --> 00:08:51.440
+So you can use either approach. You can do the double-click, or faster is just select G and H, or select the whole columns G and H, and go to Format, um, Column Width, AutoFit Column Width, and it will AutoFit those two columns.
+
+00:08:54.960 --> 00:09:14.080
+All right: apply the Text number format to the range D4 to D9. This is a bad number format; I don't really like that term. But let's go to it and see what D4 to D9 is.
+
+00:09:14.560 --> 00:09:24.800
+So D4 to D9 is their phone numbers. Okay, and right now it's a Number format, and what we're going to do is hit the drop-down box. I'm going to change it to Text format.
+
+00:09:26.400 --> 00:09:35.760
+Okay, it doesn't change the display at all, but now it's Text format, so anytime I add something it'll always be in text format.
+
+00:09:39.760 --> 00:09:52.480
+All right: in E5, use Social Media as the complete entry for the cell. Click on E5. I click on this empty one and I start typing. So I started typing it and it popped in,
+
+00:09:52.480 --> 00:10:10.160
+because what it does is it tries to auto fill based on adjacent cells, and in this column there's a Social Media. So I can just hit Enter now, and it'll accept the whole thing. I don't have to actually type the whole thing, because it's already there in a different... in a different cell, I mean.
+
+00:10:10.160 --> 00:10:35.200
+All right: Anywhere Fitness has a company policy to contact their clients once every week. In cell H4, create a formula without a function that adds seven days to the date the client was last contacted, which is cell G4. Okay, so Follow Up, Last Contact, 3/14. We want seven days later.
+
+00:10:36.400 --> 00:10:54.380
+Okay, so what we can do is type equals and we'll start typing, because any time you type a formula, you have to start with the equals character. And what that tells Excel is it's gonna do a calculation and put the result in this cell. Equals G4.
+
+00:10:54.380 --> 00:11:08.900
+Okay, and it's super hard: plus seven. I'm adding seven days to it, and I got 3/21. Pretty nice.
+
+00:11:08.900 --> 00:11:24.840
+Fill the range H5 to H... H9 with the formula in cell H4. So basically what I want to do is copy that formula down into all of these cells. I want to take this and copy it in all these cells.
+
+00:11:24.840 --> 00:11:45.460
+There's a bunch of different ways, but the fill way is: there's a little square, you can barely see it, but it's a little square in this bottom right-hand corner. So when you scroll over top and you get this bold plus, you can click and drag down to H9, and then let go,
+
+00:11:45.460 --> 00:12:08.540
+and it will copy your formula all the way down. And to come check, you can see the third one is 3/19: 19 plus 7 is 26. Okay, 15 plus 7 is 22. So it's not just copying the value down, it's copying the formula. Okay, and you click on these cells, you can look in the Formula Bar and see that indeed it's not G4: it's G5, then G6, then G7.
+
+00:12:08.900 --> 00:12:29.560
+So you copy the formula. Okay: in J9, enter 2500 as the plan amount for Robert Bennett. Okay, Robert Bennett is the last row, Plan Amount, so we're gonna add 2500 and hit Enter, and it puts the formatting in for us, because it'll copy the adjacent cell formatting.
+
+00:12:29.560 --> 00:12:49.460
+All right, number 11: in J10, enter a formula that uses the SUM function, even though we haven't talked about functions, to sum the contract amounts from J4 to J9.
+
+00:12:49.460 --> 00:13:06.740
+Okay, so what we want to do is we want to add all of these together. All right, so in the cell J10, the easiest way is to go up here; there's a thing called AutoSum. Just click on it, and it'll add the SUM function,
+
+00:13:06.740 --> 00:13:22.400
+and then it'll look for numbers adjacent to it, and it'll pick all the adjacent numbers, so it picks J4 to J9. Okay, so I can hit Enter to say, yep, I like that, and get 11,700.
+
+00:13:22.400 --> 00:13:42.880
+Change the orientation of the worksheet to landscape, then change the print scaling to fit the sheet on one page. Okay, so what we want to do here is go to Page Layout, and we're going to change the Orientation to Landscape.
+
+00:13:42.880 --> 00:14:06.660
+Okay, and then what we're going to do: Scale to Fit. Okay, Width, instead of Automatic, 1 page; Height, instead of Automatic, 1 page. That'll force the scaling to have the whole thing fit on one page, and whether the height determines it or the width determines it, that'll be the actual scaling that gets used if you print it.
+
+00:14:06.660 --> 00:14:26.160
+All right, if you want to check that, you can always go to File, Print, and you'll see it's on one page.
+
+00:14:26.160 --> 00:14:57.140
+Okay, you can also change this, Fit Sheet on One Page, kind of a thing, if you didn't scale it. You know, doing the selection, you can do it in the Print menu structure. But we set it up in our Page Layout to automatically force everything to be on one page.
+
+00:14:57.140 --> 00:15:05.520
+Okay: your workbook should look like this, which means we're done. So what we do is we want to save and submit it.
+
+00:15:06.640 --> 00:15:36.020
+So let's make sure we save it: File, Save. Close it. Okay, then we can go back to Canvas and drag and drop your file here. So it's in my Downloads folder; let's do this. Here's the _2 one, and we will drag it, drop it in, and Submit it for grading.
+
+00:15:36.640 --> 00:15:46.480
+And then we can open up our Graded Summary Report, and we will see that we...
+
+00:15:46.480 --> 00:16:14.400
+Let's see here, let's view one page. Oh, it's in Excel, sorry. I'm like, come on, why doesn't it let me look at this? Because we're in Excel; I was thinking we were in Word. Okay, so it did it in Excel.
+
+00:16:14.560 --> 00:16:28.240
+And you can see here at the very top, I got 25 out of 25. And you can walk down: if you didn't get 25 out of 25, you can walk down and see which ones it marked you off for.
+
+00:16:28.960 --> 00:16:54.880
+All right, so that's using Excel for the first assignment and the first, um, section of, uh, using Excel for this course. So we have four sections of Excel that we're going to do, and that was the first part. Okay, thanks.`;
+
+  var player = null, timeUpdater = null, parsedTranscript = [], playerReady = false;
+
+  try {
+    if (!CSS.supports("selector(:focus-visible)")) { document.body.classList.add("no-fv"); }
+  } catch (e) { document.body.classList.add("no-fv"); }
+
+  /* ---------------- VTT parsing ---------------- */
+  function timeToSeconds(timeStr) {
+    if (!timeStr) { return 0; }
+    var parts = timeStr.trim().split(":");
+    if (parts.length === 2) {
+      return (parseInt(parts[0], 10) || 0) * 60 + (parseFloat(parts[1]) || 0);
+    }
+    if (parts.length === 3) {
+      return (parseInt(parts[0], 10) || 0) * 3600 + (parseInt(parts[1], 10) || 0) * 60 + (parseFloat(parts[2]) || 0);
+    }
+    return 0;
+  }
+
+  function formatTime(sec) {
+    sec = Math.max(0, Math.floor(sec));
+    var h = Math.floor(sec / 3600), m = Math.floor((sec % 3600) / 60), s = sec % 60;
+    var mm = (h > 0 && m < 10) ? "0" + m : String(m);
+    return (h > 0 ? h + ":" : "") + mm + ":" + (s < 10 ? "0" + s : s);
+  }
+
+  function parseVtt(vttText) {
+    var blocks = vttText.trim().split(/\n\n+/);
+    var cues = [];
+    blocks.forEach(function (block) {
+      var trimmed = block.trim();
+      if (!trimmed || trimmed.indexOf("WEBVTT") === 0 || trimmed.indexOf("NOTE") === 0) { return; }
+      var lines = trimmed.split("\n");
+      var timeLine = null, timeIndex = -1;
+      for (var i = 0; i < lines.length; i++) {
+        if (lines[i].indexOf("-->") !== -1) { timeLine = lines[i]; timeIndex = i; break; }
+      }
+      if (!timeLine) { return; }
+      var ends = timeLine.split("-->");
+      var text = lines.slice(timeIndex + 1).join(" ").trim();
+      if (!text) { return; }
+      cues.push({ start: timeToSeconds(ends[0]), end: timeToSeconds(ends[1]), text: text });
+    });
+    return cues;
+  }
+
+  /* ---------------- Transcript panel ---------------- */
+  function seek(seconds) {
+    if (!player || !player.seekTo) { return false; }
+    player.seekTo(seconds, true);
+    if (player.playVideo) { player.playVideo(); }
+    return true;
+  }
+
+  function scrollPlayerIntoView() {
+    var frame = document.getElementById("video-container");
+    if (frame && frame.scrollIntoView) { frame.scrollIntoView({ behavior: "smooth", block: "center" }); }
+  }
+
+  function populateTranscript() {
+    var container = document.getElementById("transcript-container");
+    if (!container) { return; }
+    container.innerHTML = "";
+    parsedTranscript.forEach(function (cue, i) {
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "transcript-line";
+      btn.dataset.start = cue.start;
+      btn.dataset.end = cue.end;
+      btn.dataset.index = i;
+
+      var stamp = document.createElement("span");
+      stamp.className = "t";
+      stamp.textContent = formatTime(cue.start);
+
+      var body = document.createElement("span");
+      body.className = "tx";
+      body.textContent = cue.text;
+
+      btn.appendChild(stamp);
+      btn.appendChild(body);
+      btn.setAttribute("aria-label", "Jump to " + formatTime(cue.start) + ". " + cue.text);
+
+      btn.addEventListener("click", function () {
+        if (seek(cue.start)) { scrollPlayerIntoView(); }
+      });
+      container.appendChild(btn);
+    });
+  }
+
+  /* ---------------- Active-line highlight ---------------- */
+  var lastAnnounced = null;
+  function announceLine(text) {
+    if (text === lastAnnounced) { return; }
+    lastAnnounced = text;
+    var s = document.getElementById("transcript-status");
+    if (s) { s.textContent = text || ""; }
+  }
+
+  function highlightCurrentLine() {
+    if (!player || !player.getCurrentTime) { return; }
+    var now = player.getCurrentTime();
+    var lines = document.querySelectorAll("#transcript-container .transcript-line");
+    var active = null;
+    Array.prototype.forEach.call(lines, function (line) {
+      var start = parseFloat(line.dataset.start), end = parseFloat(line.dataset.end);
+      if (now >= start && now < end) { active = line; }
+    });
+    var prev = document.querySelector("#transcript-container .is-active");
+    if (active === prev) { return; }
+    if (prev) { prev.classList.remove("is-active"); }
+    if (active) {
+      active.classList.add("is-active");
+      var body = active.querySelector(".tx");
+      announceLine(body ? body.textContent : active.textContent);
+      if (!active.hidden) { active.scrollIntoView({ behavior: "smooth", block: "center" }); }
+    }
+  }
+
+  /* ---------------- Panel height ---------------- */
+  function syncTranscriptHeight() {
+    var videoContainer = document.getElementById("video-container");
+    var panel = document.getElementById("transcript-container");
+    if (!videoContainer || !panel) { return; }
+    // Match the panel to the video only when the two columns actually sit side
+    // by side. Compared by rendered position rather than a viewport-width test,
+    // because in a Canvas iframe a media query measures the iframe, not the
+    // browser window, and can disagree with the flex-wrap result.
+    var videoCol = videoContainer.parentNode;
+    var transcriptCol = panel.parentNode;
+    var sideBySide = Math.abs(
+      transcriptCol.getBoundingClientRect().top - videoCol.getBoundingClientRect().top) < 40
+      && transcriptCol.getBoundingClientRect().left !== videoCol.getBoundingClientRect().left;
+    // Side by side, the panel should end level with the video, so subtract the
+    // heading/search row that sits above it inside the transcript column.
+    var head = transcriptCol.querySelector(".transcript-head");
+    var headH = head ? head.offsetHeight + 8 : 0;
+    var h = sideBySide ? Math.max(240, videoContainer.offsetHeight - headH) + "px" : "24rem";
+    panel.style.height = h;
+    panel.style.maxHeight = h;
+  }
+
+  /* ---------------- Transcript search ---------------- */
+  function escapeRe(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); }
+
+  function runFilter(term) {
+    var lines = document.querySelectorAll("#transcript-container .transcript-line");
+    var status = document.getElementById("transcript-filter-status");
+    var q = term.trim().toLowerCase();
+    var shown = 0;
+
+    Array.prototype.forEach.call(lines, function (line) {
+      var body = line.querySelector(".tx");
+      var cue = parsedTranscript[parseInt(line.dataset.index, 10)];
+      if (!body || !cue) { return; }
+      if (!q) {
+        body.textContent = cue.text;
+        line.hidden = false;
+        shown++;
+        return;
+      }
+      if (cue.text.toLowerCase().indexOf(q) === -1) {
+        body.textContent = cue.text;
+        line.hidden = true;
+        return;
+      }
+      line.hidden = false;
+      shown++;
+      // Rebuild with <mark> around the matches, without using innerHTML on
+      // user-supplied text.
+      body.textContent = "";
+      var re = new RegExp(escapeRe(term.trim()), "ig");
+      var last = 0, m;
+      while ((m = re.exec(cue.text)) !== null) {
+        if (m.index > last) { body.appendChild(document.createTextNode(cue.text.slice(last, m.index))); }
+        var mk = document.createElement("mark");
+        mk.textContent = m[0];
+        body.appendChild(mk);
+        last = m.index + m[0].length;
+        if (m[0].length === 0) { re.lastIndex++; }
+      }
+      if (last < cue.text.length) { body.appendChild(document.createTextNode(cue.text.slice(last))); }
+    });
+
+    if (status) {
+      status.textContent = q
+        ? (shown === 0 ? "No transcript lines match " + term : shown + " transcript line" + (shown === 1 ? "" : "s") + " match " + term)
+        : "Showing the whole transcript.";
+    }
+  }
+
+  function wireSearch() {
+    var input = document.getElementById("transcript-filter");
+    if (!input) { return; }
+    var t = null;
+    input.addEventListener("input", function () {
+      clearTimeout(t);
+      t = setTimeout(function () { runFilter(input.value); }, 250);
+    });
+  }
+
+  /* ---------------- Seek buttons (topic index + step pills) ----------------
+     Buttons wired to the embedded player, never youtu.be?t= links: a time link
+     would navigate the Canvas iframe away from this page. If the player never
+     comes up, the buttons are turned back into plain text so the index reads
+     as a reference list rather than as controls that silently do nothing. */
+  function wireSeekButtons() {
+    var btns = document.querySelectorAll("[data-seek]");
+    Array.prototype.forEach.call(btns, function (btn) {
+      var t = parseFloat(btn.getAttribute("data-seek")) || 0;
+      var item = btn.closest(".topic-index__item") || btn.closest(".todo > li") || btn.closest("tr");
+      var text = item ? item.querySelector(".topic-index__label, .todo__title, th[scope=row]") : null;
+      btn.setAttribute("aria-label", "Jump to " + formatTime(t) + (text ? " — " + text.textContent : "") + " in the video");
+      btn.addEventListener("click", function () {
+        if (seek(t)) { scrollPlayerIntoView(); }
+      });
+    });
+  }
+
+  function degradeToStatic(message) {
+    if (playerReady) { return; }
+    document.body.classList.add("no-player");
+    var idx = document.getElementById("topic-index");
+    if (idx) { idx.classList.add("topic-index--static"); }
+    Array.prototype.forEach.call(document.querySelectorAll("[data-seek]"), function (btn) {
+      btn.disabled = true;
+      btn.removeAttribute("aria-label");
+    });
+    var note = document.getElementById("topic-index-fallback");
+    if (note) { note.hidden = false; note.textContent = message; }
+  }
+
+  /* ---------------- Platform tabs ---------------- */
+  function wireTabs() {
+    var tablist = document.querySelector(".tablist");
+    if (!tablist) { return; }
+    var tabs = Array.prototype.slice.call(tablist.querySelectorAll('[role="tab"]'));
+
+    function select(tab, focus) {
+      tabs.forEach(function (t) {
+        var selected = t === tab;
+        t.setAttribute("aria-selected", selected ? "true" : "false");
+        t.tabIndex = selected ? 0 : -1;
+        var panel = document.getElementById(t.getAttribute("aria-controls"));
+        if (panel) { panel.hidden = !selected; }
+      });
+      if (focus) { tab.focus(); }
+    }
+
+    tabs.forEach(function (tab, i) {
+      tab.addEventListener("click", function () { select(tab, false); });
+      tab.addEventListener("keydown", function (e) {
+        var next = null;
+        if (e.key === "ArrowRight") { next = tabs[(i + 1) % tabs.length]; }
+        else if (e.key === "ArrowLeft") { next = tabs[(i - 1 + tabs.length) % tabs.length]; }
+        else if (e.key === "Home") { next = tabs[0]; }
+        else if (e.key === "End") { next = tabs[tabs.length - 1]; }
+        if (next) { e.preventDefault(); select(next, true); }
+      });
+    });
+  }
+
+  /* ---------------- YouTube player ---------------- */
+  window.onYouTubeIframeAPIReady = function () {
+    if (!VIDEO_ID || !document.getElementById("youtube-player")) { return; }
+    player = new YT.Player("youtube-player", {
+      events: {
+        onReady: function () {
+          playerReady = true;
+          syncTranscriptHeight();
+        },
+        onStateChange: function (event) {
+          clearInterval(timeUpdater);
+          if (event.data === YT.PlayerState.PLAYING) {
+            timeUpdater = setInterval(highlightCurrentLine, 300);
+          } else {
+            highlightCurrentLine();
+          }
+        }
+      }
+    });
+  };
+
+  document.addEventListener("DOMContentLoaded", function () {
+    parsedTranscript = parseVtt(vttContent);
+    populateTranscript();
+    wireSearch();
+    wireSeekButtons();
+    wireTabs();
+    setTimeout(syncTranscriptHeight, 100);
+
+    if (typeof YT === "undefined" || typeof YT.Player === "undefined") {
+      var tag = document.createElement("script");
+      tag.src = "https://www.youtube.com/iframe_api";
+      tag.onerror = function () {
+        degradeToStatic("The video player could not load, so the times below are listed for reference rather than as buttons. The full transcript is above.");
+      };
+      document.head.appendChild(tag);
+    } else {
+      window.onYouTubeIframeAPIReady();
+    }
+
+    // If the API never reports ready — blocked script, offline, restrictive
+    // network — fall back rather than leaving dead buttons on the page.
+    setTimeout(function () {
+      degradeToStatic("The video player did not load, so the times below are listed for reference rather than as buttons. The full transcript is above.");
+    }, 8000);
+  });
+
+  var resizeTimeout;
+  window.addEventListener("resize", function () {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(syncTranscriptHeight, 250);
+  });
+
+  /* Report height to a Canvas parent that listens for it. Harmless otherwise. */
+  function postHeight() {
+    try {
+      if (window.parent && window.parent !== window) {
+        var h = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
+        window.parent.postMessage({ subject: "lti.frameResize", height: h }, "*");
+      }
+    } catch (e) { /* cross-origin parent — ignore */ }
+  }
+  window.addEventListener("load", postHeight);
+  if (window.ResizeObserver) { new ResizeObserver(postHeight).observe(document.body); }
+})();
+</script>
+</body>
+</html>
