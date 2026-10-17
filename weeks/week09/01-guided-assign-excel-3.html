@@ -1,0 +1,1696 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CSC 104 — Excel Module 3 Guided Assignment</title>
+<style>
+/* ============================================================
+   CSC 104 — Week 9 — Excel Module 3 Guided Assignment
+   Self-contained SPA for embedding in a Canvas iframe.
+   Vanilla CSS + vanilla JS, one file, no outbound links.
+   The only external resources are the YouTube player iframe and
+   the YouTube IFrame API (needed for click-to-seek); the page
+   degrades to a readable transcript and a plain topic list if
+   either is blocked.
+   Token block and layout match weeks/week03/01-guided-assign-word-1.html.
+   ============================================================ */
+
+:root {
+  color-scheme: light dark;
+  --surface:      #ffffff;
+  --panel:        #f6f8fb;
+  --panel-2:      #eef2f8;
+  --accent-bg:    #e8f0fe;
+  --ink:          #16202f;
+  --muted:        #46536b;
+  --brand:        #1d4ed8;
+  --brand-ink:    #17399c;
+  --border:       #c3cddc;
+  --border-soft:  #dde4ee;
+  --field-border: #6b7a92;
+  --btn-bg:       #1d4ed8;
+  --btn-fg:       #ffffff;
+  --btn-bg-hover: #17399c;
+  --btn2-bg:      #ffffff;
+  --btn2-fg:      #17399c;
+  --ok:           #1a6b3c;
+  --ok-bg:        #e6f4ec;
+  --warn-ink:     #7a4a06;
+  --warn-bg:      #fdf3e0;
+  --warn-rule:    #b8860b;
+  --focus:        #b4530a;
+  --hit:          #fff2b8;
+  --hit-ink:      #3a2c00;
+  --radius:       10px;
+  --maxw:         70rem;
+  --readw:        46rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --surface:      #0f1726;
+    --panel:        #17223a;
+    --panel-2:      #1e2b45;
+    --accent-bg:    #1a2a4d;
+    --ink:          #e9eefa;
+    --muted:        #b6c3d8;
+    --brand:        #9dbcff;
+    --brand-ink:    #bcd2ff;
+    --border:       #3a4a68;
+    --border-soft:  #2b3a56;
+    --field-border: #7b89a3;
+    --btn-bg:       #9dbcff;
+    --btn-fg:       #0b1424;
+    --btn-bg-hover: #c3d6ff;
+    --btn2-bg:      #17223a;
+    --btn2-fg:      #bcd2ff;
+    --ok:           #8fe0b0;
+    --ok-bg:        #123328;
+    --warn-ink:     #f6d59a;
+    --warn-bg:      #3a2c11;
+    --warn-rule:    #d9a441;
+    --focus:        #ffb066;
+    --hit:          #5c4a10;
+    --hit-ink:      #ffeeb8;
+  }
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--surface);
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; border-radius: 4px; }
+.no-fv :focus { outline: 3px solid var(--focus); outline-offset: 2px; }
+
+.skip-link {
+  position: absolute; left: -9999px; top: 0; z-index: 60;
+  background: var(--btn-bg); color: var(--btn-fg);
+  padding: 0.6rem 1rem; font-weight: 700; border-radius: 0 0 var(--radius) 0;
+}
+.skip-link:focus { left: 0; outline: 3px solid var(--focus); outline-offset: 2px; }
+
+.wrap { max-width: var(--maxw); margin: 0 auto; padding: 1rem 1rem 3rem; }
+.read { max-width: var(--readw); }
+
+/* ---------------------- Header ---------------------- */
+.page-head { background: var(--panel); border-bottom: 3px solid var(--brand); }
+.page-head .wrap { padding-bottom: 1.25rem; }
+
+.eyebrow {
+  font-size: 0.8125rem; letter-spacing: 0.09em; text-transform: uppercase;
+  font-weight: 700; color: var(--brand-ink); margin: 0.75rem 0 0.35rem;
+}
+h1 { font-size: clamp(1.5rem, 4.2vw, 2.15rem); line-height: 1.22; margin: 0 0 0.6rem; }
+.lede { margin: 0; color: var(--muted); max-width: var(--readw); }
+
+.facts { list-style: none; display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 1rem 0 0; padding: 0; }
+.facts li {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 999px; padding: 0.3rem 0.85rem; font-size: 0.875rem;
+}
+.facts .k { font-weight: 700; color: var(--brand-ink); }
+
+/* ---------------------- Typography ---------------------- */
+h2 {
+  font-size: clamp(1.25rem, 3.2vw, 1.6rem);
+  margin: 2.5rem 0 0.75rem; color: var(--brand-ink);
+  padding-bottom: 0.35rem; border-bottom: 2px solid var(--border-soft);
+}
+h3 { font-size: 1.125rem; margin: 1.75rem 0 0.5rem; }
+p { margin: 0 0 1rem; max-width: var(--readw); }
+ul, ol { margin: 0 0 1rem; padding-left: 1.35rem; max-width: var(--readw); }
+li { margin-bottom: 0.4rem; }
+.mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.9375em; }
+.ui { font-weight: 700; }
+
+.callout {
+  border-left: 5px solid var(--brand); background: var(--accent-bg);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding: 0.9rem 1.1rem; margin: 0 0 1.25rem; max-width: var(--readw);
+}
+.callout > :last-child { margin-bottom: 0; }
+.callout h3 { margin-top: 0; font-size: 1.05rem; }
+.callout--warn { border-left-color: var(--warn-rule); background: var(--warn-bg); color: var(--warn-ink); }
+.callout--wide { max-width: none; }
+
+/* ---------------------- Video + transcript ---------------------- */
+.video-row { display: flex; flex-wrap: wrap; gap: 1.25rem; margin: 0 0 1.5rem; }
+.video-col { flex: 1 1 32rem; min-width: min(100%, 20rem); }
+.transcript-col { flex: 1 1 20rem; min-width: min(100%, 17rem); display: flex; flex-direction: column; }
+
+.video-frame {
+  position: relative; width: 100%; padding-top: 56.25%;
+  background: #000; border-radius: var(--radius); overflow: hidden;
+  border: 1px solid var(--field-border);
+}
+.video-frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+.video-caption { font-size: 0.875rem; color: var(--muted); margin-top: 0.5rem; }
+
+.transcript-head { display: flex; flex-wrap: wrap; gap: 0.5rem 0.75rem; align-items: flex-end; margin-bottom: 0.5rem; }
+.transcript-head h3 { margin: 0 0 0.3rem; font-size: 1rem; flex: 0 1 auto; }
+.transcript-search { flex: 1 1 10rem; }
+.transcript-search label { display: block; font-size: 0.8125rem; font-weight: 600; color: var(--muted); }
+.transcript-search input {
+  font: inherit; width: 100%; min-height: 2.5rem; color: var(--ink);
+  background: var(--surface); border: 1px solid var(--field-border);
+  border-radius: 8px; padding: 0.35rem 0.55rem;
+}
+
+.transcript-panel {
+  height: 24rem; max-height: 24rem; overflow-y: auto;
+  border: 1px solid var(--field-border); border-radius: var(--radius);
+  background: var(--panel); padding: 0.4rem;
+}
+.transcript-line {
+  display: block; width: 100%; text-align: left; font: inherit;
+  font-size: 0.9375rem; line-height: 1.5; color: var(--ink);
+  background: transparent; border: 0; border-radius: 6px;
+  padding: 0.45rem 0.6rem; cursor: pointer;
+}
+.transcript-line:hover { background: var(--accent-bg); }
+.transcript-line .t {
+  display: inline-block; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.8125rem; font-weight: 700; color: var(--brand-ink); margin-right: 0.5rem;
+}
+.transcript-line.is-active {
+  background: var(--accent-bg);
+  box-shadow: inset 3px 0 0 0 var(--brand);
+  font-weight: 600;
+}
+.transcript-line[hidden] { display: none; }
+.transcript-line mark { background: var(--hit); color: var(--hit-ink); }
+.transcript-note { color: var(--muted); font-size: 0.875rem; padding: 0.6rem; margin: 0; }
+
+/* Static fallback when the player never loads */
+.no-player .transcript-line { cursor: default; }
+.no-player .transcript-line:hover { background: transparent; }
+
+/* ---------------------- Topic index ---------------------- */
+.topic-index { margin: 0 0 1.5rem; }
+.topic-index__group {
+  font-weight: 700; color: var(--brand-ink); margin: 1.25rem 0 0.4rem;
+  font-size: 0.9375rem; letter-spacing: 0.02em;
+}
+.topic-index__group:first-child { margin-top: 0; }
+.topic-index__list { list-style: none; padding: 0; margin: 0; max-width: none; }
+.topic-index__item {
+  display: flex; gap: 0.7rem; align-items: baseline;
+  padding: 0.28rem 0; margin: 0; border-bottom: 1px solid var(--border-soft);
+}
+.topic-index__list li:last-child { border-bottom: none; }
+.topic-index__time {
+  flex: 0 0 auto; font: inherit;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.875rem; font-weight: 700;
+  min-width: 4.25rem; min-height: 2rem; text-align: center;
+  color: var(--btn2-fg); background: var(--btn2-bg);
+  border: 1px solid var(--field-border); border-radius: 6px;
+  padding: 0.15rem 0.4rem; cursor: pointer;
+}
+.topic-index__time:hover { background: var(--accent-bg); }
+.topic-index__label { flex: 1 1 auto; }
+
+.topic-index--static .topic-index__time {
+  cursor: default; background: transparent; border-color: transparent;
+  color: var(--muted); text-align: left; padding-left: 0;
+}
+.topic-index--static .topic-index__time:hover { background: transparent; }
+
+@media (min-width: 52em) {
+  .topic-cols { column-count: 2; column-gap: 2.25rem; }
+  .topic-cols .topic-index__group { break-after: avoid; }
+  .topic-cols .topic-index__list { break-inside: avoid; }
+}
+
+/* ---------------------- To-do / step lists ---------------------- */
+.todo { list-style: none; padding: 0; margin: 0 0 1.5rem; max-width: none; }
+.todo > li {
+  background: var(--panel); border: 1px solid var(--border-soft);
+  border-radius: var(--radius); padding: 0.85rem 1rem;
+  margin: 0 0 0.75rem;
+}
+.todo__top { display: flex; flex-wrap: wrap; gap: 0.6rem; align-items: baseline; }
+.todo__num {
+  flex: 0 0 auto; min-width: 1.9rem; height: 1.9rem; padding: 0 0.4rem; border-radius: 999px;
+  background: var(--btn-bg); color: var(--btn-fg); font-weight: 700; font-size: 0.9375rem;
+  display: flex; align-items: center; justify-content: center; align-self: flex-start;
+}
+.todo__num--setup { background: var(--btn2-bg); color: var(--btn2-fg); border: 1px solid var(--field-border); }
+.todo__title { flex: 1 1 14rem; font-weight: 700; margin: 0; }
+.todo__body { margin: 0.35rem 0 0 2.5rem; max-width: var(--readw); }
+.todo__body p { margin: 0 0 0.5rem; }
+.todo__body ul { margin: 0 0 0.5rem; }
+.todo__body > :last-child { margin-bottom: 0; }
+.todo__meta { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0.5rem 0 0 2.5rem; }
+.pill {
+  font-size: 0.8125rem; font-weight: 700; border-radius: 999px;
+  padding: 0.1rem 0.6rem; border: 1px solid currentColor; white-space: nowrap;
+}
+.pill--graded { color: var(--ok); background: var(--ok-bg); }
+.pill--setup { color: var(--brand-ink); background: var(--accent-bg); }
+.pill--due { color: var(--warn-ink); background: var(--warn-bg); }
+.pill--time {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  color: var(--btn2-fg); background: var(--btn2-bg); border-color: var(--field-border);
+  cursor: pointer; font-size: 0.8125rem; min-height: 1.9rem;
+}
+.pill--time:hover { background: var(--accent-bg); }
+.no-player .pill--time { cursor: default; }
+
+/* ---------------------- Platform tabs ---------------------- */
+.tabs { margin: 0 0 1.5rem; }
+.tablist { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0 0 -1px; padding: 0; }
+.tab {
+  font: inherit; font-weight: 700; cursor: pointer;
+  color: var(--btn2-fg); background: var(--btn2-bg);
+  border: 1px solid var(--field-border); border-bottom-color: transparent;
+  border-radius: var(--radius) var(--radius) 0 0;
+  padding: 0.5rem 1rem; min-height: 2.5rem;
+}
+.tab[aria-selected="true"] { background: var(--accent-bg); border-bottom-color: var(--accent-bg); }
+.tab:hover { background: var(--accent-bg); }
+.tabpanel {
+  border: 1px solid var(--field-border); border-radius: 0 var(--radius) var(--radius) var(--radius);
+  background: var(--panel); padding: 1rem 1.1rem;
+}
+.tabpanel > :last-child { margin-bottom: 0; }
+.tabpanel h3:first-child { margin-top: 0; }
+
+/* ---------------------- Reference table ---------------------- */
+.table-scroll { overflow-x: auto; margin: 0 0 1.5rem; }
+table { border-collapse: collapse; width: 100%; min-width: 30rem; background: var(--surface); }
+caption { text-align: left; font-weight: 700; padding: 0 0 0.5rem; color: var(--muted); }
+th, td { border: 1px solid var(--border); padding: 0.6rem 0.7rem; text-align: left; vertical-align: top; }
+thead th { background: var(--panel-2); }
+tbody th { background: var(--panel); font-weight: 700; white-space: nowrap; }
+
+.status {
+  min-height: 1.4rem; font-weight: 600; color: var(--ok); background: var(--ok-bg);
+  border-radius: 8px; padding: 0.3rem 0.55rem; margin: 0.5rem 0 0;
+  max-width: var(--readw); font-size: 0.9375rem;
+}
+.status:empty { background: transparent; padding: 0; min-height: 0; }
+
+.footnote {
+  margin-top: 2.5rem; padding-top: 1rem; border-top: 1px solid var(--border-soft);
+  color: var(--muted); font-size: 0.9375rem; max-width: var(--readw);
+}
+
+.sr-only {
+  position: absolute !important; width: 1px; height: 1px; margin: -1px; padding: 0;
+  overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
+}
+
+@media print {
+  .skip-link, .video-frame, .transcript-search, .tablist { display: none !important; }
+  .transcript-panel { height: auto !important; max-height: none !important; overflow: visible; border: none; }
+  .topic-index__time, .pill--time { border: none; }
+  .tabpanel { display: block !important; border-radius: var(--radius); margin-bottom: 1rem; }
+  body { background: #fff; color: #000; }
+  .todo > li, .callout, table { break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+
+<a class="skip-link" href="#main">Skip to page content</a>
+
+<header class="page-head">
+  <div class="wrap">
+    <p class="eyebrow">CSC 104 &middot; Week 9 &middot; Guided Assignment</p>
+    <h1>Excel Module 3 &mdash; Guided Assignment Walkthrough</h1>
+    <p class="lede">Week 9 is large worksheets, charting and what-if analysis. The video below walks through an orders
+      and inventory workbook for Elite Fashion: renaming a sheet, unfreezing panes, the NOW function, rotated text,
+      Format Painter, Paste Values, Goal Seek, line and column sparklines, filling without formatting, absolute
+      references, and changing a chart. Every step is listed on this page with a button that jumps the video straight
+      to it, and the whole video is written out here so you can read it instead of watching.</p>
+    <ul class="facts">
+      <li><span class="k">Video:</span> 28 minutes</li>
+      <li><span class="k">Week 9:</span> 10/26/2026 &ndash; 11/1/2026</li>
+      <li><span class="k">This assignment:</span> 25 pts in MindTap</li>
+      <li><span class="k">Attempts:</span> up to 10</li>
+      <li><span class="k">Due:</span> Sun 11/1, 11:59 PM</li>
+    </ul>
+  </div>
+</header>
+
+<main id="main" class="wrap" tabindex="-1">
+
+  <!-- ============ What to do this week ============ -->
+  <section aria-labelledby="todo-heading">
+    <h2 id="todo-heading" style="margin-top:1.25rem">What to do this week</h2>
+    <p>Same pattern as every week: a <strong>guided</strong> assignment we walk through together, then a
+      <strong>homework</strong> assignment you do on your own. Do them in that order. This one is longer than the
+      last two, thirteen steps and almost half an hour of video, so give yourself time. Each time stamp below jumps
+      the video to the part that explains it.</p>
+
+    <ol class="todo">
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">1</span>
+          <p class="todo__title">Watch the walkthrough with Excel open beside it</p>
+        </div>
+        <div class="todo__body">
+          <p>Pause after each step and do it in your own file. Sparklines are tiny; the zoom slider in the
+            bottom-right corner of the Excel window makes them easier to check. It changes only how the sheet looks on
+            your screen, not the file.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="0.04">0:00</button>
+          <button type="button" class="pill pill--time" data-seek="52.58">0:52</button>
+          <span class="pill pill--setup">Not graded</span>
+        </p>
+      </li>
+
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">2</span>
+          <p class="todo__title">Download the assignment files from MindTap</p>
+        </div>
+        <div class="todo__body">
+          <p>Two files again: an instruction file and an Excel start file with your name on it. No support file. Use
+            <span class="ui">Download All</span>, the same as always.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="24">0:24</button>
+          <span class="pill pill--setup">Not graded</span>
+        </p>
+      </li>
+
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">3</span>
+          <p class="todo__title">Do the thirteen steps and submit the guided assignment</p>
+        </div>
+        <div class="todo__body">
+          <p>Every step is written out further down this page. Save as the <span class="mono">_2</span> version first,
+            work through the steps, then upload the file and select <span class="ui">Submit</span>. Check the
+            <span class="ui">Graded Summary Report</span> afterwards. It tells you exactly which steps earned
+            points.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="148.26">2:28</button>
+          <button type="button" class="pill pill--time" data-seek="1637.52">27:17</button>
+          <span class="pill pill--graded">Graded &mdash; 25 pts</span>
+          <span class="pill pill--due">Due Sun 11/1, 11:59 PM</span>
+        </p>
+      </li>
+
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">4</span>
+          <p class="todo__title">Do the Excel Module 3 homework on your own</p>
+        </div>
+        <div class="todo__body">
+          <p>The second MindTap assignment this week. It's a different workbook with the same commands, and there's
+            no walkthrough. That's the point. Start it right after the guided one is submitted, while you still
+            remember where Goal Seek, the sparkline tools and Paste Special are.</p>
+        </div>
+        <p class="todo__meta">
+          <span class="pill pill--graded">Graded &mdash; 100 pts</span>
+          <span class="pill pill--due">Due Sun 11/1, 11:59 PM</span>
+        </p>
+      </li>
+
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">5</span>
+          <p class="todo__title">Do the module reading</p>
+        </div>
+        <div class="todo__body">
+          <p>The Excel Module 3 chapter in the Shelly Cashman text, on large worksheets, charting and what-if
+            analysis. Skim it for <em>what</em> Excel can do, and come back to it as a step-by-step reference when an
+            assignment names something you haven't seen. Not graded.</p>
+        </div>
+        <p class="todo__meta">
+          <span class="pill pill--setup">Not graded</span>
+        </p>
+      </li>
+    </ol>
+  </section>
+
+  <!-- ============ Video + transcript ============ -->
+  <section aria-labelledby="video-heading">
+    <h2 id="video-heading">The walkthrough video</h2>
+    <p>Twenty-eight minutes, start to finish. It covers downloading the files, saving your copy, all thirteen steps,
+      a check against the finished workbook, and submitting. If you're stuck on one step, use the topic index below
+      rather than scrubbing through.</p>
+
+    <div class="video-row">
+      <div class="video-col">
+        <div class="video-frame" id="video-container">
+          <iframe id="youtube-player"
+                  src="https://www.youtube.com/embed/1l5JwdqOFD4?enablejsapi=1&amp;cc_load_policy=1&amp;iv_load_policy=3&amp;modestbranding=1&amp;rel=0"
+                  title="CSC 104 Excel Module 3 Guided Assignment Walkthrough"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  referrerpolicy="strict-origin-when-cross-origin"
+                  allowfullscreen loading="lazy"></iframe>
+        </div>
+        <p class="video-caption">Closed captions are on by default. Select any line of the transcript to jump the
+          video to that moment.</p>
+      </div>
+
+      <div class="transcript-col">
+        <div class="transcript-head">
+          <h3 id="transcript-heading">Transcript</h3>
+          <div class="transcript-search">
+            <label for="transcript-filter">Search the transcript</label>
+            <input type="search" id="transcript-filter" autocomplete="off" spellcheck="false"
+                   aria-describedby="transcript-filter-status">
+          </div>
+        </div>
+        <div class="transcript-panel" id="transcript-container" role="group" aria-labelledby="transcript-heading">
+          <p class="transcript-note">Loading transcript&hellip;</p>
+        </div>
+        <p class="sr-only" role="status" aria-live="polite" id="transcript-filter-status"></p>
+        <p class="sr-only" role="status" aria-live="polite" id="transcript-status"></p>
+        <p style="margin:0.5rem 0 0"><a href="#topic-index-heading">Skip past the transcript</a></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ Topic index ============ -->
+  <section aria-labelledby="topic-index-heading">
+    <h2 id="topic-index-heading">Find a moment in the video</h2>
+    <p><strong>Select any time below and the video jumps there.</strong> This is the detailed contents of the
+      walkthrough. If one step isn't working, find it here and watch just that minute.</p>
+
+    <p id="topic-index-fallback" class="status" hidden></p>
+
+    <div class="topic-index topic-cols" id="topic-index">
+
+      <div class="topic-index__group">Getting started</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="0.04">0:00</button><span class="topic-index__label">Module 3: large worksheets, charting, what-if analysis</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="24">0:24</button><span class="topic-index__label">Two files; sort Downloads by Date Modified</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="52.58">0:52</button><span class="topic-index__label">Instructions at Page Width; zoom the start file</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="84">1:24</button><span class="topic-index__label">Save As the _2 copy</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="108.42">1:48</button><span class="topic-index__label">Your name in B6</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="126.06">2:06</button><span class="topic-index__label">The scenario: Elite Fashion</span></li>
+      </ul>
+
+      <div class="topic-index__group">Steps 1 and 2 &mdash; sheet name, panes, alignment</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="148.26">2:28</button><span class="topic-index__label">Step 1: rename the Orders sheet</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="168.3">2:48</button><span class="topic-index__label">Double-click the tab, Right Arrow, type the rest</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="198.3">3:18</button><span class="topic-index__label">Step 2: what frozen rows look like</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="228.18">3:48</button><span class="topic-index__label">View &rsaquo; Freeze Panes &rsaquo; Unfreeze Panes, and when to freeze</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="274.74">4:34</button><span class="topic-index__label">Middle (vertical) vs. Center (horizontal)</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="298.02">4:58</button><span class="topic-index__label">The Alignment group: top row vs. bottom row</span></li>
+      </ul>
+
+      <div class="topic-index__group">Step 3 &mdash; cut, paste, and NOW</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="317.94">5:17</button><span class="topic-index__label">Cut K2, paste in A2</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="348.42">5:48</button><span class="topic-index__label">Type =NOW() in B2</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="373.14">6:13</button><span class="topic-index__label">Or use Insert Function when you're unsure</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="403.94">6:43</button><span class="topic-index__label">Search for NOW and select it</span></li>
+      </ul>
+
+      <div class="topic-index__group">Steps 4 and 5 &mdash; rotate, Format Painter, indent</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="444.98">7:24</button><span class="topic-index__label">Step 4: what it asks for</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="467.94">7:47</button><span class="topic-index__label">Merge &amp; Center, then rotate to 90&deg; in Format Cells</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="498.66">8:18</button><span class="topic-index__label">Right-click column A &rsaquo; Column Width 6</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="517.78">8:37</button><span class="topic-index__label">Step 5: Format Painter from B9:K9 to B11</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="567.86">9:27</button><span class="topic-index__label">Decrease Indent on B12</span></li>
+      </ul>
+
+      <div class="topic-index__group">Steps 6 and 7 &mdash; Paste Values and Goal Seek</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="597.68">9:57</button><span class="topic-index__label">Step 6: copy C28:G28, values only</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="629.08">10:29</button><span class="topic-index__label">Paste &rsaquo; Paste Values in C12</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="666.94">11:06</button><span class="topic-index__label">Delete row 28</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="689.18">11:29</button><span class="topic-index__label">Step 7: what Goal Seek is for</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="711.46">11:51</button><span class="topic-index__label">Data &rsaquo; What-If Analysis &rsaquo; Goal Seek</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="752.18">12:32</button><span class="topic-index__label">I set the wrong cell, and fix it: C4</span></li>
+      </ul>
+
+      <div class="topic-index__group">Steps 8 and 9 &mdash; line sparklines</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="795.62">13:15</button><span class="topic-index__label">Step 8: one sentence at a time</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="818.1">13:38</button><span class="topic-index__label">Insert &rsaquo; Sparklines &rsaquo; Line in H8</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="855.96">14:15</button><span class="topic-index__label">Fill H9:H13 without formatting</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="887.34">14:47</button><span class="topic-index__label">Right-drag the fill handle &rsaquo; Fill Without Formatting</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="905.62">15:05</button><span class="topic-index__label">Sparkline Color: Tan, Background 2, Darker 90%</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="949.18">15:49</button><span class="topic-index__label">Markers, and Marker Color</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="985.78">16:25</button><span class="topic-index__label">Checking them with the magnifier</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1033.34">17:13</button><span class="topic-index__label">Step 9: copy K8</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1064.6">17:44</button><span class="topic-index__label">Paste &rsaquo; Formulas and Number Formatting</span></li>
+      </ul>
+
+      <div class="topic-index__group">Step 10 &mdash; absolute references</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1086.02">18:06</button><span class="topic-index__label">What step 10 asks for</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1118.56">18:38</button><span class="topic-index__label">=C13/I13 in C5</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1152.08">19:12</button><span class="topic-index__label">Why I13 has to stay put when you copy</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1173.12">19:33</button><span class="topic-index__label">Typing the dollar signs: $I$13</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1198.56">19:58</button><span class="topic-index__label">The F4 shortcut</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1227.52">20:27</button><span class="topic-index__label">Cycling through all four F4 options</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1271.84">21:11</button><span class="topic-index__label">Copy it across to D5:G5</span></li>
+      </ul>
+
+      <div class="topic-index__group">Steps 11 and 12 &mdash; column sparklines, formulas only</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1309.76">21:49</button><span class="topic-index__label">Step 11: column sparkline in H17</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1355.68">22:35</button><span class="topic-index__label">Show High Point and Low Point</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1380.24">23:00</button><span class="topic-index__label">Fill H18:H25 without formatting</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1406.64">23:26</button><span class="topic-index__label">Step 12: copy I17, paste Formulas only</span></li>
+      </ul>
+
+      <div class="topic-index__group">Step 13 &mdash; the chart</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1452.4">24:12</button><span class="topic-index__label">Where the chart is: J14 to O25</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1482.4">24:42</button><span class="topic-index__label">Chart Design &rsaquo; Change Chart Type &rsaquo; Area</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1498.32">24:58</button><span class="topic-index__label">The chart title</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1537.88">25:37</button><span class="topic-index__label">Undo the pasted formatting; Keep Text Only</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1573.86">26:13</button><span class="topic-index__label">Add Chart Element &rsaquo; Data Labels</span></li>
+      </ul>
+
+      <div class="topic-index__group">Checking and submitting</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1607.82">26:47</button><span class="topic-index__label">Compare with the final figure</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1637.52">27:17</button><span class="topic-index__label">Save, close, drag in the _2 file and Submit</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1671.98">27:51</button><span class="topic-index__label">25 out of 25, and a recap of Module 3</span></li>
+      </ul>
+
+    </div>
+  </section>
+
+  <!-- ============ New ideas ============ -->
+  <section aria-labelledby="vocab-heading">
+    <h2 id="vocab-heading">New ideas this week</h2>
+    <p>This module is about working with a bigger sheet: keeping it readable, pasting only part of what you copy,
+      and seeing trends at a glance. The instruction file uses these words without explaining them, so here they are
+      in one place.</p>
+
+    <div class="table-scroll" tabindex="0" role="region" aria-label="New Excel ideas table, scrollable">
+      <table>
+        <caption>The Excel ideas this assignment uses, with the moment in the video where each one comes up.</caption>
+        <thead>
+          <tr><th scope="col">Idea</th><th scope="col">What it means</th><th scope="col">In the video</th></tr>
+        </thead>
+        <tbody>
+          <tr><th scope="row">Freeze Panes</th><td>Keeps chosen rows or columns on screen while you scroll, usually the headings. Unfreeze Panes turns it off.</td><td><button type="button" class="pill pill--time" data-seek="228.18">3:48</button></td></tr>
+          <tr><th scope="row">Middle Align vs. Center</th><td><em>Middle</em> is vertical: halfway between the top and bottom of the cell. <em>Center</em> is horizontal: halfway between left and right.</td><td><button type="button" class="pill pill--time" data-seek="274.74">4:34</button></td></tr>
+          <tr><th scope="row">NOW</th><td>A function with nothing inside the parentheses, <span class="mono">=NOW()</span>. It shows the current date and time, and updates whenever the workbook recalculates.</td><td><button type="button" class="pill pill--time" data-seek="348.42">5:48</button></td></tr>
+          <tr><th scope="row">Insert Function</th><td>The <span class="mono">fx</span> button beside the Formula Bar. Search for a function by name or description and Excel builds it for you.</td><td><button type="button" class="pill pill--time" data-seek="373.14">6:13</button></td></tr>
+          <tr><th scope="row">Format Painter</th><td>Copies only the formatting of what you've selected, and applies it to the next cells you click.</td><td><button type="button" class="pill pill--time" data-seek="517.78">8:37</button></td></tr>
+          <tr><th scope="row">Paste options</th><td>The arrow under Paste lets you paste only part of what you copied: <em>Values</em> (just the numbers), <em>Formulas</em>, or <em>Formulas and Number Formatting</em>, leaving the destination's other formatting alone.</td><td><button type="button" class="pill pill--time" data-seek="629.08">10:29</button></td></tr>
+          <tr><th scope="row">Goal Seek</th><td>A what-if tool. You name the result you want in one cell, and Excel works backward to find the value another cell would need.</td><td><button type="button" class="pill pill--time" data-seek="689.18">11:29</button></td></tr>
+          <tr><th scope="row">Sparkline</th><td>A tiny chart inside a single cell that shows the trend of a row of numbers. <em>Line</em> and <em>Column</em> are the two types this week.</td><td><button type="button" class="pill pill--time" data-seek="818.1">13:38</button></td></tr>
+          <tr><th scope="row">Fill Without Formatting</th><td>Copies what's in a cell down a range but leaves each cell's existing formatting, like alternating row colors, alone.</td><td><button type="button" class="pill pill--time" data-seek="887.34">14:47</button></td></tr>
+          <tr><th scope="row">Absolute reference</th><td>A cell reference with dollar signs, like <span class="mono">$I$13</span>, that stays the same when the formula is copied. In the video I call this "freezing" the row or column. That's a different thing from Freeze Panes.</td><td><button type="button" class="pill pill--time" data-seek="1173.12">19:33</button></td></tr>
+          <tr><th scope="row">Data labels</th><td>The numbers printed on a chart, one per data point.</td><td><button type="button" class="pill pill--time" data-seek="1573.86">26:13</button></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout">
+      <h3>Why step 10 needs $I$13</h3>
+      <p>Each month's share is that month's total (row 13) divided by the grand total in <strong>I13</strong>.
+        When you copy <span class="mono">=C13/I13</span> one column to the right, Excel shifts <em>every</em>
+        reference one column: you'd get <span class="mono">=D13/J13</span>, and J13 isn't the grand total.</p>
+      <p>Dollar signs lock the part they sit in front of. <span class="mono">=C13/$I$13</span> copies as
+        <span class="mono">=D13/$I$13</span>, <span class="mono">=E13/$I$13</span>, and so on. Click inside the
+        reference and press <span class="mono">F4</span> to cycle through the four forms:</p>
+      <ul style="margin:0 0 0.75rem">
+        <li><span class="mono">$I$13</span> &mdash; column and row both locked. This is the one step 10 wants.</li>
+        <li><span class="mono">I$13</span> &mdash; only the row locked.</li>
+        <li><span class="mono">$I13</span> &mdash; only the column locked.</li>
+        <li><span class="mono">I13</span> &mdash; nothing locked, back where you started.</li>
+      </ul>
+      <p>Whenever every copy of a formula should point at the <em>same</em> cell, that cell needs an absolute
+        reference.</p>
+    </div>
+  </section>
+
+  <!-- ============ The steps ============ -->
+  <section aria-labelledby="steps-heading">
+    <h2 id="steps-heading">The assignment, step by step</h2>
+    <p>Four setup items, then the thirteen graded steps, then submitting. Each one says <em>what</em> to change; the
+      time button next to it shows you <em>how</em>. <strong>Always go by the instruction file MindTap gave you.</strong>
+      The wording below is a summary, and MindTap grades against its own file.</p>
+
+    <div class="callout">
+      <h3>Four details worth knowing</h3>
+      <ul style="margin:0 0 0.75rem">
+        <li><strong>Read the long steps one sentence at a time.</strong> Steps 8 and 11 each have several parts
+          (insert the sparkline, fill it, then style it). Do each sentence before reading the next, the way I do at
+          13:15.</li>
+        <li><strong>"Without formatting" means the alternating row colors stay.</strong> A normal fill-handle drag
+          copies the first cell's background down the whole range. Right-drag instead and choose
+          <span class="ui">Fill Without Formatting</span> <em>(14:47)</em>. If right-dragging is awkward, do a
+          normal drag, then pick Fill Without Formatting from the <span class="ui">Auto Fill Options</span> button
+          that appears.</li>
+        <li><strong>Goal Seek's "Set cell" is C4.</strong> I put C5 in first and correct it at 12:32. If your result
+          looks wrong, undo it with <span class="mono">Ctrl+Z</span> and run Goal Seek again.</li>
+        <li><strong>Paste the chart title as text.</strong> If you copy the title from the instruction file and paste
+          it with Ctrl+V, it brings Word's formatting along <em>(25:37)</em>. Typing the title is just as good.</li>
+      </ul>
+      <p style="margin:0">The numbers below follow the order of the instruction file as I read it in the video. If
+        your file groups or numbers something differently, go by your file.</p>
+    </div>
+
+    <h3>Before you start</h3>
+    <ol class="todo">
+      <li>
+        <div class="todo__top">
+          <span class="todo__num todo__num--setup" aria-hidden="true">A</span>
+          <p class="todo__title">Download both files</p>
+        </div>
+        <div class="todo__body">
+          <p>The instruction file and an Excel start file with your name in it, ending in <span class="mono">_1</span>.
+            They land in your Downloads folder. Sorting by <span class="ui">Date modified</span> puts the newest at
+            the top.</p>
+        </div>
+        <p class="todo__meta"><button type="button" class="pill pill--time" data-seek="24">0:24</button></p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num todo__num--setup" aria-hidden="true">B</span>
+          <p class="todo__title">Open the instruction file and read it</p>
+        </div>
+        <div class="todo__body">
+          <p>Select <span class="ui">Enable Editing</span>, then <span class="ui">View &rsaquo; Page Width</span> to
+            make it readable. Keep it open in a second window. The final figure at the end of the file shows what
+            the worksheet should look like when you're done.</p>
+        </div>
+        <p class="todo__meta"><button type="button" class="pill pill--time" data-seek="52.58">0:52</button></p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num todo__num--setup" aria-hidden="true">C</span>
+          <p class="todo__title">Open the start file and save it as the _2 version</p>
+        </div>
+        <div class="todo__body">
+          <p><span class="ui">Enable Editing</span>, then <span class="ui">File &rsaquo; Save As</span>. Leave it in
+            Downloads, change the <span class="mono">1</span> at the end of the file name to a
+            <span class="mono">2</span>, and save. <strong>Everything you do from here goes in the
+            <span class="mono">_2</span> file.</strong></p>
+        </div>
+        <p class="todo__meta"><button type="button" class="pill pill--time" data-seek="84">1:24</button></p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num todo__num--setup" aria-hidden="true">D</span>
+          <p class="todo__title">Check that it's your file</p>
+        </div>
+        <div class="todo__body">
+          <p>Your first and last name should be in cell <strong>B6</strong> of the <strong>Documentation</strong>
+            sheet, the same as the last two weeks. If it isn't your name, delete the file and download it again.</p>
+        </div>
+        <p class="todo__meta"><button type="button" class="pill pill--time" data-seek="108.42">1:48</button></p>
+      </li>
+    </ol>
+
+    <h3>The thirteen graded steps</h3>
+    <p>All thirteen happen on the <strong>Orders</strong> worksheet, which you rename in step 1.</p>
+    <ol class="todo">
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">1</span>
+          <p class="todo__title">Rename the Orders sheet to Orders and Inventory</p>
+        </div>
+        <div class="todo__body">
+          <p>Change the sheet tab's name to <span class="mono">Orders and Inventory</span>, with a lowercase
+            "and."</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="148.26">2:28</button>
+          <button type="button" class="pill pill--time" data-seek="168.3">2:48</button>
+        </p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">2</span>
+          <p class="todo__title">Unfreeze the top two rows; middle align A1</p>
+        </div>
+        <div class="todo__body">
+          <p><strong>Unfreeze Panes</strong> so rows 1 and 2 scroll with the rest of the sheet. Then apply
+            <strong>Middle Align</strong> (vertical) to the merged cell <strong>A1</strong>, not Center.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="198.3">3:18</button>
+          <button type="button" class="pill pill--time" data-seek="228.18">3:48</button>
+          <button type="button" class="pill pill--time" data-seek="274.74">4:34</button>
+        </p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">3</span>
+          <p class="todo__title">Move K2 to A2; NOW in B2</p>
+        </div>
+        <div class="todo__body">
+          <p><strong>Cut</strong> the contents of <strong>K2</strong> and paste them in <strong>A2</strong>. In
+            <strong>B2</strong>, enter a formula that uses the <strong>NOW</strong> function to show today's
+            date.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="317.94">5:17</button>
+          <button type="button" class="pill pill--time" data-seek="348.42">5:48</button>
+          <button type="button" class="pill pill--time" data-seek="373.14">6:13</button>
+        </p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">4</span>
+          <p class="todo__title">Merge A7:A13, rotate it 90&deg;, column A width 6</p>
+        </div>
+        <div class="todo__body">
+          <p><strong>Merge &amp; Center</strong> the range <strong>A7:A13</strong>, rotate the text in the merged
+            cell <strong>90 degrees</strong>, then set the width of <strong>column A</strong> to
+            <strong>6</strong>.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="444.98">7:24</button>
+          <button type="button" class="pill pill--time" data-seek="467.94">7:47</button>
+          <button type="button" class="pill pill--time" data-seek="498.66">8:18</button>
+        </p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">5</span>
+          <p class="todo__title">Copy B9:K9's formatting to B11:K11; decrease B12's indent</p>
+        </div>
+        <div class="todo__body">
+          <p>Use <strong>Format Painter</strong> to copy the formatting of <strong>B9:K9</strong> to
+            <strong>B11:K11</strong>. Then <strong>decrease the indent</strong> of <strong>B12</strong> by one level
+            so it lines up with the rows around it.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="517.78">8:37</button>
+          <button type="button" class="pill pill--time" data-seek="567.86">9:27</button>
+        </p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">6</span>
+          <p class="todo__title">Paste C28:G28's values into C12:G12; delete row 28</p>
+        </div>
+        <div class="todo__body">
+          <p>Copy <strong>C28:G28</strong> and paste <strong>only the values</strong> into
+            <strong>C12:G12</strong>, so row 12 keeps its own formatting. Then delete <strong>row 28</strong>, the
+            old copy of the data.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="597.68">9:57</button>
+          <button type="button" class="pill pill--time" data-seek="629.08">10:29</button>
+          <button type="button" class="pill pill--time" data-seek="666.94">11:06</button>
+        </p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">7</span>
+          <p class="todo__title">Goal Seek: C4 to 500 by changing C11</p>
+        </div>
+        <div class="todo__body">
+          <p>Use <strong>Goal Seek</strong> to set cell <strong>C4</strong> to <strong>500</strong> by changing
+            <strong>C11</strong>. Excel adjusts the Silk Blouses number until August's average comes out to
+            500.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="689.18">11:29</button>
+          <button type="button" class="pill pill--time" data-seek="711.46">11:51</button>
+          <button type="button" class="pill pill--time" data-seek="752.18">12:32</button>
+        </p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">8</span>
+          <p class="todo__title">Line sparklines in H8:H13, styled</p>
+        </div>
+        <div class="todo__body">
+          <ul>
+            <li>In <strong>H8</strong>, insert a <strong>Line</strong> sparkline based on <strong>C8:G8</strong>.</li>
+            <li>Fill <strong>H9:H13</strong> from H8 <strong>without formatting</strong>.</li>
+            <li>Change the sparkline color in <strong>H8:H13</strong> to <strong>Tan, Background 2, Darker
+              90%</strong>.</li>
+            <li>Add <strong>markers</strong>, and change the marker color to the blue your instruction file names
+              (<strong>Darker 25%</strong>).</li>
+          </ul>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="818.1">13:38</button>
+          <button type="button" class="pill pill--time" data-seek="887.34">14:47</button>
+          <button type="button" class="pill pill--time" data-seek="905.62">15:05</button>
+          <button type="button" class="pill pill--time" data-seek="949.18">15:49</button>
+        </p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">9</span>
+          <p class="todo__title">Copy K8 to K9:K12 as formulas and number formatting</p>
+        </div>
+        <div class="todo__body">
+          <p>Copy <strong>K8</strong> and paste it into <strong>K9:K12</strong> using
+            <strong>Formulas and Number Formatting</strong>, so the rows keep their own background colors.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="1033.34">17:13</button>
+          <button type="button" class="pill pill--time" data-seek="1064.6">17:44</button>
+        </p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">10</span>
+          <p class="todo__title">In C5, August's share of the total, with an absolute reference; copy to D5:G5</p>
+        </div>
+        <div class="todo__body">
+          <p>In <strong>C5</strong>, enter a formula that divides August's total orders (<strong>C13</strong>) by
+            the total orders in <strong>I13</strong>. Make <strong>I13</strong> an <strong>absolute
+            reference</strong>, then copy the formula to <strong>D5:G5</strong>.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="1086.02">18:06</button>
+          <button type="button" class="pill pill--time" data-seek="1118.56">18:38</button>
+          <button type="button" class="pill pill--time" data-seek="1198.56">19:58</button>
+          <button type="button" class="pill pill--time" data-seek="1271.84">21:11</button>
+        </p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">11</span>
+          <p class="todo__title">Column sparklines in H17:H25, with high and low points</p>
+        </div>
+        <div class="todo__body">
+          <ul>
+            <li>In <strong>H17</strong>, insert a <strong>Column</strong> sparkline based on
+              <strong>C17:G17</strong>.</li>
+            <li>Show the <strong>High Point</strong> and <strong>Low Point</strong>.</li>
+            <li>Fill <strong>H18:H25</strong> from H17 <strong>without formatting</strong>.</li>
+          </ul>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="1309.76">21:49</button>
+          <button type="button" class="pill pill--time" data-seek="1355.68">22:35</button>
+          <button type="button" class="pill pill--time" data-seek="1380.24">23:00</button>
+        </p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">12</span>
+          <p class="todo__title">Copy I17's formula to I18:I25, formulas only</p>
+        </div>
+        <div class="todo__body">
+          <p>Copy <strong>I17</strong> and paste <strong>only the formula</strong> into
+            <strong>I18:I25</strong>.</p>
+        </div>
+        <p class="todo__meta"><button type="button" class="pill pill--time" data-seek="1406.64">23:26</button></p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">13</span>
+          <p class="todo__title">Make the chart an area chart, with a title and data labels</p>
+        </div>
+        <div class="todo__body">
+          <ul>
+            <li>Change the chart in <strong>J14:O25</strong> to an <strong>Area</strong> chart.</li>
+            <li>Enter <span class="mono">Average Orders per Month</span> as the chart title.</li>
+            <li>Show <strong>data labels</strong> for each month.</li>
+          </ul>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="1452.4">24:12</button>
+          <button type="button" class="pill pill--time" data-seek="1482.4">24:42</button>
+          <button type="button" class="pill pill--time" data-seek="1498.32">24:58</button>
+          <button type="button" class="pill pill--time" data-seek="1573.86">26:13</button>
+        </p>
+      </li>
+    </ol>
+
+    <h3>Submitting</h3>
+    <ol class="todo">
+      <li>
+        <div class="todo__top">
+          <span class="todo__num todo__num--setup" aria-hidden="true">E</span>
+          <p class="todo__title">Compare with the final figure, then save and close</p>
+        </div>
+        <div class="todo__body">
+          <p>Check your worksheet against the final figure in the instruction file: data labels on the chart, column
+            sparklines with high and low points, line sparklines with markers. Save the <span class="mono">_2</span>
+            file and close it. A file still open in Excel can upload incomplete.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="1607.82">26:47</button>
+          <button type="button" class="pill pill--time" data-seek="1637.52">27:17</button>
+        </p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num todo__num--setup" aria-hidden="true">F</span>
+          <p class="todo__title">Upload the _2 file and select Submit</p>
+        </div>
+        <div class="todo__body">
+          <p>Drag and drop it into the MindTap assignment and submit it for grading. Make sure it's the
+            <span class="mono">_2</span> file, not the <span class="mono">_1</span>.</p>
+        </div>
+        <p class="todo__meta"><button type="button" class="pill pill--time" data-seek="1637.52">27:17</button></p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num todo__num--setup" aria-hidden="true">G</span>
+          <p class="todo__title">Open the Graded Summary Report, and fix anything it flags</p>
+        </div>
+        <div class="todo__body">
+          <p>Your score is at the top. Read down the list to see which steps lost points. Fix just those in your
+            <span class="mono">_2</span> file, save and close it, then start a new attempt in MindTap and upload
+            again. You have up to ten attempts.</p>
+        </div>
+        <p class="todo__meta"><button type="button" class="pill pill--time" data-seek="1671.98">27:51</button></p>
+      </li>
+    </ol>
+  </section>
+
+  <!-- ============ Platform tabs ============ -->
+  <section aria-labelledby="platform-heading">
+    <h2 id="platform-heading">Windows and Mac differences</h2>
+    <p>The steps are the same on both. This week uses more of the ribbon than before (View, Data, Insert, the
+      Sparkline tab and Chart Design), and a couple of mouse and keyboard tricks that differ on a Mac. Pick your
+      platform.</p>
+
+    <div class="tabs">
+      <div class="tablist" role="tablist" aria-label="Choose your platform">
+        <button type="button" class="tab" role="tab" id="tab-win" aria-controls="panel-win" aria-selected="true">Windows</button>
+        <button type="button" class="tab" role="tab" id="tab-mac" aria-controls="panel-mac" aria-selected="false" tabindex="-1">Mac</button>
+      </div>
+
+      <div class="tabpanel" role="tabpanel" id="panel-win" aria-labelledby="tab-win" tabindex="0">
+        <h3>On Windows</h3>
+        <ul style="max-width:none">
+          <li><strong>Enable Editing.</strong> Downloaded files open in Protected View with a yellow bar across the
+            top. Select <span class="ui">Enable Editing</span> before anything works.</li>
+          <li><strong>Rename a sheet:</strong> double-click the sheet tab, or right-click it &rsaquo;
+            <span class="ui">Rename</span>.</li>
+          <li><strong>Unfreeze:</strong> <span class="ui">View &rsaquo; Freeze Panes &rsaquo; Unfreeze
+            Panes</span>.</li>
+          <li><strong>Rotate text:</strong> the <span class="ui">Orientation</span> button in the Home tab's Alignment
+            group, or the small launcher arrow in the Font or Alignment group &rsaquo; Alignment tab, and type 90.</li>
+          <li><strong>Paste options:</strong> the arrow under <span class="ui">Home &rsaquo; Paste</span>, or
+            right-click &rsaquo; <span class="ui">Paste Special</span>.</li>
+          <li><strong>Goal Seek:</strong> <span class="ui">Data &rsaquo; What-If Analysis &rsaquo; Goal Seek</span>.</li>
+          <li><strong>Sparklines:</strong> <span class="ui">Insert &rsaquo; Sparklines</span>. Select a sparkline and
+            the <span class="ui">Sparkline</span> tab appears with Sparkline Color, Marker Color and the High Point /
+            Low Point boxes.</li>
+          <li><strong>Absolute reference:</strong> <span class="mono">F4</span>. On many laptops you need
+            <span class="mono">Fn+F4</span>.</li>
+          <li><strong>Chart:</strong> click the chart, then <span class="ui">Chart Design &rsaquo; Change Chart
+            Type</span> and <span class="ui">Add Chart Element &rsaquo; Data Labels</span>.</li>
+        </ul>
+      </div>
+
+      <div class="tabpanel" role="tabpanel" id="panel-mac" aria-labelledby="tab-mac" tabindex="0" hidden>
+        <h3>On Mac</h3>
+        <p>Cengage's material is written for Windows. Most of this assignment matches, but check these before you
+          decide something is broken. I've done these assignments on a Mac myself. If a command genuinely isn't where
+          I say it is, message me through the Canvas Inbox rather than guessing at a substitute.</p>
+        <ul style="max-width:none">
+          <li><strong>No Protected View.</strong> There's no Enable Editing bar. The file opens ready to edit.</li>
+          <li><strong>Right-click</strong> is Control-click, or a two-finger click on a trackpad. That's how you reach
+            Rename, Column Width and Delete.</li>
+          <li><strong>Unfreeze:</strong> the View tab. When panes are frozen, its Freeze Panes button reads
+            <span class="ui">Unfreeze Panes</span>.</li>
+          <li><strong>Fill Without Formatting:</strong> right-dragging is hard on a trackpad. Drag the fill handle
+            normally, then click the <span class="ui">Auto Fill Options</span> button that appears and choose
+            <span class="ui">Fill Without Formatting</span>.</li>
+          <li><strong>Paste options:</strong> the arrow beside <span class="ui">Home &rsaquo; Paste</span>, or
+            <span class="ui">Edit &rsaquo; Paste Special</span> in the menu bar.</li>
+          <li><strong>Goal Seek:</strong> <span class="ui">Data &rsaquo; What-If Analysis &rsaquo; Goal Seek</span>,
+            the same as Windows.</li>
+          <li><strong>Absolute reference:</strong> <span class="mono">&#8984;+T</span> cycles the dollar signs the
+            way F4 does on Windows. Typing the dollar signs works too.</li>
+          <li><strong>Chart:</strong> click the chart, then the <span class="ui">Chart Design</span> tab, as on
+            Windows.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ Corrections ============ -->
+  <section aria-labelledby="corrections-heading">
+    <h2 id="corrections-heading">Since this was recorded</h2>
+    <p>A few things in the video are worth a note. <strong>Where this page and the video disagree, this page is
+      right.</strong></p>
+
+    <div class="callout callout--warn callout--wide">
+      <ul style="margin:0; max-width:none">
+        <li><strong>Goal Seek, C5 then C4.</strong> At 11:51 I type C5 in Set cell; at 12:32 I catch it and redo it
+          with <strong>C4</strong>. C4 is right.</li>
+        <li><strong>Two slips reading the steps.</strong> At 18:06 I say "I3" before correcting it to C13 and I13,
+          and at 21:49 I say "G17" before correcting it to C17 to G17.</li>
+        <li><strong>Step 12 was already done on my screen.</strong> At 24:06 I find I'd pasted the I17 formula in an
+          earlier attempt. On your file, I18:I25 will be empty until you paste it.</li>
+        <li><strong>"Freeze" in step 10.</strong> I describe dollar signs as freezing the row or column. Excel calls
+          that an absolute reference. It has nothing to do with Freeze Panes in step 2.</li>
+        <li><strong>"Canvas submission."</strong> At 27:39 I say drag the file into Canvas. I mean the MindTap
+          assignment page, which you open through Canvas. That's where the upload and Submit button are.</li>
+        <li><strong>Color names as spoken.</strong> The marker color in step 8 sounds like "Blue, Accent 2, Darker
+          25%" on the recording. Go by the exact color name in your instruction file.</li>
+        <li><strong>Two garbled spots.</strong> At 4:17 and 19:17 the automatic captions invented words that weren't
+          said. The transcript leaves them out; no instructions are missing.</li>
+        <li><strong>Module release.</strong> Modules post on the Friday before the week begins, so Week 9 opened
+          <strong>Friday 10/23</strong>. You can start early.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ AI policy ============ -->
+  <section aria-labelledby="ai-heading">
+    <h2 id="ai-heading">Using AI on this assignment</h2>
+    <p>The course AI policy is <strong>Limited</strong>. You can ask an AI tool to explain what an absolute
+      reference does, to tell you where the sparkline tools are in Mac Excel, to troubleshoot a Goal Seek that won't
+      behave, or to quiz you afterward. <strong>You build the Excel file yourself.</strong> Spell check is an ordinary
+      Excel feature and is always allowed.</p>
+    <p>The practical reason: the 200-point Excel Project in Week 11 expects you to copy formulas with the right
+      references and format a large sheet on your own.</p>
+  </section>
+
+  <!-- ============ What's next ============ -->
+  <section aria-labelledby="next-heading">
+    <h2 id="next-heading">What's next</h2>
+    <p>Once the guided assignment is submitted, go straight to the <strong>Excel Module 3 homework</strong> in
+      MindTap. It's the same commands on a different workbook, with no walkthrough, for 100 points. Both are due
+      <strong>Sunday 11/1</strong>.</p>
+    <p>Next week is Excel Module 4, the last one. Then the 200-point <strong>Excel Project</strong> in Week 11, due
+      <strong>Sunday 11/15 at 11:59 PM</strong>. It can't be dropped and it isn't accepted late unless you arrange it
+      with me before the due date.</p>
+    <p>Stuck on a step after re-watching it? Send me a message in the Canvas Inbox and say which step number and what
+      you tried. That's faster than burning attempts.</p>
+  </section>
+
+  <!-- ============ Quick reference ============ -->
+  <section aria-labelledby="reference-heading">
+    <h2 id="reference-heading">Quick reference</h2>
+    <div class="table-scroll" tabindex="0" role="region" aria-label="Quick reference table, scrollable">
+      <table>
+        <caption>Every value this assignment asks for, in one place. Confirm each one against your own instruction
+          file.</caption>
+        <thead>
+          <tr><th scope="col">Step</th><th scope="col">Where it lives</th><th scope="col">Exact setting</th></tr>
+        </thead>
+        <tbody>
+          <tr><th scope="row">Your name</th><td>Documentation sheet</td><td>Your first and last name in B6</td></tr>
+          <tr><th scope="row">1. Sheet name</th><td>Double-click the sheet tab</td><td><span class="mono">Orders and Inventory</span></td></tr>
+          <tr><th scope="row">2. Panes, alignment</th><td>View &rsaquo; Freeze Panes; Home &rsaquo; Middle Align</td><td>Unfreeze Panes; A1 Middle Align</td></tr>
+          <tr><th scope="row">3. Move, date</th><td>Home &rsaquo; Cut, Paste; type in the cell</td><td>K2 cut to A2; B2: <span class="mono">=NOW()</span></td></tr>
+          <tr><th scope="row">4. Merge, rotate, width</th><td>Merge &amp; Center; Format Cells &rsaquo; Alignment; right-click &rsaquo; Column Width</td><td>A7:A13 merged; text 90&deg;; column A width 6</td></tr>
+          <tr><th scope="row">5. Format, indent</th><td>Home &rsaquo; Format Painter; Decrease Indent</td><td>B9:K9 formatting to B11:K11; B12 indent down one level</td></tr>
+          <tr><th scope="row">6. Values</th><td>Paste &rsaquo; Paste Values; right-click &rsaquo; Delete</td><td>C28:G28 values into C12:G12; row 28 deleted</td></tr>
+          <tr><th scope="row">7. Goal Seek</th><td>Data &rsaquo; What-If Analysis &rsaquo; Goal Seek</td><td>Set cell C4, To value 500, By changing C11</td></tr>
+          <tr><th scope="row">8. Line sparklines</th><td>Insert &rsaquo; Sparklines &rsaquo; Line; Sparkline tab</td><td>H8 from C8:G8; filled to H9:H13 without formatting; Tan, Background 2, Darker 90%; Markers on, marker color per your file</td></tr>
+          <tr><th scope="row">9. Formulas and number formats</th><td>Paste &rsaquo; Formulas and Number Formatting</td><td>K8 into K9:K12</td></tr>
+          <tr><th scope="row">10. Share of total</th><td>Type in the cell; F4</td><td>C5: <span class="mono">=C13/$I$13</span>, copied to D5:G5</td></tr>
+          <tr><th scope="row">11. Column sparklines</th><td>Insert &rsaquo; Sparklines &rsaquo; Column; Sparkline tab</td><td>H17 from C17:G17; High Point and Low Point; filled to H18:H25 without formatting</td></tr>
+          <tr><th scope="row">12. Formulas only</th><td>Paste &rsaquo; Formulas</td><td>I17 into I18:I25</td></tr>
+          <tr><th scope="row">13. Chart</th><td>Chart Design &rsaquo; Change Chart Type; Add Chart Element</td><td>Area chart; title <span class="mono">Average Orders per Month</span>; data labels shown</td></tr>
+          <tr><th scope="row">File name</th><td>File &rsaquo; Save As</td><td>The <span class="mono">_2</span> version (.xlsx), in Downloads</td></tr>
+          <tr><th scope="row">Submission</th><td>MindTap</td><td>Upload the <span class="mono">_2</span> file, select Submit, read the Graded Summary Report</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <p class="footnote">CSC 104 &middot; Computers and Computer Applications &middot; Fall 2026, Section 0840 &middot;
+    Mendocino College &middot; Instructor: David Pai &middot; <span class="mono">dpai@mendocino.edu</span>.
+    Nothing you type on this page is saved or submitted. Use the Canvas navigation outside this page to get back to
+    the Week 9 module.</p>
+</main>
+
+
+
+
+<script>
+(function () {
+  "use strict";
+
+  var VIDEO_ID = "1l5JwdqOFD4";
+
+  /* Transcript source: weeks/week09/csc104-excel-3-guided-corrected.vtt — the
+     Whisper output with its hallucinated passage removed, its repeated and
+     duplicate cues collapsed, and its Excel command names, cell references, proper
+     nouns and punctuation restored. Inlined rather than fetched so this page
+     stays self-contained inside the Canvas iframe. Keep the two copies in step:
+     if the YouTube captions are re-uploaded from the .vtt, re-paste it here
+     too. */
+  var vttContent = `WEBVTT
+
+NOTE
+CSC 104 — Week 9 — Excel Module 3 Guided Assignment Walkthrough (YouTube 1l5JwdqOFD4)
+Corrected transcript. Source: csc104-excel-3-guided.vtt (Whisper output).
+Cleanup applied: the hallucinated passage at 4:17–4:18 ("months or dates or
+days like I say I'm like just one column with a lot of hours / and I see a
+total of six days...") removed, and "names" restored before "on the left"
+from the instructor's own "it keeps the names there"; the garbled line at
+19:17 ("F13 over i3 ... F0 over a5莊 F0 over a8") removed; the repeated
+"paste values only" cue at 10:44, the rolling duplicate at 9:44, the stray
+"and" at 15:00 and other repeated fragments collapsed; sentence casing and
+punctuation restored throughout (Whisper dropped both almost from the start);
+Excel command names and proper nouns corrected (Excel Module 3, Cengage,
+Downloads, Date Modified, Page Width, Enable Editing, File, Save As, Orders,
+Orders and Inventory, Elite Fashion, View, Freeze Panes, Unfreeze Panes,
+Home, Alignment, Top, Middle, Bottom, Left, Center, Right, NOW, Insert
+Function, Search for a function, Merge & Center, Format Cells, Column Width,
+Format Painter, Decrease Indent, Increase Indent, Leggings, Paste Values,
+Values and Number Formatting, Values and Source Formatting, Delete, Goal
+Seek, Data, What-If Analysis, Set cell, To value, By changing cell, Silk
+Blouses, Sparklines, Line, Column, Data Range, Location Range, Fill Without
+Formatting, Sparkline Color, Marker Color, Markers, High Point, Low Point,
+Formulas and Number Formatting, F4, Chart Design, Change Chart Type, Area,
+Chart Title, Ctrl+V, Ctrl+Z, Keep Text Only, Add Chart Element, Data Labels,
+Canvas, Graded Summary Report). "free paint freeze paints" → Freeze Panes;
+"infer insert function" → Insert Function; "decrease the index" → indent;
+"use orders and inventory" → Orders and Inventory; "tan background to darker
+90%" → Tan, Background 2, Darker 90%; "blue accent to darker 25" written as
+Blue, Accent 2, Darker 25% (the accent number is as heard); "j14 to 025" →
+J14 to O25; "set the seat itself and C 4" → set the cell C4; "Clothesline.com
+and design company" → a clothing line and design company. At 11:36 the audio
+says "C7" for the cell he goes to; written as "up here" rather than
+reconstructed. The sparkline values at 14:09 are written as heard (456, 385,
+390, 220, 155). The instructor's "freeze" for absolute references is his own
+word and is kept. Short cues merged into readable 1–2 sentence lines;
+timestamps normalized to HH:MM:SS.mmm. The instructor's voice, hedges and
+on-camera corrections are preserved, including "oopsie", setting C5 in Goal
+Seek and correcting it to C4 at 12:32, "I3... I mean, sorry, C13" at 18:22,
+"G17... C17 to G17, sorry" at 21:49, "which apparently I did already" at
+24:06, and the Ctrl+V title paste that he undoes at 25:37.
+
+00:00:00.040 --> 00:00:24.000
+Hello, and welcome. This is the Excel Module 3 guided assignment, on large worksheets, charting, and what-if analysis. Okay, so we're gonna start it the way we always do. We're gonna load the project from Cengage, and then once it's loaded,
+
+00:00:24.000 --> 00:00:52.580
+we'll start it, and then we'll download the files that we need. Okay, and so for this one we need two files, our instruction file and our starting Excel file. Okay, and then we'll open up that folder, which is Downloads. I'm going to click Date Modified twice just to update it, and I don't want this one.
+
+00:00:52.580 --> 00:01:23.980
+Okay, so first I have my instructions. Okay, so I will change the view to Page Width, and then I will expand this so that we can see it really clearly. And then I will open up my Excel spreadsheet. Again, I have to Enable Editing if it asks me to, and then I will use the zoom slider to blow it up a little bit so I
+
+00:01:24.000 --> 00:01:48.420
+can read it better. All right, so let's get started. Okay, first thing is I want to change the name; I want to save the second copy. So I'll go back to Excel, File, Save As, replace that last _1 with _2, and
+
+00:01:48.420 --> 00:02:06.060
+save it. Okay, and then the second part is to make sure your name is in B6, and my name is in B6. You can see here, I need to move over... there's a... it's in B6. Okay, so
+
+00:02:06.060 --> 00:02:28.260
+I'm good to go. All right, the scenario is that you're helping Elise Lucero, who's a senior purchasing manager for Elite Fashion, a clothing line and design company in L.A. She created a workbook projecting the company's orders and inventory, and wants your help completing and formatting it.
+
+00:02:28.260 --> 00:02:48.300
+Okay, so the first thing is: go to the Orders worksheet. Rename the Orders worksheet to use Orders and Inventory as the worksheet name. Okay, so we're gonna go over here to Orders. So we're on the Orders... click on Orders. I will blow this up a little bit, just so that it's... oopsie... we can see it.
+
+00:02:48.300 --> 00:03:18.120
+Now, to change the name, what you do is you just double-click on the name. It highlights the whole name, but I want to keep Orders, so I'm just gonna hit the Right Arrow, which will take me to the end, and then add space, and, space, Inventory. Lowercase "and," and Inventory. So if I got it right, then hit Enter to accept it. There's my new name of my worksheet.
+
+00:03:18.300 --> 00:03:48.180
+Step 2: unfreeze the top two rows of the worksheet, then middle align the contents of the merged cell A1. Okay, so you can freeze... so if I scroll down, what you'll see, you see Elite Fashion: the first two rows always stay there, because they're frozen. Okay, so all you have to do is go to View, and then, for the top two rows,
+
+00:03:48.180 --> 00:04:17.260
+Freeze Panes. That is the Freeze Panes, and then click that down arrow and go select Unfreeze Panes. And now when I scroll, rows 1 and 2 just scroll up; they're not frozen. Okay, Freeze Panes is great when you have, like, a title bar across the top and a lot of data, and you want to scroll down and see the column headings all the time. And you can also freeze rows the same way, like you have
+
+00:04:18.180 --> 00:04:33.540
+names on the left, or in this case Orders, and you have a bunch of sales to the right. You could freeze that column B, so that as you go across, it keeps the names there. Okay, so anyway,
+
+00:04:34.740 --> 00:04:58.020
+that's why I use Freeze Panes. Freeze Panes, Unfreeze, and then middle align the contents of merged cell A1. Okay, so if I click on cell A1, you'll see it's across here; it's thick. Okay, so we're gonna go to Home. Now, it says middle align. So Middle is vertical alignment; Center is left and right, or
+
+00:04:58.020 --> 00:05:15.620
+horizontal alignment. So in the Alignment group, the top three things here are vertical: Top, Middle, Bottom. And then the ones below it are Left, Center, Right. Okay, so Middle, to move it in the middle vertically.
+
+00:05:17.940 --> 00:05:46.500
+All right, we're on step 3: cut the contents of cell K2 and paste them in cell A2, and then in cell B2 insert a formula that uses the NOW function to display today's date. Okay, so first thing, we're going to go to K2, just here. We're going to cut it, and then we're going to paste it into A2.
+
+00:05:48.420 --> 00:06:11.220
+Okay, and then in B2 we use the NOW function. There's a couple ways. If you don't know NOW... the answer is really simple. If I type it in, the answer is equals NOW, open, close parenthesis. Hit Enter. There's the date. Okay, but if you don't know what NOW means, you didn't know that, you can...
+
+00:06:13.140 --> 00:06:40.260
+What you can do, and I like to do this a lot if I'm unsure, is use this, up in here in the Formula Bar: use this Insert Function button. So use Insert Function. Okay, and let me fill this up just a little bit so you can see it better. And so, um, what I want is up in this box, Search,
+
+00:06:43.940 --> 00:07:10.500
+I want to just type a brief description, and I could type NOW. But I have to go... and here comes NOW, right? So I can select this function: returns the current date and time formatted as a date and time. And say OK. All right, and then it says the formula result, whatever. Say OK.
+
+00:07:13.620 --> 00:07:21.140
+All right, and so you can see it just put NOW in there and put the date in there, because the formula is equals NOW.
+
+00:07:24.980 --> 00:07:46.980
+Okay, so that's the NOW function. Number 4: merge and center the range A7 to A13, rotate the text 90 degrees in the merged cell, and then change the width of column A to 6. Okay, so what we want to do is we take A7, which says Projected, down to A13.
+
+00:07:47.940 --> 00:08:16.980
+We want to Merge & Center; that's the first thing I want to do. And then we want to rotate the text so it's vertical, like the text below it. Okay, so we can go into Font, blow that up, Alignment, and on the right side here, this is the alignment. We can manually do it like this, rotate it up to 90, or we could type 90 in the thing and just say OK. And there's Projected Orders
+
+00:08:18.660 --> 00:08:31.060
+at 90 degrees. And then we can right-click on the column, set the Column Width to 6, and say OK, and now our column width is 6.
+
+00:08:37.780 --> 00:09:03.860
+Okay: copy the formatting from B9 to K9 and apply it to B11 to K11. Okay, so we're going to go to B9, this one here, B9 to K9, and then we hit Format Painter. And it wants us to apply it to B11 to K11, so all we have to do is click on B11,
+
+00:09:05.620 --> 00:09:23.700
+and it'll copy the whole Format Painter from B to K over to B to K. Okay, so if I click out, you'll see row 9 and row 11 now look identical in terms of the format.
+
+00:09:27.860 --> 00:09:57.680
+And so, B12: decrease the indent by one level. Let's do that. So let's go to B12. Leggings is indented. Under Number... not Number, under Alignment, we have our outdent and indent, Decrease Indent and Increase Indent. So we'll decrease the indent now. So that's the adjustment we did to that one, so that it lines up with all the other information.
+
+00:09:57.680 --> 00:10:29.080
+Okay, we're on 6: copy the values in the range C28 to G28, C to G28, and then paste only the values in the range C12 to G12. Okay, so down here at the bottom we have some data here about leggings, and we want to copy it into here, but we only want the data. We don't want the other formatting stuff, because we want to keep this formatting that's up here in this table. Okay, so we will copy this. I like this data we want.
+
+00:10:29.080 --> 00:11:06.940
+We'll go Copy. Then we're gonna click up here; we can just click the first cell. But under Paste, when we click on Paste, we want to paste values only. So we could Paste Values: Values, Values and Number Formatting, Values and Source Formatting. Okay, it says paste only the values in C12 to G12. Okay, so we go to C12 and we go Paste Values.
+
+00:11:06.940 --> 00:11:29.180
+All right, so it just pastes the numbers in and keeps the formatting that was there. And now it wants us to delete the old data, since we just pasted the values in. So I'll just click on the row number, right-click, and go Delete. Delete the whole row. Okay, so we delete row 28. Now we're on number 7:
+
+00:11:29.180 --> 00:11:51.460
+use Goal Seek to set the cell C4 to 500 by changing C11. Okay, so Goal Seek is a what-if. So I'll go up here. So right now August has the average orders of 527. We wanted it to be 500; we wanted to see what it would take to make it 500.
+
+00:11:51.460 --> 00:12:28.980
+Okay, so we go to Data, What-If Analysis, Goal Seek. Okay, Set cell: C4... because I started C5... I mean, it's supposed to be in C5, I think... to 500, by changing C11, which is Silk Blouses, C11. Okay, I think that's the row I got right. Say OK.
+
+00:12:32.180 --> 00:12:55.780
+Oh, I think... I'm sorry, it's supposed to be C4. Set cell C4 to 500, because this formula has to use these numbers, and then it'll run through the formula. Okay, and it'll cycle through until it gets the average orders to be 500, and it'll adjust the orders for Silk Blouses to get that
+
+00:12:55.780 --> 00:13:15.620
+average to be 500. Sorry about that: C4, 500, changing C11. Okay, so you can kind of do things like, uh, how much do I have to do to create this situation, or how much do I have to do to create that situation, and then it'll run the calculation for you.
+
+00:13:15.620 --> 00:13:38.100
+Okay: in cell H8, insert a line sparkline based on the data in range... we'll do this one sentence at a time, because there's a lot of stuff here. H8: insert a line sparkline based on the data in range C8 to G8. Okay, H8; we're going to base it on this data, C to G.
+
+00:13:38.100 --> 00:14:15.960
+And so what we want to do is Insert, under Sparklines, a Line. Data Range: C8 to G8. Yeah, so you click on these; it lets you pick the cells. Then you click on that box on the right to go back. And we want it in H8. Say OK. And now we have a sparkline, which just shows the trend, where it starts at 456, 385, 390,
+
+00:14:15.960 --> 00:14:47.340
+220, 155. Okay, so: fill the range H9 to H13 without formatting, based on the contents in cell H8. So what we want to do... previously, when we wanted to fill, we could grab the fill handle with our left mouse button and drag it down, boom, and it would fill, but it brings the formatting with it. We don't want to do that, okay? We want to fill without formatting. So to do
+
+00:14:47.340 --> 00:15:05.620
+that, what you do: it's the same thing, except you use the right mouse button to click and drag, and then it says Fill Without Formatting. It gives you some options, and we'll choose Fill Without Formatting. And now it keeps all the old formatting, like the background colors and stuff.
+
+00:15:05.620 --> 00:15:49.180
+Okay, so that's Fill Without Formatting. Change the color of the sparklines in the range H8 to H13 to Tan, Background 2, Darker 90%. Okay, so you can click here; we can click them all, however you want to do it. Okay, Sparklines... Sparklines, I can use these: Sparkline Color, Tan, Darker 90%. Bang. They all should be Tan, Darker 90%.
+
+00:15:49.180 --> 00:16:18.380
+Okay: add markers, and then change the marker color to Blue, Accent 2, Darker 25%. Okay, so then we want to add Markers, and then we can change our Marker Color, to Markers, to Blue, Accent 2... it's Darker 25%. Right.
+
+00:16:25.780 --> 00:17:09.340
+Make sure... look... quick... Darker 25%. So Marker Color, Markers, Blue, Accent 2, Darker 25%. Okay, so now I have dots as well on those lines. Okay, and again, it's hard to see. You could see it if you... let me show the magnifier. Okay, so these are little trend lines that show the trends, and they're just this data in an X-Y kind of line format. All right, so
+
+00:17:13.340 --> 00:17:44.600
+all right, all right, number 9. So that's number 8 finished. Number 9: copy the formula in K8 and paste the formula and number formatting in the range K9 to K12. Okay, so I'm gonna go to K8. I'm gonna take this formula here, I copy it, and then we want to paste it into K9 to K12. We want to
+
+00:17:44.600 --> 00:18:01.220
+paste it with Formulas and Number Formatting. So I paste the formulas and the number formatting. It looks the same, but we don't change the background color; we're not trying to do that.
+
+00:18:06.020 --> 00:18:38.560
+All right, number 10: in cell C5, insert a formula that divides the total orders for August by the total number of orders in cell I3... use an absolute reference to cell I13... I mean, sorry: C13, by total orders in I13. Use an absolute cell reference for I13, and
+
+00:18:38.560 --> 00:19:12.080
+copy the formula to the range D5 to G5. Okay, so we want to basically... we're going to get that percentage of total orders for each month. Okay, so what we want to do here in C5 is we want to put in equals C13 divided by I13.
+
+00:19:12.080 --> 00:19:33.120
+Okay, and so when we copy this over, we want this to be D13 over I13, E13 over I13, F13 over I13, G13 over I13. Okay, so we want these numbers divided by I13. So to do that, what we need to do is make this, instead of I13, we make it dollar sign I dollar sign 13.
+
+00:19:33.120 --> 00:19:58.560
+Okay, so I could go in here and I could manually type these dollar signs: dollar sign, dollar sign. Okay, notice it turns red, and that's to say this is an absolute cell reference, meaning when I copy it over, it's always going to say I13, anywhere I copy it, right?
+
+00:19:58.560 --> 00:20:26.720
+There's a shortcut to do that, and that is: when you click inside that I13 value, you hit F4 on your keyboard, and it puts dollar sign, dollar sign. If I hit F4 again, okay, it's... dollar sign letter, which is the column, so it says freeze the column; dollar sign 13 is freeze row 13. So it says always go to column I and row 13.
+
+00:20:27.520 --> 00:21:09.840
+I can hit F4 again, and it'll say go to I, which is a relative reference from where I am, which means go right from C to I, whatever that is: one, two, three, four, five, six. Go six columns right, and always use row 13. You hit it again, it says always use column I, and in this case row 13 is from 5... it's one, two, three, four, five, six, seven, eight rows below me. All right, and you can go F4 and it takes them all away. So you can cycle through all these four options.
+
+00:21:11.840 --> 00:21:46.560
+Freeze nothing, freeze everything, freeze row, freeze column, freeze nothing. We want everything. Okay, and then we want to copy that across, and we can do it this way because the format is identical for all of them, right? So we're not violating anything; we're not changing the format, because everything else to the right of that is in the same format. Okay, so we moved it to D5 to G5.
+
+00:21:49.760 --> 00:22:28.480
+In cell H17, insert a column sparkline based on G17 to... C17 to G17, sorry. So in H17, down here, the trend here... we're going to insert a sparkline, but this time we're going to use columns instead of a line. Okay, Data Range is going to be, again, C17 to G17. Okay, our Location is going to be H17, and say OK. There it is.
+
+00:22:35.680 --> 00:23:00.240
+Display the high and low point on the sparkline, and then fill the range H18 to H25 without formatting, based on the sparkline in cell H17. Okay, so we want to add the high point and the low point. So we want High Point, so we'll select High Point to show, and Low Point to show. You can barely see it: it's this second column one here, really low, and then the high point is the last one.
+
+00:23:00.240 --> 00:23:20.640
+And now we're going to fill without formatting, by right-click and drag, and Fill Without Formatting. Okay, it'll keep our high and low point and the formatting we did on that column sparkline originally; it just won't change the background colors and stuff like that.
+
+00:23:26.640 --> 00:24:09.600
+Okay: copy the formula in I17 and paste only the formula in I18 to I25. So we take this one, we'll copy it, and we want to paste it in from here to 25, but we want to paste the formula, not anything else, right? Only the formula. So we will paste the formula... which apparently I did already. Okay.
+
+00:24:12.400 --> 00:24:41.200
+All right. Step 13: change the chart in the range J14 to O25... so let's just talk about this chart here. Notice it starts here in J14 and goes to O25; this is kind of where it is on the page... to an area chart. That's the first thing. So we're on the chart, and we're going to go Chart Design,
+
+00:24:42.400 --> 00:24:53.360
+and we will change the chart type. That's an option, one of the items in our menu: Change Chart Type. We will select Area and say OK, and now it's an area chart.
+
+00:24:58.320 --> 00:25:37.880
+Enter Average Orders per Month as the chart title. I'm just going to cheat a little bit: I'm going to copy this, and I'm going to go over to my chart, and where it says Chart Title, it's just a text box. I'm gonna highlight it all. Okay, and I'm in there, and what I want to do is paste it, so I'm gonna use Ctrl+V, paste. There's Average Orders per Month. Now, the problem is, I actually,
+
+00:25:37.880 --> 00:26:13.140
+because I did that, I changed the formatting, because I copied the formatting. So I can use Ctrl+Z to undo that. I should be able... it doesn't allow me to really paste special kind of stuff. Okay, I can use Home, I can go Paste, Keep Text Only: Average Orders per Month. That would be like typing it over top.
+
+00:26:13.860 --> 00:26:47.280
+All right: show data labels for each month. Okay, so in our Chart Design... our Format... sorry, Chart Design. I'm in here, right, Area. Add Chart Element: we want Data Labels, and we want to show them. Okay, and so the numbers are now showing in the middle as we go across.
+
+00:26:47.820 --> 00:27:17.520
+Let's review this. And so it says it should look like this. Notice the data labels show up in the middle: 500, 495, 603. Here's our vertical trend lines, here's our horizontal line sparklines. These are column sparklines, and those are line sparklines with markers. Okay, it's pretty much what everything looks like; it looks the same to me.
+
+00:27:17.520 --> 00:27:51.980
+So let's save it. And you probably should save it... I would save it after everything I do, just so I know I don't lose anything. And we can close it, and then we can go in here, find the _2, drag it into our Canvas submission, submit it, get our Graded Summary Report, take a quick look at it, and what
+
+00:27:51.980 --> 00:28:30.680
+we're looking for is to see how we did. Here I got 25 out of 25. If you didn't get 25, again, obviously, go down and look to see where you missed something. Okay, so that's, uh, working in Module 3: um, you know, using sparklines, using, um, charting, changing charts, how to fill a range, how to copy and paste with formatting, without formatting, stuff like that. Okay, see you next time.`;
+
+  var player = null, timeUpdater = null, parsedTranscript = [], playerReady = false;
+
+  try {
+    if (!CSS.supports("selector(:focus-visible)")) { document.body.classList.add("no-fv"); }
+  } catch (e) { document.body.classList.add("no-fv"); }
+
+  /* ---------------- VTT parsing ---------------- */
+  function timeToSeconds(timeStr) {
+    if (!timeStr) { return 0; }
+    var parts = timeStr.trim().split(":");
+    if (parts.length === 2) {
+      return (parseInt(parts[0], 10) || 0) * 60 + (parseFloat(parts[1]) || 0);
+    }
+    if (parts.length === 3) {
+      return (parseInt(parts[0], 10) || 0) * 3600 + (parseInt(parts[1], 10) || 0) * 60 + (parseFloat(parts[2]) || 0);
+    }
+    return 0;
+  }
+
+  function formatTime(sec) {
+    sec = Math.max(0, Math.floor(sec));
+    var h = Math.floor(sec / 3600), m = Math.floor((sec % 3600) / 60), s = sec % 60;
+    var mm = (h > 0 && m < 10) ? "0" + m : String(m);
+    return (h > 0 ? h + ":" : "") + mm + ":" + (s < 10 ? "0" + s : s);
+  }
+
+  function parseVtt(vttText) {
+    var blocks = vttText.trim().split(/\n\n+/);
+    var cues = [];
+    blocks.forEach(function (block) {
+      var trimmed = block.trim();
+      if (!trimmed || trimmed.indexOf("WEBVTT") === 0 || trimmed.indexOf("NOTE") === 0) { return; }
+      var lines = trimmed.split("\n");
+      var timeLine = null, timeIndex = -1;
+      for (var i = 0; i < lines.length; i++) {
+        if (lines[i].indexOf("-->") !== -1) { timeLine = lines[i]; timeIndex = i; break; }
+      }
+      if (!timeLine) { return; }
+      var ends = timeLine.split("-->");
+      var text = lines.slice(timeIndex + 1).join(" ").trim();
+      if (!text) { return; }
+      cues.push({ start: timeToSeconds(ends[0]), end: timeToSeconds(ends[1]), text: text });
+    });
+    return cues;
+  }
+
+  /* ---------------- Transcript panel ---------------- */
+  function seek(seconds) {
+    if (!player || !player.seekTo) { return false; }
+    player.seekTo(seconds, true);
+    if (player.playVideo) { player.playVideo(); }
+    return true;
+  }
+
+  function scrollPlayerIntoView() {
+    var frame = document.getElementById("video-container");
+    if (frame && frame.scrollIntoView) { frame.scrollIntoView({ behavior: "smooth", block: "center" }); }
+  }
+
+  function populateTranscript() {
+    var container = document.getElementById("transcript-container");
+    if (!container) { return; }
+    container.innerHTML = "";
+    parsedTranscript.forEach(function (cue, i) {
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "transcript-line";
+      btn.dataset.start = cue.start;
+      btn.dataset.end = cue.end;
+      btn.dataset.index = i;
+
+      var stamp = document.createElement("span");
+      stamp.className = "t";
+      stamp.textContent = formatTime(cue.start);
+
+      var body = document.createElement("span");
+      body.className = "tx";
+      body.textContent = cue.text;
+
+      btn.appendChild(stamp);
+      btn.appendChild(body);
+      btn.setAttribute("aria-label", "Jump to " + formatTime(cue.start) + ". " + cue.text);
+
+      btn.addEventListener("click", function () {
+        if (seek(cue.start)) { scrollPlayerIntoView(); }
+      });
+      container.appendChild(btn);
+    });
+  }
+
+  /* ---------------- Active-line highlight ---------------- */
+  var lastAnnounced = null;
+  function announceLine(text) {
+    if (text === lastAnnounced) { return; }
+    lastAnnounced = text;
+    var s = document.getElementById("transcript-status");
+    if (s) { s.textContent = text || ""; }
+  }
+
+  function highlightCurrentLine() {
+    if (!player || !player.getCurrentTime) { return; }
+    var now = player.getCurrentTime();
+    var lines = document.querySelectorAll("#transcript-container .transcript-line");
+    var active = null;
+    Array.prototype.forEach.call(lines, function (line) {
+      var start = parseFloat(line.dataset.start), end = parseFloat(line.dataset.end);
+      if (now >= start && now < end) { active = line; }
+    });
+    var prev = document.querySelector("#transcript-container .is-active");
+    if (active === prev) { return; }
+    if (prev) { prev.classList.remove("is-active"); }
+    if (active) {
+      active.classList.add("is-active");
+      var body = active.querySelector(".tx");
+      announceLine(body ? body.textContent : active.textContent);
+      if (!active.hidden) { active.scrollIntoView({ behavior: "smooth", block: "center" }); }
+    }
+  }
+
+  /* ---------------- Panel height ---------------- */
+  function syncTranscriptHeight() {
+    var videoContainer = document.getElementById("video-container");
+    var panel = document.getElementById("transcript-container");
+    if (!videoContainer || !panel) { return; }
+    // Match the panel to the video only when the two columns actually sit side
+    // by side. Compared by rendered position rather than a viewport-width test,
+    // because in a Canvas iframe a media query measures the iframe, not the
+    // browser window, and can disagree with the flex-wrap result.
+    var videoCol = videoContainer.parentNode;
+    var transcriptCol = panel.parentNode;
+    var sideBySide = Math.abs(
+      transcriptCol.getBoundingClientRect().top - videoCol.getBoundingClientRect().top) < 40
+      && transcriptCol.getBoundingClientRect().left !== videoCol.getBoundingClientRect().left;
+    // Side by side, the panel should end level with the video, so subtract the
+    // heading/search row that sits above it inside the transcript column.
+    var head = transcriptCol.querySelector(".transcript-head");
+    var headH = head ? head.offsetHeight + 8 : 0;
+    var h = sideBySide ? Math.max(240, videoContainer.offsetHeight - headH) + "px" : "24rem";
+    panel.style.height = h;
+    panel.style.maxHeight = h;
+  }
+
+  /* ---------------- Transcript search ---------------- */
+  function escapeRe(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); }
+
+  function runFilter(term) {
+    var lines = document.querySelectorAll("#transcript-container .transcript-line");
+    var status = document.getElementById("transcript-filter-status");
+    var q = term.trim().toLowerCase();
+    var shown = 0;
+
+    Array.prototype.forEach.call(lines, function (line) {
+      var body = line.querySelector(".tx");
+      var cue = parsedTranscript[parseInt(line.dataset.index, 10)];
+      if (!body || !cue) { return; }
+      if (!q) {
+        body.textContent = cue.text;
+        line.hidden = false;
+        shown++;
+        return;
+      }
+      if (cue.text.toLowerCase().indexOf(q) === -1) {
+        body.textContent = cue.text;
+        line.hidden = true;
+        return;
+      }
+      line.hidden = false;
+      shown++;
+      // Rebuild with <mark> around the matches, without using innerHTML on
+      // user-supplied text.
+      body.textContent = "";
+      var re = new RegExp(escapeRe(term.trim()), "ig");
+      var last = 0, m;
+      while ((m = re.exec(cue.text)) !== null) {
+        if (m.index > last) { body.appendChild(document.createTextNode(cue.text.slice(last, m.index))); }
+        var mk = document.createElement("mark");
+        mk.textContent = m[0];
+        body.appendChild(mk);
+        last = m.index + m[0].length;
+        if (m[0].length === 0) { re.lastIndex++; }
+      }
+      if (last < cue.text.length) { body.appendChild(document.createTextNode(cue.text.slice(last))); }
+    });
+
+    if (status) {
+      status.textContent = q
+        ? (shown === 0 ? "No transcript lines match " + term : shown + " transcript line" + (shown === 1 ? "" : "s") + " match " + term)
+        : "Showing the whole transcript.";
+    }
+  }
+
+  function wireSearch() {
+    var input = document.getElementById("transcript-filter");
+    if (!input) { return; }
+    var t = null;
+    input.addEventListener("input", function () {
+      clearTimeout(t);
+      t = setTimeout(function () { runFilter(input.value); }, 250);
+    });
+  }
+
+  /* ---------------- Seek buttons (topic index + step pills) ----------------
+     Buttons wired to the embedded player, never youtu.be?t= links: a time link
+     would navigate the Canvas iframe away from this page. If the player never
+     comes up, the buttons are turned back into plain text so the index reads
+     as a reference list rather than as controls that silently do nothing. */
+  function wireSeekButtons() {
+    var btns = document.querySelectorAll("[data-seek]");
+    Array.prototype.forEach.call(btns, function (btn) {
+      var t = parseFloat(btn.getAttribute("data-seek")) || 0;
+      var item = btn.closest(".topic-index__item") || btn.closest(".todo > li") || btn.closest("tr");
+      var text = item ? item.querySelector(".topic-index__label, .todo__title, th[scope=row]") : null;
+      btn.setAttribute("aria-label", "Jump to " + formatTime(t) + (text ? " — " + text.textContent : "") + " in the video");
+      btn.addEventListener("click", function () {
+        if (seek(t)) { scrollPlayerIntoView(); }
+      });
+    });
+  }
+
+  function degradeToStatic(message) {
+    if (playerReady) { return; }
+    document.body.classList.add("no-player");
+    var idx = document.getElementById("topic-index");
+    if (idx) { idx.classList.add("topic-index--static"); }
+    Array.prototype.forEach.call(document.querySelectorAll("[data-seek]"), function (btn) {
+      btn.disabled = true;
+      btn.removeAttribute("aria-label");
+    });
+    var note = document.getElementById("topic-index-fallback");
+    if (note) { note.hidden = false; note.textContent = message; }
+  }
+
+  /* ---------------- Platform tabs ---------------- */
+  function wireTabs() {
+    var tablist = document.querySelector(".tablist");
+    if (!tablist) { return; }
+    var tabs = Array.prototype.slice.call(tablist.querySelectorAll('[role="tab"]'));
+
+    function select(tab, focus) {
+      tabs.forEach(function (t) {
+        var selected = t === tab;
+        t.setAttribute("aria-selected", selected ? "true" : "false");
+        t.tabIndex = selected ? 0 : -1;
+        var panel = document.getElementById(t.getAttribute("aria-controls"));
+        if (panel) { panel.hidden = !selected; }
+      });
+      if (focus) { tab.focus(); }
+    }
+
+    tabs.forEach(function (tab, i) {
+      tab.addEventListener("click", function () { select(tab, false); });
+      tab.addEventListener("keydown", function (e) {
+        var next = null;
+        if (e.key === "ArrowRight") { next = tabs[(i + 1) % tabs.length]; }
+        else if (e.key === "ArrowLeft") { next = tabs[(i - 1 + tabs.length) % tabs.length]; }
+        else if (e.key === "Home") { next = tabs[0]; }
+        else if (e.key === "End") { next = tabs[tabs.length - 1]; }
+        if (next) { e.preventDefault(); select(next, true); }
+      });
+    });
+  }
+
+  /* ---------------- YouTube player ---------------- */
+  window.onYouTubeIframeAPIReady = function () {
+    if (!VIDEO_ID || !document.getElementById("youtube-player")) { return; }
+    player = new YT.Player("youtube-player", {
+      events: {
+        onReady: function () {
+          playerReady = true;
+          syncTranscriptHeight();
+        },
+        onStateChange: function (event) {
+          clearInterval(timeUpdater);
+          if (event.data === YT.PlayerState.PLAYING) {
+            timeUpdater = setInterval(highlightCurrentLine, 300);
+          } else {
+            highlightCurrentLine();
+          }
+        }
+      }
+    });
+  };
+
+  document.addEventListener("DOMContentLoaded", function () {
+    parsedTranscript = parseVtt(vttContent);
+    populateTranscript();
+    wireSearch();
+    wireSeekButtons();
+    wireTabs();
+    setTimeout(syncTranscriptHeight, 100);
+
+    if (typeof YT === "undefined" || typeof YT.Player === "undefined") {
+      var tag = document.createElement("script");
+      tag.src = "https://www.youtube.com/iframe_api";
+      tag.onerror = function () {
+        degradeToStatic("The video player could not load, so the times below are listed for reference rather than as buttons. The full transcript is above.");
+      };
+      document.head.appendChild(tag);
+    } else {
+      window.onYouTubeIframeAPIReady();
+    }
+
+    // If the API never reports ready — blocked script, offline, restrictive
+    // network — fall back rather than leaving dead buttons on the page.
+    setTimeout(function () {
+      degradeToStatic("The video player did not load, so the times below are listed for reference rather than as buttons. The full transcript is above.");
+    }, 8000);
+  });
+
+  var resizeTimeout;
+  window.addEventListener("resize", function () {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(syncTranscriptHeight, 250);
+  });
+
+  /* Report height to a Canvas parent that listens for it. Harmless otherwise. */
+  function postHeight() {
+    try {
+      if (window.parent && window.parent !== window) {
+        var h = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
+        window.parent.postMessage({ subject: "lti.frameResize", height: h }, "*");
+      }
+    } catch (e) { /* cross-origin parent — ignore */ }
+  }
+  window.addEventListener("load", postHeight);
+  if (window.ResizeObserver) { new ResizeObserver(postHeight).observe(document.body); }
+})();
+</script>
+</body>
+</html>
