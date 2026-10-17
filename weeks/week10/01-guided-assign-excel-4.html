@@ -1,0 +1,1761 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CSC 104 — Excel Module 4 Guided Assignment</title>
+<style>
+/* ============================================================
+   CSC 104 — Week 10 — Excel Module 4 Guided Assignment
+   Self-contained SPA for embedding in a Canvas iframe.
+   Vanilla CSS + vanilla JS, one file, no outbound links.
+   The only external resources are the YouTube player iframe and
+   the YouTube IFrame API (needed for click-to-seek); the page
+   degrades to a readable transcript and a plain topic list if
+   either is blocked.
+   Token block and layout match weeks/week03/01-guided-assign-word-1.html.
+   ============================================================ */
+
+:root {
+  color-scheme: light dark;
+  --surface:      #ffffff;
+  --panel:        #f6f8fb;
+  --panel-2:      #eef2f8;
+  --accent-bg:    #e8f0fe;
+  --ink:          #16202f;
+  --muted:        #46536b;
+  --brand:        #1d4ed8;
+  --brand-ink:    #17399c;
+  --border:       #c3cddc;
+  --border-soft:  #dde4ee;
+  --field-border: #6b7a92;
+  --btn-bg:       #1d4ed8;
+  --btn-fg:       #ffffff;
+  --btn-bg-hover: #17399c;
+  --btn2-bg:      #ffffff;
+  --btn2-fg:      #17399c;
+  --ok:           #1a6b3c;
+  --ok-bg:        #e6f4ec;
+  --warn-ink:     #7a4a06;
+  --warn-bg:      #fdf3e0;
+  --warn-rule:    #b8860b;
+  --focus:        #b4530a;
+  --hit:          #fff2b8;
+  --hit-ink:      #3a2c00;
+  --radius:       10px;
+  --maxw:         70rem;
+  --readw:        46rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --surface:      #0f1726;
+    --panel:        #17223a;
+    --panel-2:      #1e2b45;
+    --accent-bg:    #1a2a4d;
+    --ink:          #e9eefa;
+    --muted:        #b6c3d8;
+    --brand:        #9dbcff;
+    --brand-ink:    #bcd2ff;
+    --border:       #3a4a68;
+    --border-soft:  #2b3a56;
+    --field-border: #7b89a3;
+    --btn-bg:       #9dbcff;
+    --btn-fg:       #0b1424;
+    --btn-bg-hover: #c3d6ff;
+    --btn2-bg:      #17223a;
+    --btn2-fg:      #bcd2ff;
+    --ok:           #8fe0b0;
+    --ok-bg:        #123328;
+    --warn-ink:     #f6d59a;
+    --warn-bg:      #3a2c11;
+    --warn-rule:    #d9a441;
+    --focus:        #ffb066;
+    --hit:          #5c4a10;
+    --hit-ink:      #ffeeb8;
+  }
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--surface);
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; border-radius: 4px; }
+.no-fv :focus { outline: 3px solid var(--focus); outline-offset: 2px; }
+
+.skip-link {
+  position: absolute; left: -9999px; top: 0; z-index: 60;
+  background: var(--btn-bg); color: var(--btn-fg);
+  padding: 0.6rem 1rem; font-weight: 700; border-radius: 0 0 var(--radius) 0;
+}
+.skip-link:focus { left: 0; outline: 3px solid var(--focus); outline-offset: 2px; }
+
+.wrap { max-width: var(--maxw); margin: 0 auto; padding: 1rem 1rem 3rem; }
+.read { max-width: var(--readw); }
+
+/* ---------------------- Header ---------------------- */
+.page-head { background: var(--panel); border-bottom: 3px solid var(--brand); }
+.page-head .wrap { padding-bottom: 1.25rem; }
+
+.eyebrow {
+  font-size: 0.8125rem; letter-spacing: 0.09em; text-transform: uppercase;
+  font-weight: 700; color: var(--brand-ink); margin: 0.75rem 0 0.35rem;
+}
+h1 { font-size: clamp(1.5rem, 4.2vw, 2.15rem); line-height: 1.22; margin: 0 0 0.6rem; }
+.lede { margin: 0; color: var(--muted); max-width: var(--readw); }
+
+.facts { list-style: none; display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 1rem 0 0; padding: 0; }
+.facts li {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 999px; padding: 0.3rem 0.85rem; font-size: 0.875rem;
+}
+.facts .k { font-weight: 700; color: var(--brand-ink); }
+
+/* ---------------------- Typography ---------------------- */
+h2 {
+  font-size: clamp(1.25rem, 3.2vw, 1.6rem);
+  margin: 2.5rem 0 0.75rem; color: var(--brand-ink);
+  padding-bottom: 0.35rem; border-bottom: 2px solid var(--border-soft);
+}
+h3 { font-size: 1.125rem; margin: 1.75rem 0 0.5rem; }
+p { margin: 0 0 1rem; max-width: var(--readw); }
+ul, ol { margin: 0 0 1rem; padding-left: 1.35rem; max-width: var(--readw); }
+li { margin-bottom: 0.4rem; }
+.mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.9375em; }
+.ui { font-weight: 700; }
+
+.callout {
+  border-left: 5px solid var(--brand); background: var(--accent-bg);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding: 0.9rem 1.1rem; margin: 0 0 1.25rem; max-width: var(--readw);
+}
+.callout > :last-child { margin-bottom: 0; }
+.callout h3 { margin-top: 0; font-size: 1.05rem; }
+.callout--warn { border-left-color: var(--warn-rule); background: var(--warn-bg); color: var(--warn-ink); }
+.callout--wide { max-width: none; }
+
+/* ---------------------- Video + transcript ---------------------- */
+.video-row { display: flex; flex-wrap: wrap; gap: 1.25rem; margin: 0 0 1.5rem; }
+.video-col { flex: 1 1 32rem; min-width: min(100%, 20rem); }
+.transcript-col { flex: 1 1 20rem; min-width: min(100%, 17rem); display: flex; flex-direction: column; }
+
+.video-frame {
+  position: relative; width: 100%; padding-top: 56.25%;
+  background: #000; border-radius: var(--radius); overflow: hidden;
+  border: 1px solid var(--field-border);
+}
+.video-frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+.video-caption { font-size: 0.875rem; color: var(--muted); margin-top: 0.5rem; }
+
+.transcript-head { display: flex; flex-wrap: wrap; gap: 0.5rem 0.75rem; align-items: flex-end; margin-bottom: 0.5rem; }
+.transcript-head h3 { margin: 0 0 0.3rem; font-size: 1rem; flex: 0 1 auto; }
+.transcript-search { flex: 1 1 10rem; }
+.transcript-search label { display: block; font-size: 0.8125rem; font-weight: 600; color: var(--muted); }
+.transcript-search input {
+  font: inherit; width: 100%; min-height: 2.5rem; color: var(--ink);
+  background: var(--surface); border: 1px solid var(--field-border);
+  border-radius: 8px; padding: 0.35rem 0.55rem;
+}
+
+.transcript-panel {
+  height: 24rem; max-height: 24rem; overflow-y: auto;
+  border: 1px solid var(--field-border); border-radius: var(--radius);
+  background: var(--panel); padding: 0.4rem;
+}
+.transcript-line {
+  display: block; width: 100%; text-align: left; font: inherit;
+  font-size: 0.9375rem; line-height: 1.5; color: var(--ink);
+  background: transparent; border: 0; border-radius: 6px;
+  padding: 0.45rem 0.6rem; cursor: pointer;
+}
+.transcript-line:hover { background: var(--accent-bg); }
+.transcript-line .t {
+  display: inline-block; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.8125rem; font-weight: 700; color: var(--brand-ink); margin-right: 0.5rem;
+}
+.transcript-line.is-active {
+  background: var(--accent-bg);
+  box-shadow: inset 3px 0 0 0 var(--brand);
+  font-weight: 600;
+}
+.transcript-line[hidden] { display: none; }
+.transcript-line mark { background: var(--hit); color: var(--hit-ink); }
+.transcript-note { color: var(--muted); font-size: 0.875rem; padding: 0.6rem; margin: 0; }
+
+/* Static fallback when the player never loads */
+.no-player .transcript-line { cursor: default; }
+.no-player .transcript-line:hover { background: transparent; }
+
+/* ---------------------- Topic index ---------------------- */
+.topic-index { margin: 0 0 1.5rem; }
+.topic-index__group {
+  font-weight: 700; color: var(--brand-ink); margin: 1.25rem 0 0.4rem;
+  font-size: 0.9375rem; letter-spacing: 0.02em;
+}
+.topic-index__group:first-child { margin-top: 0; }
+.topic-index__list { list-style: none; padding: 0; margin: 0; max-width: none; }
+.topic-index__item {
+  display: flex; gap: 0.7rem; align-items: baseline;
+  padding: 0.28rem 0; margin: 0; border-bottom: 1px solid var(--border-soft);
+}
+.topic-index__list li:last-child { border-bottom: none; }
+.topic-index__time {
+  flex: 0 0 auto; font: inherit;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.875rem; font-weight: 700;
+  min-width: 4.25rem; min-height: 2rem; text-align: center;
+  color: var(--btn2-fg); background: var(--btn2-bg);
+  border: 1px solid var(--field-border); border-radius: 6px;
+  padding: 0.15rem 0.4rem; cursor: pointer;
+}
+.topic-index__time:hover { background: var(--accent-bg); }
+.topic-index__label { flex: 1 1 auto; }
+
+.topic-index--static .topic-index__time {
+  cursor: default; background: transparent; border-color: transparent;
+  color: var(--muted); text-align: left; padding-left: 0;
+}
+.topic-index--static .topic-index__time:hover { background: transparent; }
+
+@media (min-width: 52em) {
+  .topic-cols { column-count: 2; column-gap: 2.25rem; }
+  .topic-cols .topic-index__group { break-after: avoid; }
+  .topic-cols .topic-index__list { break-inside: avoid; }
+}
+
+/* ---------------------- To-do / step lists ---------------------- */
+.todo { list-style: none; padding: 0; margin: 0 0 1.5rem; max-width: none; }
+.todo > li {
+  background: var(--panel); border: 1px solid var(--border-soft);
+  border-radius: var(--radius); padding: 0.85rem 1rem;
+  margin: 0 0 0.75rem;
+}
+.todo__top { display: flex; flex-wrap: wrap; gap: 0.6rem; align-items: baseline; }
+.todo__num {
+  flex: 0 0 auto; min-width: 1.9rem; height: 1.9rem; padding: 0 0.4rem; border-radius: 999px;
+  background: var(--btn-bg); color: var(--btn-fg); font-weight: 700; font-size: 0.9375rem;
+  display: flex; align-items: center; justify-content: center; align-self: flex-start;
+}
+.todo__num--setup { background: var(--btn2-bg); color: var(--btn2-fg); border: 1px solid var(--field-border); }
+.todo__title { flex: 1 1 14rem; font-weight: 700; margin: 0; }
+.todo__body { margin: 0.35rem 0 0 2.5rem; max-width: var(--readw); }
+.todo__body p { margin: 0 0 0.5rem; }
+.todo__body ul { margin: 0 0 0.5rem; }
+.todo__body > :last-child { margin-bottom: 0; }
+.todo__meta { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0.5rem 0 0 2.5rem; }
+.pill {
+  font-size: 0.8125rem; font-weight: 700; border-radius: 999px;
+  padding: 0.1rem 0.6rem; border: 1px solid currentColor; white-space: nowrap;
+}
+.pill--graded { color: var(--ok); background: var(--ok-bg); }
+.pill--setup { color: var(--brand-ink); background: var(--accent-bg); }
+.pill--due { color: var(--warn-ink); background: var(--warn-bg); }
+.pill--time {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  color: var(--btn2-fg); background: var(--btn2-bg); border-color: var(--field-border);
+  cursor: pointer; font-size: 0.8125rem; min-height: 1.9rem;
+}
+.pill--time:hover { background: var(--accent-bg); }
+.no-player .pill--time { cursor: default; }
+
+/* ---------------------- Platform tabs ---------------------- */
+.tabs { margin: 0 0 1.5rem; }
+.tablist { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0 0 -1px; padding: 0; }
+.tab {
+  font: inherit; font-weight: 700; cursor: pointer;
+  color: var(--btn2-fg); background: var(--btn2-bg);
+  border: 1px solid var(--field-border); border-bottom-color: transparent;
+  border-radius: var(--radius) var(--radius) 0 0;
+  padding: 0.5rem 1rem; min-height: 2.5rem;
+}
+.tab[aria-selected="true"] { background: var(--accent-bg); border-bottom-color: var(--accent-bg); }
+.tab:hover { background: var(--accent-bg); }
+.tabpanel {
+  border: 1px solid var(--field-border); border-radius: 0 var(--radius) var(--radius) var(--radius);
+  background: var(--panel); padding: 1rem 1.1rem;
+}
+.tabpanel > :last-child { margin-bottom: 0; }
+.tabpanel h3:first-child { margin-top: 0; }
+
+/* ---------------------- Reference table ---------------------- */
+.table-scroll { overflow-x: auto; margin: 0 0 1.5rem; }
+table { border-collapse: collapse; width: 100%; min-width: 30rem; background: var(--surface); }
+caption { text-align: left; font-weight: 700; padding: 0 0 0.5rem; color: var(--muted); }
+th, td { border: 1px solid var(--border); padding: 0.6rem 0.7rem; text-align: left; vertical-align: top; }
+thead th { background: var(--panel-2); }
+tbody th { background: var(--panel); font-weight: 700; white-space: nowrap; }
+
+.status {
+  min-height: 1.4rem; font-weight: 600; color: var(--ok); background: var(--ok-bg);
+  border-radius: 8px; padding: 0.3rem 0.55rem; margin: 0.5rem 0 0;
+  max-width: var(--readw); font-size: 0.9375rem;
+}
+.status:empty { background: transparent; padding: 0; min-height: 0; }
+
+.footnote {
+  margin-top: 2.5rem; padding-top: 1rem; border-top: 1px solid var(--border-soft);
+  color: var(--muted); font-size: 0.9375rem; max-width: var(--readw);
+}
+
+.sr-only {
+  position: absolute !important; width: 1px; height: 1px; margin: -1px; padding: 0;
+  overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
+}
+
+@media print {
+  .skip-link, .video-frame, .transcript-search, .tablist { display: none !important; }
+  .transcript-panel { height: auto !important; max-height: none !important; overflow: visible; border: none; }
+  .topic-index__time, .pill--time { border: none; }
+  .tabpanel { display: block !important; border-radius: var(--radius); margin-bottom: 1rem; }
+  body { background: #fff; color: #000; }
+  .todo > li, .callout, table { break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+
+<a class="skip-link" href="#main">Skip to page content</a>
+
+<header class="page-head">
+  <div class="wrap">
+    <p class="eyebrow">CSC 104 &middot; Week 10 &middot; Guided Assignment</p>
+    <h1>Excel Module 4 &mdash; Guided Assignment Walkthrough</h1>
+    <p class="lede">Week 10 is the last Excel module: financial functions, data tables and what-if analysis. The
+      video below walks through a retirement and loan workbook for Core Technology: unprotecting a sheet, defined
+      names, the FV, PMT and PV functions, one- and two-variable data tables, Error Checking, hiding a sheet and
+      setting a print area. Every step is listed on this page with a button that jumps the video straight to it, and
+      the whole video is written out here so you can read it instead of watching.</p>
+    <ul class="facts">
+      <li><span class="k">Video:</span> 42 minutes</li>
+      <li><span class="k">Week 10:</span> 11/2/2026 &ndash; 11/8/2026</li>
+      <li><span class="k">This assignment:</span> 25 pts in MindTap</li>
+      <li><span class="k">Attempts:</span> up to 10</li>
+      <li><span class="k">Due:</span> Sun 11/8, 11:59 PM</li>
+    </ul>
+  </div>
+</header>
+
+<main id="main" class="wrap" tabindex="-1">
+
+  <!-- ============ What to do this week ============ -->
+  <section aria-labelledby="todo-heading">
+    <h2 id="todo-heading" style="margin-top:1.25rem">What to do this week</h2>
+    <p>Same pattern as every week: a <strong>guided</strong> assignment we walk through together, then a
+      <strong>homework</strong> assignment you do on your own. Do them in that order. This is the longest and most
+      complex Excel module, fifteen steps and over forty minutes of video, so don't leave it for Sunday night. Each
+      time stamp below jumps the video to the part that explains it.</p>
+
+    <ol class="todo">
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">1</span>
+          <p class="todo__title">Watch the walkthrough with Excel open beside it</p>
+        </div>
+        <div class="todo__body">
+          <p>Pause after each step and do it in your own file. The function dialogs are small; the zoom slider in the
+            bottom-right corner of the Excel window helps with the sheet, and it changes only how it looks on your
+            screen, not the file.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="0.04">0:00</button>
+          <button type="button" class="pill pill--time" data-seek="55.08">0:55</button>
+          <span class="pill pill--setup">Not graded</span>
+        </p>
+      </li>
+
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">2</span>
+          <p class="todo__title">Download the assignment files from MindTap</p>
+        </div>
+        <div class="todo__body">
+          <p>Two files again: an instruction file and an Excel start file with your name on it. No support file. Use
+            <span class="ui">Download All</span>, the same as always.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="25.08">0:25</button>
+          <span class="pill pill--setup">Not graded</span>
+        </p>
+      </li>
+
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">3</span>
+          <p class="todo__title">Do the fifteen steps and submit the guided assignment</p>
+        </div>
+        <div class="todo__body">
+          <p>Every step is written out further down this page. Save as the <span class="mono">_2</span> version first,
+            work through the steps, then upload the file and select <span class="ui">Submit</span>. Check the
+            <span class="ui">Graded Summary Report</span> afterwards. It tells you exactly which steps earned
+            points.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="155.44">2:35</button>
+          <button type="button" class="pill pill--time" data-seek="2479.16">41:19</button>
+          <span class="pill pill--graded">Graded &mdash; 25 pts</span>
+          <span class="pill pill--due">Due Sun 11/8, 11:59 PM</span>
+        </p>
+      </li>
+
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">4</span>
+          <p class="todo__title">Do the Excel Module 4 homework on your own</p>
+        </div>
+        <div class="todo__body">
+          <p>The second MindTap assignment this week. It's a different workbook with the same commands, and there's
+            no walkthrough. That's the point. Start it right after the guided one is submitted, while you still
+            remember Name Manager, the function arguments and the Data Table dialog.</p>
+        </div>
+        <p class="todo__meta">
+          <span class="pill pill--graded">Graded &mdash; 100 pts</span>
+          <span class="pill pill--due">Due Sun 11/8, 11:59 PM</span>
+        </p>
+      </li>
+
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">5</span>
+          <p class="todo__title">Do the module reading</p>
+        </div>
+        <div class="todo__body">
+          <p>The Excel Module 4 chapter in the Shelly Cashman text, on financial functions, data tables and
+            amortization schedules. Skim it for <em>what</em> Excel can do, and come back to it as a step-by-step
+            reference when an assignment names something you haven't seen. Not graded.</p>
+        </div>
+        <p class="todo__meta">
+          <span class="pill pill--setup">Not graded</span>
+        </p>
+      </li>
+    </ol>
+  </section>
+
+  <!-- ============ Video + transcript ============ -->
+  <section aria-labelledby="video-heading">
+    <h2 id="video-heading">The walkthrough video</h2>
+    <p>Forty-two minutes, start to finish. It covers downloading the files, saving your copy, all fifteen steps, a
+      check against the finished workbook, and submitting. If you're stuck on one step, use the topic index below
+      rather than scrubbing through.</p>
+
+    <div class="video-row">
+      <div class="video-col">
+        <div class="video-frame" id="video-container">
+          <iframe id="youtube-player"
+                  src="https://www.youtube.com/embed/vhheSjgXFBI?enablejsapi=1&amp;cc_load_policy=1&amp;iv_load_policy=3&amp;modestbranding=1&amp;rel=0"
+                  title="CSC 104 Excel Module 4 Guided Assignment Walkthrough"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  referrerpolicy="strict-origin-when-cross-origin"
+                  allowfullscreen loading="lazy"></iframe>
+        </div>
+        <p class="video-caption">Closed captions are on by default. Select any line of the transcript to jump the
+          video to that moment.</p>
+      </div>
+
+      <div class="transcript-col">
+        <div class="transcript-head">
+          <h3 id="transcript-heading">Transcript</h3>
+          <div class="transcript-search">
+            <label for="transcript-filter">Search the transcript</label>
+            <input type="search" id="transcript-filter" autocomplete="off" spellcheck="false"
+                   aria-describedby="transcript-filter-status">
+          </div>
+        </div>
+        <div class="transcript-panel" id="transcript-container" role="group" aria-labelledby="transcript-heading">
+          <p class="transcript-note">Loading transcript&hellip;</p>
+        </div>
+        <p class="sr-only" role="status" aria-live="polite" id="transcript-filter-status"></p>
+        <p class="sr-only" role="status" aria-live="polite" id="transcript-status"></p>
+        <p style="margin:0.5rem 0 0"><a href="#topic-index-heading">Skip past the transcript</a></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ Topic index ============ -->
+  <section aria-labelledby="topic-index-heading">
+    <h2 id="topic-index-heading">Find a moment in the video</h2>
+    <p><strong>Select any time below and the video jumps there.</strong> This is the detailed contents of the
+      walkthrough. If one step isn't working, find it here and watch just that minute.</p>
+
+    <p id="topic-index-fallback" class="status" hidden></p>
+
+    <div class="topic-index topic-cols" id="topic-index">
+
+      <div class="topic-index__group">Getting started</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="0.04">0:00</button><span class="topic-index__label">Module 4: financial functions and data tables</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="25.08">0:25</button><span class="topic-index__label">Two files; I clear out my old practice copies</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="55.08">0:55</button><span class="topic-index__label">Open the instructions and the start file</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="85.3">1:25</button><span class="topic-index__label">Save As the _2 copy; your name in B6</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="124.68">2:04</button><span class="topic-index__label">The scenario: Core Technology</span></li>
+      </ul>
+
+      <div class="topic-index__group">Steps 1 and 2 &mdash; unprotect, border color</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="155.44">2:35</button><span class="topic-index__label">Step 1: right-click the Investments tab &rsaquo; Unprotect</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="200.48">3:20</button><span class="topic-index__label">The #NAME? errors you'll fix later</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="225.28">3:45</button><span class="topic-index__label">Step 2: what it asks for</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="246.46">4:06</button><span class="topic-index__label">Why Border Color alone won't do it: More Borders</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="275.66">4:35</button><span class="topic-index__label">Pick the color, then click each existing border</span></li>
+      </ul>
+
+      <div class="topic-index__group">Steps 3 and 4 &mdash; defined names</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="347.16">5:47</button><span class="topic-index__label">Step 3: one name to fix, one to add</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="369.68">6:09</button><span class="topic-index__label">Formulas &rsaquo; Name Manager</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="433.56">7:13</button><span class="topic-index__label">Edit Match to Employer_Match (and my typo)</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="463.54">7:43</button><span class="topic-index__label">New name for D19</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="493.54">8:13</button><span class="topic-index__label">Future_Value: point Refers To at D19, not F14</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="572.22">9:32</button><span class="topic-index__label">Step 4: a formula built from names</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="600.12">10:00</button><span class="topic-index__label">Type a name and pick it from the list</span></li>
+      </ul>
+
+      <div class="topic-index__group">Step 5 &mdash; FV</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="666.72">11:06</button><span class="topic-index__label">What step 5 asks for</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="690.72">11:30</button><span class="topic-index__label">Rate &divide; 12, years &times; 12, and the negative payment</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="756.64">12:36</button><span class="topic-index__label">Insert Function &rsaquo; FV; bold arguments are required</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="791.52">13:11</button><span class="topic-index__label">Filling in Rate and Nper</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="860">14:20</button><span class="topic-index__label">$247,362</span></li>
+      </ul>
+
+      <div class="topic-index__group">Step 6 &mdash; a one-variable data table</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="897.98">14:57</button><span class="topic-index__label">What step 6 asks for</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="960.3">16:00</button><span class="topic-index__label">What the table is going to show</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="997.78">16:37</button><span class="topic-index__label">Select B22:D28 &rsaquo; Data &rsaquo; What-If Analysis &rsaquo; Data Table</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1028.74">17:08</button><span class="topic-index__label">Column input cell D14; Row input left empty</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1104.58">18:24</button><span class="topic-index__label">What Excel does behind the scenes</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1142.62">19:02</button><span class="topic-index__label">Thirty years: $1.5 million</span></li>
+      </ul>
+
+      <div class="topic-index__group">Steps 7 and 8 &mdash; a two-variable data table</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1192.6">19:52</button><span class="topic-index__label">Step 7: what an IRA is</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1214.54">20:14</button><span class="topic-index__label">F9:F19 to one decimal place</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1252.52">20:52</button><span class="topic-index__label">Home &rsaquo; Decrease Decimal</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1283.4">21:23</button><span class="topic-index__label">Step 8: what it asks for</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1316.08">21:56</button><span class="topic-index__label">Select F8:N19; Row input D13, Column input D10</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1358.98">22:38</button><span class="topic-index__label">Reading the results</span></li>
+      </ul>
+
+      <div class="topic-index__group">Steps 9 and 10 &mdash; Error Checking</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1429.04">23:49</button><span class="topic-index__label">Step 9: what it asks for</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1459.04">24:19</button><span class="topic-index__label">D5 depends on N29: Formulas &rsaquo; Error Checking</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1497.68">24:57</button><span class="topic-index__label">SOM should be SUM; Edit in Formula Bar</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1543.2">25:43</button><span class="topic-index__label">Accept it, and D5 shows 323</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1578.4">26:18</button><span class="topic-index__label">Step 10: what it asks for</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1638.4">27:18</button><span class="topic-index__label">#VALUE!: the wrong data type</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1678.44">27:58</button><span class="topic-index__label">The highlighted cells show it: change H23 to K23</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1723.94">28:43</button><span class="topic-index__label">Double-click the fill handle to fill down</span></li>
+      </ul>
+
+      <div class="topic-index__group">Steps 11 and 12 &mdash; hide a sheet, create names</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1764.9">29:24</button><span class="topic-index__label">Step 11: hide the Salary sheet, and how to unhide one</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1810.98">30:10</button><span class="topic-index__label">Step 12: the Loans sheet and balloon loans</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1843.74">30:43</button><span class="topic-index__label">Select B4:C7, labels and values together</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1873.74">31:13</button><span class="topic-index__label">Formulas &rsaquo; Create from Selection</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1903.74">31:43</button><span class="topic-index__label">Left column only</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1932.94">32:12</button><span class="topic-index__label">Check the four new names in Name Manager</span></li>
+      </ul>
+
+      <div class="topic-index__group">Steps 13 and 14 &mdash; PMT and PV</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1976.28">32:56</button><span class="topic-index__label">Step 13: what PMT needs</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="2050.22">34:10</button><span class="topic-index__label">Insert Function &rsaquo; PMT: Rate</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="2080.22">34:40</button><span class="topic-index__label">Nper and a negative Principal</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="2159.08">35:59</button><span class="topic-index__label">$176.98 a month, and why it looks low</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="2204.68">36:44</button><span class="topic-index__label">Step 14: the balloon payment with PV</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="2240.92">37:20</button><span class="topic-index__label">Insert Function &rsaquo; PV</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="2300.44">38:20</button><span class="topic-index__label">Parentheses around the years; underscore, not dash</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="2340.52">39:00</button><span class="topic-index__label">The loan totals fill in</span></li>
+      </ul>
+
+      <div class="topic-index__group">Step 15, checking and submitting</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="2388.76">39:48</button><span class="topic-index__label">Step 15: Page Layout &rsaquo; Print Area &rsaquo; Set Print Area</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="2435">40:35</button><span class="topic-index__label">Compare with the final figure</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="2479.16">41:19</button><span class="topic-index__label">Save, close, drag in the _2 file and Submit</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="2517.96">41:57</button><span class="topic-index__label">25 out of 25: the last Excel module</span></li>
+      </ul>
+
+    </div>
+  </section>
+
+  <!-- ============ New ideas ============ -->
+  <section aria-labelledby="vocab-heading">
+    <h2 id="vocab-heading">New ideas this week</h2>
+    <p>This module is the most "business" of the four. You don't need a finance background; you need to know what
+      each function wants and where to find it. The instruction file uses these words without explaining them, so
+      here they are in one place.</p>
+
+    <div class="table-scroll" tabindex="0" role="region" aria-label="New Excel ideas table, scrollable">
+      <table>
+        <caption>The Excel ideas this assignment uses, with the moment in the video where each one comes up.</caption>
+        <thead>
+          <tr><th scope="col">Idea</th><th scope="col">What it means</th><th scope="col">In the video</th></tr>
+        </thead>
+        <tbody>
+          <tr><th scope="row">Protected sheet</th><td>A sheet locked against changes, sometimes with a password. You have to unprotect it before you can edit.</td><td><button type="button" class="pill pill--time" data-seek="155.44">2:35</button></td></tr>
+          <tr><th scope="row">Defined name</th><td>A name, like <span class="mono">Employer_Match</span>, given to a cell. You can use it in formulas instead of the cell reference. Names can't contain spaces, so they use underscores.</td><td><button type="button" class="pill pill--time" data-seek="369.68">6:09</button></td></tr>
+          <tr><th scope="row">Name Manager</th><td>The list of every defined name in the workbook, what cell each refers to, and its current value. Edit, add and delete names here.</td><td><button type="button" class="pill pill--time" data-seek="369.68">6:09</button></td></tr>
+          <tr><th scope="row">Create from Selection</th><td>Names a set of cells all at once, using the labels next to them. "Left column" means the labels are to the left of the values.</td><td><button type="button" class="pill pill--time" data-seek="1873.74">31:13</button></td></tr>
+          <tr><th scope="row">FV, PMT, PV</th><td>Financial functions. <em>FV</em>: what regular payments grow to. <em>PMT</em>: the regular payment on a loan. <em>PV</em>: what a series of future payments is worth today.</td><td><button type="button" class="pill pill--time" data-seek="666.72">11:06</button></td></tr>
+          <tr><th scope="row">Data table</th><td>A what-if tool that reruns a formula for a list of different inputs and shows every result. A one-variable table changes one input; a two-variable table changes two at once.</td><td><button type="button" class="pill pill--time" data-seek="997.78">16:37</button></td></tr>
+          <tr><th scope="row">Input cell</th><td>The cell a data table swaps its values into. <em>Column input</em> when your inputs run down a column, <em>row input</em> when they run across a row.</td><td><button type="button" class="pill pill--time" data-seek="1028.74">17:08</button></td></tr>
+          <tr><th scope="row">Error Checking</th><td>Finds cells showing errors, says what kind, and offers to edit them. <span class="mono">#NAME?</span> means Excel doesn't recognize a word in the formula; <span class="mono">#VALUE!</span> means the formula is using the wrong kind of data, such as text in a subtraction.</td><td><button type="button" class="pill pill--time" data-seek="1459.04">24:19</button></td></tr>
+          <tr><th scope="row">Print area</th><td>The part of a sheet that prints. Excel marks it with a thin dashed line.</td><td><button type="button" class="pill pill--time" data-seek="2388.76">39:48</button></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout">
+      <h3>The three rules for FV, PMT and PV</h3>
+      <p>Steps 5, 13 and 14 all follow the same pattern. Get these three things right and the function dialog does
+        the rest.</p>
+      <ul style="margin:0 0 0.75rem">
+        <li><strong>Rate is per month.</strong> The sheet gives an <em>annual</em> rate, but payments are monthly, so
+          divide it by 12: <span class="mono">Annual_Rate/12</span>.</li>
+        <li><strong>Periods are months.</strong> The sheet gives <em>years</em>, so multiply by 12:
+          <span class="mono">Years*12</span>. If you subtract first, as in step 14, wrap the subtraction in
+          parentheses.</li>
+        <li><strong>Money you pay out is negative.</strong> That's why each step says "negative" for the payment or
+          principal. Leave the minus off and you get the right number with the wrong sign <em>(11:30)</em>.</li>
+      </ul>
+      <p>Only the arguments shown in <strong>bold</strong> in the Function Arguments dialog are required. The others
+        can stay empty <em>(12:36)</em>.</p>
+    </div>
+  </section>
+
+  <!-- ============ The steps ============ -->
+  <section aria-labelledby="steps-heading">
+    <h2 id="steps-heading">The assignment, step by step</h2>
+    <p>Four setup items, then the fifteen graded steps, then submitting. Each one says <em>what</em> to change; the
+      time button next to it shows you <em>how</em>. <strong>Always go by the instruction file MindTap gave you.</strong>
+      The wording below is a summary, and MindTap grades against its own file.</p>
+
+    <div class="callout">
+      <h3>Four details worth knowing</h3>
+      <ul style="margin:0 0 0.75rem">
+        <li><strong>Three worksheets.</strong> Steps 1 through 11 happen on <em>Investments</em> (step 11 hides
+          <em>Salary</em>); steps 12 through 15 on <em>Loans</em>.</li>
+        <li><strong>Re-apply each border in step 2.</strong> Picking a color doesn't change borders that are already
+          there. In <span class="ui">More Borders</span>, pick the color first, then click each existing border line
+          in the preview, the thick one and both thin ones <em>(4:35)</em>.</li>
+        <li><strong>Names use underscores, never spaces or dashes.</strong> Type
+          <span class="mono">Years_until_Balloon</span>, not <span class="mono">Years-until-Balloon</span>. As you
+          type, Excel offers the matching names; double-click one to insert it exactly <em>(10:00)</em>.</li>
+        <li><strong>Select the whole data table, formulas included.</strong> For step 6 that's B22:D28 and for step
+          8 it's F8:N19, including the formula row or corner cell at the top.</li>
+      </ul>
+      <p style="margin:0">The numbers below follow the order of the instruction file as I read it in the video. If
+        your file groups or numbers something differently, go by your file.</p>
+    </div>
+
+    <h3>Before you start</h3>
+    <ol class="todo">
+      <li>
+        <div class="todo__top">
+          <span class="todo__num todo__num--setup" aria-hidden="true">A</span>
+          <p class="todo__title">Download both files</p>
+        </div>
+        <div class="todo__body">
+          <p>The instruction file and an Excel start file with your name in it, ending in <span class="mono">_1</span>.
+            They land in your Downloads folder.</p>
+        </div>
+        <p class="todo__meta"><button type="button" class="pill pill--time" data-seek="25.08">0:25</button></p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num todo__num--setup" aria-hidden="true">B</span>
+          <p class="todo__title">Open the instruction file and read it</p>
+        </div>
+        <div class="todo__body">
+          <p>Select <span class="ui">Enable Editing</span>, then <span class="ui">View &rsaquo; Page Width</span> to
+            make it readable. Keep it open in a second window. The final figures at the end of the file show what
+            the Investments and Loans sheets should look like when you're done.</p>
+        </div>
+        <p class="todo__meta"><button type="button" class="pill pill--time" data-seek="55.08">0:55</button></p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num todo__num--setup" aria-hidden="true">C</span>
+          <p class="todo__title">Open the start file and save it as the _2 version</p>
+        </div>
+        <div class="todo__body">
+          <p><span class="ui">Enable Editing</span>, then <span class="ui">File &rsaquo; Save As</span>. Leave it in
+            Downloads, change the <span class="mono">1</span> at the end of the file name to a
+            <span class="mono">2</span>, and save. <strong>Everything you do from here goes in the
+            <span class="mono">_2</span> file.</strong></p>
+        </div>
+        <p class="todo__meta"><button type="button" class="pill pill--time" data-seek="85.3">1:25</button></p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num todo__num--setup" aria-hidden="true">D</span>
+          <p class="todo__title">Check that it's your file</p>
+        </div>
+        <div class="todo__body">
+          <p>Your first and last name should be in cell <strong>B6</strong> of the <strong>Documentation</strong>
+            sheet. If it isn't your name, delete the file and download it again.</p>
+        </div>
+        <p class="todo__meta"><button type="button" class="pill pill--time" data-seek="113.08">1:53</button></p>
+      </li>
+    </ol>
+
+    <h3>The fifteen graded steps</h3>
+    <p>Steps 1&ndash;11 are on the <strong>Investments</strong> worksheet.</p>
+    <ol class="todo">
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">1</span>
+          <p class="todo__title">Unprotect the Investments sheet</p>
+        </div>
+        <div class="todo__body">
+          <p>Remove the protection from the <strong>Investments</strong> worksheet so you can edit it. There's no
+            password.</p>
+        </div>
+        <p class="todo__meta"><button type="button" class="pill pill--time" data-seek="155.44">2:35</button></p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">2</span>
+          <p class="todo__title">Change only the border color of B2:D4</p>
+        </div>
+        <div class="todo__body">
+          <p>Change the color of the existing borders in <strong>B2:D4</strong> from red to the gray your instruction
+            file names (<strong>Darker 25%</strong>), to match the rest of the sheet. Keep the border styles as they
+            are.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="225.28">3:45</button>
+          <button type="button" class="pill pill--time" data-seek="246.46">4:06</button>
+          <button type="button" class="pill pill--time" data-seek="275.66">4:35</button>
+        </p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">3</span>
+          <p class="todo__title">Rename D11 to Employer_Match; name D19 Future_Value</p>
+        </div>
+        <div class="todo__body">
+          <p>In <strong>Name Manager</strong>, edit the name for <strong>D11</strong> (currently
+            <span class="mono">Match</span>) to <span class="mono">Employer_Match</span>. Then add a new name,
+            <span class="mono">Future_Value</span>, that refers to <strong>D19</strong>.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="347.16">5:47</button>
+          <button type="button" class="pill pill--time" data-seek="433.56">7:13</button>
+          <button type="button" class="pill pill--time" data-seek="493.54">8:13</button>
+        </p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">4</span>
+          <p class="todo__title">In D12, add the two percentages using their names</p>
+        </div>
+        <div class="todo__body">
+          <p>In <strong>D12</strong>, enter a formula <em>without a function</em> that adds
+            <span class="mono">Percent_Invested</span> and <span class="mono">Employer_Match</span>. The result is
+            12.75%.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="572.22">9:32</button>
+          <button type="button" class="pill pill--time" data-seek="600.12">10:00</button>
+        </p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">5</span>
+          <p class="todo__title">In D19, the IRA's future value with FV</p>
+        </div>
+        <div class="todo__body">
+          <p>In <strong>D19</strong>, use the <strong>FV</strong> function with defined names: the annual return
+            divided by 12 for the rate, the years employed times 12 for the periods, and the <em>negative</em>
+            monthly total for the payment. The result is $247,362.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="666.72">11:06</button>
+          <button type="button" class="pill pill--time" data-seek="756.64">12:36</button>
+          <button type="button" class="pill pill--time" data-seek="791.52">13:11</button>
+        </p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">6</span>
+          <p class="todo__title">One-variable data table in B22:D28</p>
+        </div>
+        <div class="todo__body">
+          <p>Select <strong>B22:D28</strong> and create a one-variable <strong>Data Table</strong> with
+            <strong>D14</strong> as the <strong>column input cell</strong>. Leave the row input cell empty. C22 and
+            D22 already hold the formulas.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="897.98">14:57</button>
+          <button type="button" class="pill pill--time" data-seek="997.78">16:37</button>
+          <button type="button" class="pill pill--time" data-seek="1028.74">17:08</button>
+        </p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">7</span>
+          <p class="todo__title">Show F9:F19 with one decimal place</p>
+        </div>
+        <div class="todo__body">
+          <p>Decrease the decimal places in <strong>F9:F19</strong> so the percentages show only
+            <strong>one</strong> decimal place. The F8 formula is already there.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="1214.54">20:14</button>
+          <button type="button" class="pill pill--time" data-seek="1252.52">20:52</button>
+        </p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">8</span>
+          <p class="todo__title">Two-variable data table in F8:N19</p>
+        </div>
+        <div class="todo__body">
+          <p>Select <strong>F8:N19</strong> and create a two-variable <strong>Data Table</strong>:
+            <strong>D13</strong> (annual rate of return) as the <strong>row input cell</strong> and
+            <strong>D10</strong> (percent invested) as the <strong>column input cell</strong>.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="1283.4">21:23</button>
+          <button type="button" class="pill pill--time" data-seek="1316.08">21:56</button>
+        </p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">9</span>
+          <p class="todo__title">Fix N29 with Error Checking, then check D5</p>
+        </div>
+        <div class="todo__body">
+          <p>Use <strong>Error Checking</strong> to find the problem in <strong>N29</strong>, which should sum the
+            Value column. Correct the formula, then confirm the error in <strong>D5</strong> is gone too. D5 shows
+            323 when it's right.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="1429.04">23:49</button>
+          <button type="button" class="pill pill--time" data-seek="1497.68">24:57</button>
+          <button type="button" class="pill pill--time" data-seek="1543.2">25:43</button>
+        </p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">10</span>
+          <p class="todo__title">Fix M23 with Error Checking, then fill M24:M28</p>
+        </div>
+        <div class="todo__body">
+          <p>Use <strong>Error Checking</strong> on <strong>M23</strong>, which should subtract the
+            <em>target</em> percentage from the <em>actual</em> percentage. Correct the formula, then fill
+            <strong>M24:M28</strong> with it.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="1578.4">26:18</button>
+          <button type="button" class="pill pill--time" data-seek="1678.44">27:58</button>
+          <button type="button" class="pill pill--time" data-seek="1723.94">28:43</button>
+        </p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">11</span>
+          <p class="todo__title">Hide the Salary worksheet</p>
+        </div>
+        <div class="todo__body">
+          <p>Hide the <strong>Salary</strong> sheet so its tab no longer shows.</p>
+        </div>
+        <p class="todo__meta"><button type="button" class="pill pill--time" data-seek="1764.9">29:24</button></p>
+      </li>
+    </ol>
+
+    <p>Steps 12&ndash;15 are on the <strong>Loans</strong> worksheet.</p>
+    <ol class="todo" start="12">
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">12</span>
+          <p class="todo__title">Name C4:C7 from the labels in B4:B7</p>
+        </div>
+        <div class="todo__body">
+          <p>Select <strong>B4:C7</strong> and use <strong>Create from Selection</strong> with <strong>Left
+            column</strong> checked, so C4:C7 get the names in B4:B7.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="1843.74">30:43</button>
+          <button type="button" class="pill pill--time" data-seek="1873.74">31:13</button>
+          <button type="button" class="pill pill--time" data-seek="1932.94">32:12</button>
+        </p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">13</span>
+          <p class="todo__title">In C10, the monthly payment with PMT</p>
+        </div>
+        <div class="todo__body">
+          <p>In <strong>C10</strong>, use the <strong>PMT</strong> function with defined names: the annual rate
+            divided by 12, the years times 12, and the <em>negative</em> principal. The result is $176.98.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="1976.28">32:56</button>
+          <button type="button" class="pill pill--time" data-seek="2050.22">34:10</button>
+          <button type="button" class="pill pill--time" data-seek="2080.22">34:40</button>
+        </p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">14</span>
+          <p class="todo__title">In C14, the balloon payment with PV</p>
+        </div>
+        <div class="todo__body">
+          <p>In <strong>C14</strong>, use the <strong>PV</strong> function: the annual rate divided by 12; the years
+            minus the years until balloon, <em>in parentheses</em>, times 12; and the <em>negative</em> monthly
+            payment. The balloon payment comes out to about $15,400.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="2204.68">36:44</button>
+          <button type="button" class="pill pill--time" data-seek="2240.92">37:20</button>
+          <button type="button" class="pill pill--time" data-seek="2300.44">38:20</button>
+        </p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">15</span>
+          <p class="todo__title">Set A1:D15 as the print area</p>
+        </div>
+        <div class="todo__body">
+          <p>Select <strong>A1:D15</strong> on the Loans sheet and set it as the <strong>print area</strong>.</p>
+        </div>
+        <p class="todo__meta"><button type="button" class="pill pill--time" data-seek="2388.76">39:48</button></p>
+      </li>
+    </ol>
+
+    <h3>Submitting</h3>
+    <ol class="todo">
+      <li>
+        <div class="todo__top">
+          <span class="todo__num todo__num--setup" aria-hidden="true">E</span>
+          <p class="todo__title">Compare with the final figures, then save and close</p>
+        </div>
+        <div class="todo__body">
+          <p>Check both sheets against the final figures in the instruction file: $247,362 and 323 on Investments,
+            the corrected differences in column M, and a balloon payment of about $15,400 on Loans. Save the
+            <span class="mono">_2</span> file and close it. A file still open in Excel can upload incomplete.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="2435">40:35</button>
+          <button type="button" class="pill pill--time" data-seek="2479.16">41:19</button>
+        </p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num todo__num--setup" aria-hidden="true">F</span>
+          <p class="todo__title">Upload the _2 file and select Submit</p>
+        </div>
+        <div class="todo__body">
+          <p>Drag and drop it into the MindTap assignment and submit it for grading. Make sure it's the
+            <span class="mono">_2</span> file, not the <span class="mono">_1</span>.</p>
+        </div>
+        <p class="todo__meta"><button type="button" class="pill pill--time" data-seek="2479.16">41:19</button></p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num todo__num--setup" aria-hidden="true">G</span>
+          <p class="todo__title">Open the Graded Summary Report, and fix anything it flags</p>
+        </div>
+        <div class="todo__body">
+          <p>Your score is at the top. Read down the list to see which steps lost points. Fix just those in your
+            <span class="mono">_2</span> file, save and close it, then start a new attempt in MindTap and upload
+            again. You have up to ten attempts.</p>
+        </div>
+        <p class="todo__meta"><button type="button" class="pill pill--time" data-seek="2517.96">41:57</button></p>
+      </li>
+    </ol>
+  </section>
+
+  <!-- ============ Platform tabs ============ -->
+  <section aria-labelledby="platform-heading">
+    <h2 id="platform-heading">Windows and Mac differences</h2>
+    <p>The steps are the same on both. Most of this week is on the Formulas and Data tabs, which look much the same
+      on Mac and Windows. Pick your platform.</p>
+
+    <div class="tabs">
+      <div class="tablist" role="tablist" aria-label="Choose your platform">
+        <button type="button" class="tab" role="tab" id="tab-win" aria-controls="panel-win" aria-selected="true">Windows</button>
+        <button type="button" class="tab" role="tab" id="tab-mac" aria-controls="panel-mac" aria-selected="false" tabindex="-1">Mac</button>
+      </div>
+
+      <div class="tabpanel" role="tabpanel" id="panel-win" aria-labelledby="tab-win" tabindex="0">
+        <h3>On Windows</h3>
+        <ul style="max-width:none">
+          <li><strong>Enable Editing.</strong> Downloaded files open in Protected View with a yellow bar across the
+            top. Select <span class="ui">Enable Editing</span> before anything works. That's different from the
+            sheet protection in step 1.</li>
+          <li><strong>Unprotect:</strong> right-click the sheet tab &rsaquo; <span class="ui">Unprotect Sheet</span>,
+            or <span class="ui">Review &rsaquo; Unprotect Sheet</span>.</li>
+          <li><strong>Border color:</strong> the arrow beside the Borders button &rsaquo;
+            <span class="ui">More Borders</span>.</li>
+          <li><strong>Names:</strong> <span class="ui">Formulas &rsaquo; Name Manager</span> and
+            <span class="ui">Formulas &rsaquo; Create from Selection</span>.</li>
+          <li><strong>Functions:</strong> <span class="ui">Formulas &rsaquo; Insert Function</span>, or the
+            <span class="mono">fx</span> button beside the Formula Bar.</li>
+          <li><strong>Data tables:</strong> <span class="ui">Data &rsaquo; What-If Analysis &rsaquo; Data
+            Table</span>.</li>
+          <li><strong>Error Checking:</strong> <span class="ui">Formulas &rsaquo; Error Checking</span>.</li>
+          <li><strong>Hide a sheet:</strong> right-click the tab &rsaquo; <span class="ui">Hide</span>. Right-click any
+            tab &rsaquo; <span class="ui">Unhide</span> to bring it back.</li>
+          <li><strong>Print area:</strong> <span class="ui">Page Layout &rsaquo; Print Area &rsaquo; Set Print
+            Area</span>.</li>
+        </ul>
+      </div>
+
+      <div class="tabpanel" role="tabpanel" id="panel-mac" aria-labelledby="tab-mac" tabindex="0" hidden>
+        <h3>On Mac</h3>
+        <p>Cengage's material is written for Windows. Most of this assignment matches, but check these before you
+          decide something is broken. I've done these assignments on a Mac myself. If a command genuinely isn't where
+          I say it is, message me through the Canvas Inbox rather than guessing at a substitute.</p>
+        <ul style="max-width:none">
+          <li><strong>No Protected View.</strong> There's no Enable Editing bar. The sheet protection in step 1 still
+            applies, though.</li>
+          <li><strong>Right-click</strong> is Control-click, or a two-finger click on a trackpad. That's how you reach
+            Unprotect Sheet, Hide and Unhide on a sheet tab. <span class="ui">Review &rsaquo; Unprotect Sheet</span>
+            works too.</li>
+          <li><strong>Border color:</strong> <span class="ui">Format &rsaquo; Cells &rsaquo; Border</span> in the menu
+            bar opens the same dialog as More Borders.</li>
+          <li><strong>Names:</strong> the Formulas tab has Define Name and Create from Selection. If you don't see a
+            Name Manager button, <span class="ui">Define Name</span> lists the existing names and lets you edit
+            them.</li>
+          <li><strong>Data tables and Error Checking:</strong> <span class="ui">Data &rsaquo; What-If Analysis &rsaquo;
+            Data Table</span> and <span class="ui">Formulas &rsaquo; Error Checking</span>, as on Windows.</li>
+          <li><strong>Print area:</strong> <span class="ui">Page Layout &rsaquo; Print Area &rsaquo; Set Print
+            Area</span>, or <span class="ui">File &rsaquo; Print Area</span> in the menu bar.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ Corrections ============ -->
+  <section aria-labelledby="corrections-heading">
+    <h2 id="corrections-heading">Since this was recorded</h2>
+    <p>A few things in the video are worth a note. <strong>Where this page and the video disagree, this page is
+      right.</strong></p>
+
+    <div class="callout callout--warn callout--wide">
+      <ul style="margin:0; max-width:none">
+        <li><strong>My Downloads folder is messier than yours.</strong> At 0:41 I delete old practice copies, and at
+          1:49 I delete a "(1)" from my file name that Windows added because of them. Your file name won't have
+          one.</li>
+        <li><strong>Two typos, both fixed on camera.</strong> An extra O in Employer_Match at 7:43, and a dash
+          instead of an underscore in Years_until_Balloon at 38:52.</li>
+        <li><strong>"84,216 invested" at 16:00.</strong> The invested amount counts only what the employee puts in
+          each month (D16, about $584), not the $1,028 monthly total that includes the employer match. That's why
+          it's less than 1,028 &times; 144.</li>
+        <li><strong>"Hide" at 29:58.</strong> I say "click on Hide" while showing the list of hidden sheets. That
+          list comes from <span class="ui">Unhide</span>.</li>
+        <li><strong>"A 12-year loan" at 36:03.</strong> The sample loan is 15 years, as I say at 35:08. The balloon
+          comes due at year 5.</li>
+        <li><strong>No amortization schedule.</strong> The module is called Financial Functions, Data Tables, and
+          Amortization Schedules, but this guided assignment has no amortization schedule step. That part is in the
+          module reading.</li>
+        <li><strong>Values as spoken.</strong> The border gray in step 2 sounds like "Gray, Accent 1, Darker 25%,"
+          and the rate range for the data table in steps 7 and 8 sounds like "2% to 7%." Go by your instruction file
+          and the headings on your sheet.</li>
+        <li><strong>Several garbled spots.</strong> At 1:24, 9:15, 13:50, 25:43, 31:39, 35:23 and 37:50 the automatic
+          captions invented words, repeated themselves or filled silence. The transcript leaves those out; no
+          instructions are missing.</li>
+        <li><strong>Module release.</strong> Modules post on the Friday before the week begins, so Week 10 opened
+          <strong>Friday 10/30</strong>. You can start early.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ AI policy ============ -->
+  <section aria-labelledby="ai-heading">
+    <h2 id="ai-heading">Using AI on this assignment</h2>
+    <p>The course AI policy is <strong>Limited</strong>. You can ask an AI tool to explain what FV or a data table
+      does, why a payment has to be negative, where Name Manager is in Mac Excel, or what an error code means, or to
+      quiz you afterward. <strong>You build the Excel file yourself.</strong> Spell check is an ordinary Excel feature
+      and is always allowed.</p>
+    <p>The practical reason: next week's 200-point Excel Project is all yours, with no walkthrough.</p>
+  </section>
+
+  <!-- ============ What's next ============ -->
+  <section aria-labelledby="next-heading">
+    <h2 id="next-heading">What's next</h2>
+    <p>Once the guided assignment is submitted, go straight to the <strong>Excel Module 4 homework</strong> in
+      MindTap. It's the same commands on a different workbook, with no walkthrough, for 100 points. Both are due
+      <strong>Sunday 11/8</strong>.</p>
+    <p>That's the last Excel module. Week 11 is the 200-point <strong>Excel Project</strong> in Canvas, due
+      <strong>Sunday 11/15 at 11:59 PM</strong>. There's no MindTap module that week. It can't be dropped and it
+      isn't accepted late unless you arrange it with me before the due date.</p>
+    <p>Stuck on a step after re-watching it? Send me a message in the Canvas Inbox and say which step number and what
+      you tried. That's faster than burning attempts.</p>
+  </section>
+
+  <!-- ============ Quick reference ============ -->
+  <section aria-labelledby="reference-heading">
+    <h2 id="reference-heading">Quick reference</h2>
+    <div class="table-scroll" tabindex="0" role="region" aria-label="Quick reference table, scrollable">
+      <table>
+        <caption>Every value this assignment asks for, in one place. Confirm each one, including the exact defined
+          names, against your own instruction file.</caption>
+        <thead>
+          <tr><th scope="col">Step</th><th scope="col">Where it lives</th><th scope="col">Exact setting</th></tr>
+        </thead>
+        <tbody>
+          <tr><th scope="row">Your name</th><td>Documentation sheet</td><td>Your first and last name in B6</td></tr>
+          <tr><th scope="row">1. Unprotect</th><td>Investments; right-click the tab</td><td>Unprotect Sheet</td></tr>
+          <tr><th scope="row">2. Border color</th><td>Borders &rsaquo; More Borders</td><td>B2:D4: existing borders re-colored to the gray in your file (Darker 25%)</td></tr>
+          <tr><th scope="row">3. Names</th><td>Formulas &rsaquo; Name Manager</td><td>D11 renamed <span class="mono">Employer_Match</span>; new name <span class="mono">Future_Value</span> for D19</td></tr>
+          <tr><th scope="row">4. Total percent</th><td>Type in the cell</td><td>D12: <span class="mono">=Percent_Invested+Employer_Match</span> (no function)</td></tr>
+          <tr><th scope="row">5. Future value</th><td>Insert Function &rsaquo; FV</td><td>D19: <span class="mono">=FV(Annual_Return/12,Years_Employed*12,-Monthly_Total)</span></td></tr>
+          <tr><th scope="row">6. One-variable table</th><td>Data &rsaquo; What-If Analysis &rsaquo; Data Table</td><td>B22:D28; Column input cell D14</td></tr>
+          <tr><th scope="row">7. Decimals</th><td>Home &rsaquo; Decrease Decimal</td><td>F9:F19, one decimal place</td></tr>
+          <tr><th scope="row">8. Two-variable table</th><td>Data &rsaquo; What-If Analysis &rsaquo; Data Table</td><td>F8:N19; Row input cell D13; Column input cell D10</td></tr>
+          <tr><th scope="row">9. Fix N29</th><td>Formulas &rsaquo; Error Checking</td><td>N29: <span class="mono">=SUM(N23:N28)</span>; D5 then shows 323</td></tr>
+          <tr><th scope="row">10. Fix M23</th><td>Formulas &rsaquo; Error Checking; fill handle</td><td>M23: <span class="mono">=L23-K23</span>, filled to M24:M28</td></tr>
+          <tr><th scope="row">11. Hide</th><td>Right-click the tab</td><td>Salary sheet hidden</td></tr>
+          <tr><th scope="row">12. Create names</th><td>Loans; Formulas &rsaquo; Create from Selection</td><td>B4:C7 selected, Left column</td></tr>
+          <tr><th scope="row">13. Payment</th><td>Insert Function &rsaquo; PMT</td><td>C10: <span class="mono">=PMT(Annual_Rate/12,Years*12,-Principal)</span></td></tr>
+          <tr><th scope="row">14. Balloon</th><td>Insert Function &rsaquo; PV</td><td>C14: PV with rate <span class="mono">Annual_Rate/12</span>, periods <span class="mono">(Years-Years_until_Balloon)*12</span>, payment the negative monthly payment</td></tr>
+          <tr><th scope="row">15. Print area</th><td>Page Layout &rsaquo; Print Area</td><td>A1:D15 on Loans</td></tr>
+          <tr><th scope="row">File name</th><td>File &rsaquo; Save As</td><td>The <span class="mono">_2</span> version (.xlsx), in Downloads</td></tr>
+          <tr><th scope="row">Submission</th><td>MindTap</td><td>Upload the <span class="mono">_2</span> file, select Submit, read the Graded Summary Report</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <p class="footnote">CSC 104 &middot; Computers and Computer Applications &middot; Fall 2026, Section 0840 &middot;
+    Mendocino College &middot; Instructor: David Pai &middot; <span class="mono">dpai@mendocino.edu</span>.
+    Nothing you type on this page is saved or submitted. Use the Canvas navigation outside this page to get back to
+    the Week 10 module.</p>
+</main>
+
+
+
+
+<script>
+(function () {
+  "use strict";
+
+  var VIDEO_ID = "vhheSjgXFBI";
+
+  /* Transcript source: weeks/week10/csc104-excel-4-guided-corrected.vtt — the
+     Whisper output with its hallucinated passage removed, its repeated and
+     duplicate cues collapsed, and its Excel command names, cell references, proper
+     nouns and punctuation restored. Inlined rather than fetched so this page
+     stays self-contained inside the Canvas iframe. Keep the two copies in step:
+     if the YouTube captions are re-uploaded from the .vtt, re-paste it here
+     too. */
+  var vttContent = `WEBVTT
+
+NOTE
+CSC 104 — Week 10 — Excel Module 4 Guided Assignment Walkthrough (YouTube vhheSjgXFBI)
+Corrected transcript. Source: csc104-guided-excel-4.vtt (Whisper output).
+Cleanup applied: hallucinated or garbled passages removed at 1:24–1:25
+(rolling repeat of "open up my instruction file"), 9:15 ("and sell default
+d12 to me and it will editing"), 13:50–14:13 (dead air), 14:19 (a garbled
+repeat of the previous line), 25:43–25:54 ("i have a value display because
+it's a value distribution... we give resume or disclose it"), 31:39–31:43
+(mixed-language word-salad, "гasty from selection", "подумate", "Terr茶"),
+35:56–35:58 ("our balance sheet is our balance sheet"), and the "okay" ×12
+run over silence at 37:50; "I don't type it right" ×4 over silence at
+35:23–35:48 kept once; the rolling duplicates at 1:29–1:53, 38:20 and 38:45
+collapsed. Sentence casing and punctuation restored throughout; Excel command
+names, defined names and proper nouns corrected (Excel Module 4, Download
+All, Enable Editing, File, Save As, Omari Carter, Core Technology,
+Investments, Unprotect Sheet, #NAME?, More Borders, Format Cells, Formulas,
+Name Manager, Refers To, Scope, Edit Name, New, Employer_Match, Future_Value,
+Percent_Invested, FV, NPER, PMT, Insert Function, Annual_Return,
+Years_Employed, Monthly_Total, IRA, Data, What-If Analysis, Data Table, Row
+input cell, Column input cell, Home, Decrease Decimal, Error Checking,
+Invalid Name Error, SUM, Edit in Formula Bar, #VALUE!, Salary, Hide, Unhide,
+Loans, Create from Selection, Define Name, Use in Formula, Left column,
+Principal, Annual_Rate, Years, Years_until_Balloon, PV, Page Layout, Print
+Area, Set Print Area, Date Modified, Graded Summary Report). "Oh Mari" /
+"Omar I" / "armari" → Omari; "pound names" → #NAME?s; "som" → SOM; "a
+value device" → a value; "click on hide... select the ones you want to hide"
+at 29:58 → Unhide, which is what that list does; "at a percent" → at 8%
+(the rate he states at 19:17); "investment out" → percent invested; "you
+already set the structure" → he's already set up the structure (the
+instruction file's description of the sheet, not a step). Dollar figures are
+written as he says them. The rate range "2% to 7%" at 19:52 and 20:14 is as
+heard. Short cues merged into readable 1–2 sentence lines; timestamps
+normalized to HH:MM:SS.mmm. The instructor's voice, hedges and on-camera
+corrections are preserved, including deleting old practice files at 0:41,
+the extra O in Employer_Match at 7:43, "I think" and "I believe" while
+filling the function dialogs, "a 12-year loan" at 36:03 (the loan is 15
+years), "oh, that doesn't make sense... it's a balloon loan calculator, I'm
+sorry" at 36:22, and the dash typed for an underscore at 38:52.
+
+00:00:00.040 --> 00:00:25.080
+Aloha. This is Excel 4: financial functions, data tables, and amortization schedules. I'm gonna go over the guided assignment; this is my guided assignment video. Okay, so we do our normal: load the project, just like we normally do. Take a
+
+00:00:25.080 --> 00:00:54.060
+second here, and then we start our assignment. We have two files to download, the instruction file and the start file, so I'll Download All. And you can see that I have a bunch of them already from practicing, so let me delete the old ones.
+
+00:00:55.080 --> 00:01:24.180
+All right, so I'm gonna open up my instruction file first, and let's view it so we can read it. And then I'll open up my Excel file, make sure I Enable Editing so I can change it, and then here's where I can magnify and blow it up and down if I need, so I can see it better.
+
+00:01:25.300 --> 00:01:53.080
+All right, so let me go back to the instruction file. First one is obviously to change the name so it ends with a 2, and then make sure your name is in B6. So go back to Excel, and we'll do a File, Save As, Save As, and replace the 1 with a 2, and delete the (1). In mine, it's
+
+00:01:53.080 --> 00:02:04.360
+already had versions in that folder. Okay, and then this has my name here in B6. B6. So we're good to go.
+
+00:02:04.680 --> 00:02:35.440
+All right, so for this scenario you're working with Omari Carter, who's a human resources officer for a company called Core Technology, that makes chips and integrated circuit boards. And he's creating a workbook for employees to keep track of their financial interests, okay? And he wants some help fixing some errors and completing the financial calculations using the data in the spreadsheet.
+
+00:02:35.440 --> 00:03:19.460
+So what we want to do is go to the Investments worksheet and unprotect that worksheet. Okay, so in Excel you can protect stuff. So we'll go to Investments first, and then the easiest way to unprotect is to right-click on Investments and go Unprotect. So when you protect a sheet... and now it's unprotected, so now I can edit it and do whatever I want to it. When you do protect a sheet, you do it the same way, and then you can create a password; you can choose what to protect and what not to protect. Okay, we're not going to do that, but that's where you would do it if you wanted to
+
+00:03:20.480 --> 00:03:44.640
+create a spreadsheet that you shared with people that you didn't want them to change. Okay, so here's our thing. You can see there's some of these #NAME?s and stuff in here. That means that these cells are... we don't know what's supposed to be in these cells, but it's not what's in them, okay? So we'll get to that later. As we go through it, you will fix all those things.
+
+00:03:45.280 --> 00:04:06.460
+All right, so first, number 2: change only the color of the borders for B2 to D4 to Gray, Accent 1, Darker 25%, to match the borders of the rest of the worksheet. Okay, so we want to go to B2 to D4,
+
+00:04:06.460 --> 00:04:35.660
+and we want to change these borders. Okay, so with borders, we could try to go to colors and change the colors, but it won't apply to anything, because of the way borders work. That would change the color so that if we created any new borders, they would be that color. We need to change the existing borders. So we've got to go to More Borders.
+
+00:04:35.660 --> 00:05:02.640
+Okay, and we can see the borders are red, and we have a horizontal one that's thicker, and then two narrower ones for the lower two. So the first thing we do is change the color to Gray, Accent 1, Darker 25%, which is the second from the bottom one. So now they're this color. Now we can go here, and I believe this one is selected,
+
+00:05:02.640 --> 00:05:45.600
+this border is selected, the thick one, so we can click there and apply that color, gray. Then we're going to click on the smaller borders, the thinner ones, and we can click the middle and the bottom border to fix all those borders. Okay, and say OK. And hopefully we did it right and we got them all: they're no longer red. And if we want to... fill this up, so they don't appear red anymore. All right, so that's how you would change the borders.
+
+00:05:47.160 --> 00:06:09.680
+Okay: the range in cells D8 to D19 should have defined names, but one could be clearer and one is missing. So edit the name assigned to cell D11 to use Employer_Match as the defined name, which better clarifies the contents of that cell, and use Future_Value for the name of cell D19.
+
+00:06:09.680 --> 00:06:46.860
+Okay, so what we're going to do is we're going to give these names, right? And so we don't know what the names are. Okay, so we go to Formulas and we go to Name Manager. Okay, and now, Name Manager... I'll expand this just a little bit so you can see. Name Manager says, here's all your names and here's what they refer to: there's Refers To, and Value, the current value, and then the next,
+
+00:06:47.160 --> 00:07:13.560
+what's the Scope? The scope is the workbook, meaning this file. All right, and so what we need to do is see this D11: we want to make it Employer_Match, not just Match. And then there's no D19, so we're gonna have to add that one. All right, so to do it, what we want to do is we want to click on Match, which is
+
+00:07:13.560 --> 00:07:43.540
+the D11, and go Edit. Here it is. And all we need to do is change the name to Employer_Match. So in the Name: Employer_Match. Okay, so, Edit Name, Employer_Match, and I
+
+00:07:43.540 --> 00:08:12.780
+spelt it wrong; I have an extra O in there. We'll fix that: Employer_Match, and we'll say OK. Okay, and then we want to go back to our Name Manager. Okay, here's all our names: it's now Employer_Match. D19 doesn't have one, so we'll create a New one.
+
+00:08:13.540 --> 00:08:41.400
+I'm going to name... we're going to call it Future_Value. And the location: see, Refers To is whatever cell I was in when I opened up Name Manager, and we want this to actually not be F14, but we want it to be this one right here, next to Future Value. The cell says Future Value,
+
+00:08:41.400 --> 00:09:15.840
+and so we want this cell to be our future value. So we can click this to go back. So now it says Future_Value is referring to cell D19 of the Investments sheet. Then we say OK, right? And now in here there's a new one called Future_Value, on Investments, D19. All right, then we can close it. All right, and so
+
+00:09:15.840 --> 00:09:32.220
+that's using Name Manager, for step 3.
+
+00:09:32.220 --> 00:10:00.120
+Okay, so we're on number 4. It says: in cell D12, enter a formula without using a function that sums the Percent_Invested and the Employer_Match values to calculate the total percent invested. Okay, so now that we have all these names, okay, down in here, what we can do,
+
+00:10:00.120 --> 00:10:31.920
+instead of, you know, clicking cells, okay, we can use the names. All right, so we want Percent_Invested and Employer_Match; we want to add those together. So we just say equals Percent... and as you type, it comes up and says, hey, did you want this one? You can double-click on it to put it in. Plus...
+
+00:10:32.220 --> 00:11:06.720
+Employer_Match. Okay, so we can use the names in our formulas instead of the cells. You know, you can see the names instead of the cells. All right, and then it'll grab the 7.25 from Percent_Invested and add it to the 5.5 in Employer_Match to make 12.75 total. Step 5:
+
+00:11:06.720 --> 00:11:30.720
+okay, Omari asks you to determine the future value of the traditional IRA after twelve years. In cell D19, enter a formula using the FV, FV stands for Future Value, function to calculate the future value, using defined names for the rate, the period, NPER is the period, and PMT is the payment. Okay, or the amount you're putting in.
+
+00:11:30.720 --> 00:12:04.960
+So for the rate, you want the annual return divided by 12; that's the monthly interest rate. The years is going to be how many years times the... number of periods, excuse me, it's going to be how many years you're employed times 12, to get how many months you're employed. And then you put in a negative monthly total. You put the monthly total in; if you put it as a positive, you'll get a negative future value. So you want to put it as a negative, so it's a payment,
+
+00:12:05.040 --> 00:12:36.640
+so that it will create a positive future value. Right, you don't really... how you need to know the future value... um, if you're in business or in finance, it'll make sense to you, future value. If you're not, just know that there's functions, and you can use your names in the functions rather than cell references. Rather than, like, B7, we can use Annual_Return.
+
+00:12:36.640 --> 00:13:10.640
+Okay, so let's go down to Future Value in D19. And what we're going to use: we're on Formulas, we can use the Insert Function, and we know it's FV, so FV, Go. Um, so it'll select FV. Say OK. Okay, and then we have this table that we need to fill in, and in our table here, anything that's bold has to have a value; anything that's not is optional. So we're just going to do the first three. All right,
+
+00:13:11.520 --> 00:13:39.120
+so the Rate is, I think it's, Annual_Return. So the problem, the only problem here is you don't... it doesn't let you... slash 12, divide by 12, because Annual_Return divided by 12 is your monthly return, which is 0.0066667. The number of periods is the Years_Employed
+
+00:13:44.640 --> 00:13:48.800
+times 12, because that's how many months there are.
+
+00:14:13.560 --> 00:14:19.120
+Monthly... okay, so it says that's negative 1,028.
+
+00:14:20.000 --> 00:14:57.980
+Okay, and then we say OK, and the answer... it says the answer should be $247,362. Okay, you say OK, and it'll put that in here, in this cell. If you click in this cell, you can see the formula is in there. All right, so that's step 5. So now we want 6.
+
+00:14:57.980 --> 00:15:29.320
+So in 6, Omari also wants you to compare the future value of the IRA and the amounts employees will invest in five-year increments, 5, 10, up to 30, so every five years, kind of a thing. So C22 and D22 already contain the formulas to return the future value and the invested amount in your IRA. So how much it's gonna be... this is how much it's gonna be worth, this is how much you put in. Okay, and
+
+00:15:29.320 --> 00:16:00.300
+in B22 to D28, create a one-input data table, using cell D14 as the column input cell, to vary the years listed in the range B23 to B28, and the formulas that calculate the future value in C22 and the invested amount in D22. Okay, so what all that says is: so down here, there's a little table, and this is the current twelve years. The future value is $247,362.
+
+00:16:00.300 --> 00:16:37.780
+Okay, after twelve years at 8%, if you had put in that 1,028 a month, you would have invested a total of $84,216, and its value, the future value, 12 years from now would be this much. So you put in this much, 84,000, and its value at 12 years is 247,000. So what we want to do is take this stuff and basically say, well, if someone did the same amount, in five years what would it be worth? In 10 years? How much they put in, what they're worth, up to 30.
+
+00:16:37.780 --> 00:17:07.540
+Okay, so to do that, what we want to do is we want to highlight all those cells, from B22 to D28. Okay, and we want to go to Data, What-If Analysis, and Data Table. All right, so we want a one-variable data table. So this is our data table. Oops.
+
+00:17:08.740 --> 00:17:49.860
+Here's our data table: Row input cell, or Column input cell. Okay, so we want to do the D14 as the column input. Okay, so what we want to do is make the column cell the D14. Okay, so Row input cell is empty, because it's just a one-variable table. So we click on the column cell, we click on the arrow, and then we wanna pick D14, which is twelve. All right.
+
+00:17:51.860 --> 00:18:24.580
+And then we can get out of that, and so this is... we're going to say OK, but before I do that, let me get rid of the magnifier. Okay, so what's going to happen, what should happen when I say OK: it's going to change 12 to 5, 10, 15, 20, 25 and 30, and just automatically put in the future value and investment numbers, based on the calculations, using the same calculations to get future value. And then I'll show you the formula in this one.
+
+00:18:24.580 --> 00:19:02.620
+Okay, and if you watch it, it'll actually change the value in this D14 cell. It'll change it to 5, do the calculations, then 10 and 15, automatically, and then when it's done, it'll go back to 12. You probably didn't see it, but that's what it does. Okay, so the future value already has the formula in it. It says it's equal to D19, and D19 has the formula of FV in it, okay, which uses Years_Employed. Investment is 12 times D16, which is the
+
+00:19:02.620 --> 00:19:52.600
+employee... how much the employee puts in, times D14, which is the Years_Employed. Okay, so basically it says if a person contributed to this IRA, they got an annual return of 8% a year, they put in 584 dollars a month, over 30 years they would have put in a total of $210,000, and the value of their IRA at 30 years would be $1.5 million. Okay, so that's what the future value does. Okay, number 7.
+
+00:19:52.600 --> 00:20:13.020
+Okay, so next, Omari wants you to calculate the total amount of a traditional IRA, with an annual return rate varying from 2% to 7%. An IRA, or individual retirement account: so this is what most people put money into so that they can retire and have enough money to live the rest of their life without working.
+
+00:20:14.540 --> 00:20:52.520
+So, 2% to 7% rate of return, with the percent invested varying from 6.5 to 10 percent. Okay: he's already set up the structure for the data table in the range F8 to N19 and entered a formula in cell F8 that references the future value in cell D19. Okay, so first thing, it says to start by decreasing the displayed decimal places in F9 to F19, to show the percentages with only one decimal place.
+
+00:20:52.520 --> 00:21:23.400
+Okay, so what we want to do... so now what we're trying to do is we're trying to complete this table here, annual return and percent invested. So we want to take F9 to F19 and we want to make it one decimal place. Okay, so we'll go to Home, and then under Number we use Decrease Decimal to knock them all down to one. Right.
+
+00:21:23.400 --> 00:21:56.080
+Based on the range F8 to N19, create a two-variable data table that uses the annual rate of return, cell D13, as the row input cell, and percent invested, D10, as the column input cell. Okay, so this works exactly the same way as the last one we did. We want to highlight from F8 down to
+
+00:21:56.080 --> 00:22:38.980
+N19. Then we want to go to Data, What-If, Data Table, and our Row input, okay, is D13, and our Column input is D10. Okay, D10 being percent invested, which is the column, and D13 being your rate of return, which we did down in this bottom, is 8%. Now we're going to do it across a bunch of different values.
+
+00:22:38.980 --> 00:23:25.680
+Okay, so our row is D13, D13; our column is D10. Okay, then we say OK. Right, and this is all at twelve years, because 247 is the base. Okay, so we're investing 8%... so if we don't invest 8%, we only invest 7%, okay, at an 8% return, which is our 8% return over here, the total would be 242 instead of 247. Oh,
+
+00:23:26.080 --> 00:23:49.040
+if we were able to get an average of 10 a year, it'd be 278, versus 247 that we're getting at 8%. So that's just kind of a trade-off matrix table, for different amounts invested at different return rates, over the number of years, in this case 12, what the total value would be. All right.
+
+00:23:49.040 --> 00:24:18.880
+All right, number 9: the other investment table in the range F21 to N29 contains errors, and Omari thinks that correcting them will also correct the error in cell D5. Use Error Checking to determine the problem in cell N29, which should sum the numbers in the Value column, and then edit the formula to correct the error, and then verify the error in D5 has been corrected.
+
+00:24:19.040 --> 00:24:57.680
+Okay, so if we look up here, here's D5. It says #NAME?, and it says it equals N29. Go to N29: it says #NAME?; it equals some formula. Okay, so we're going to go into Formulas and click in that cell. We want to go to Formulas, and then we're going to go into Error Checking. Okay, Error Checking, Error Checking, and it says...
+
+00:24:57.680 --> 00:25:36.560
+okay: Error in cell... Invalid Name Error. Formula contains unrecognized text. So it says equals SOM of N23 to N28. N23 to N28 looks correct. The word, the function, SOM, though, isn't the function we want. We want S-U-M. Okay, so we can Edit in Formula Bar, which goes up here. Go up in here and change the O to a U.
+
+00:25:43.200 --> 00:26:17.980
+Okay, hit the check mark, accept it, and now I have a value down here. It no longer says #NAME?, so we can close Error Checking, because we're done with it. All right, and then what we want to do is check D5, which should now have a value in it. Okay, so D5 is Total Other Investments, 323, and down here we have other investments, adding this stuff up, and it's 323.
+
+00:26:18.400 --> 00:26:46.540
+Okay, number 10: use Error Checking to determine the problem in cell M23, which should subtract the target percentage from the actual percentage. Correct the error, and then fill the range M24 to M28 with the corrected formula.
+
+00:26:46.540 --> 00:27:18.160
+Okay, so M23... you look at M23 here, this one we want to fix, and then we're gonna go down and copy that down. Okay, the values here should be actual minus targeted, I believe. So: subtract targeted from actual, so it's actual minus targeted, which is actual in L, and target is in K. But let's do it through Error Checking: Formulas, Error Checking.
+
+00:27:18.400 --> 00:27:58.440
+So if you look at it, it says: Error in Value, #VALUE!, a value used in the formula is of the wrong data type. It says L minus H. Okay, we can Edit it, we can Ignore, we could do whatever. Let's Edit in Formula Bar. Okay, so it sets us up here at the Formula Bar, but what I really want to do... actually, let's just close this,
+
+00:27:58.440 --> 00:28:42.100
+because what I really want to do, now that I'm in the Formula Bar and editing it: the cells I'm using are highlighted. Okay, so you can see it says L23, which is actual, minus H23, which is the words "U.S. Stocks." Okay, and what I want is actual minus targeted, so it's L minus K, not L minus H. I go up here and I can change this from H23 to K23, and then I hit the check mark to say I accept this formula, and now I have a value.
+
+00:28:43.940 --> 00:29:24.900
+All right, and then to copy this down, there's two ways I could do it. I can click on this little black square in the corner; when I get that black plus, I could click and drag, or I could just double-click it, and what it will do is it'll fill down till there's an empty cell. Okay, and I'm pretty sure it's actual minus targeted... let's make sure; we can double-check that. Subtract the target percentage from the actual, so it's actual minus targeted.
+
+00:29:24.900 --> 00:30:10.980
+All right, so we're good through 10. So 11 says: hide the Salary worksheet, since it contains data employees may want to keep private. So we go to the Salary worksheet, right-click on it, and just Hide it. It no longer appears, but you can get it back the same way we did with the columns. Okay, click on Unhide, and you have all the sheets that are hidden there, and you can select the ones you want to unhide, if you have more than one. All right, so the next thing we're gonna work in,
+
+00:30:10.980 --> 00:30:43.380
+in this... I think we're gonna work in the Loans sheet now. So number 12: go to the Loans worksheet, which provides calculations of various types of loans and now contains only a calculator for a balloon loan, which is a loan that has low payments for the first couple years, and then you have a larger one-time payment at the end of the loan term. So we're gonna assign names to the loan information cells and complete the calculations for the sample loan.
+
+00:30:43.740 --> 00:31:13.300
+Okay, so: in the range C4 to C7, define names based on the values in the range B4 to B7. So what that means is, in these cells here, B4 to B7... we want to name those cells, and what we want to name them is Principal, Annual Rate, Years, Years until Balloon. Okay, that's basically what it does. So to do that, the easiest way to do that is highlight both,
+
+00:31:13.740 --> 00:31:39.100
+the names and the numbers, the four names and the four numbers, and then we go to Define Name... actually, we don't do Define Name. What we do is, right below it, there's Use in Formula, there's Create from Selection. We want to use Create from Selection, and it'll give all these column C's names based on what's in column B.
+
+00:31:43.740 --> 00:32:12.940
+Create Names from Selection. Okay, so here's what you can do: create names from values in... we want the Left column. If you have rows, you can do... you know, if you have them vertically, you can do it the other way too. But we want Left column; that's the names, and the cells that we want to be named are the right column. Right, okay.
+
+00:32:12.940 --> 00:32:56.280
+So now we have... we go to our Name Manager, we should have the top ones: Principal. Here's Principal; it's in Loans, C4. Annual_Rate: you see there's an Annual_Rate; it's in Loans, C5. Years, okay, Loans, C6. And Years_until_Balloon, in Loans, C7. So it created all those, based on just doing that Create from Selection. All right.
+
+00:32:56.280 --> 00:33:26.620
+And so, C10: enter a formula using the PMT, which is the payment function, to calculate the monthly payment, using defined names for rate, period and present value. Okay, so this is: if I get a loan and I want to know what's my monthly payment gonna be, I can calculate that based on the annual rate divided by 12. So this is the interest rate of your loan divided by 12, which gives you the monthly interest rate, because it's all compounded monthly.
+
+00:33:26.620 --> 00:34:10.220
+Okay, number of years you're gonna pay it back, okay, multiplied by 12, because you're gonna pay it back monthly. And then use a negative principal, meaning you borrowed $20,000, so that's a negative 20,000. Okay, and we can use these names, Annual_Rate, Years and Principal, in the PMT function. That's cell C10, Monthly Payment.
+
+00:34:10.220 --> 00:34:37.780
+Okay, so Insert Function, PMT. There's PMT. Say OK. Rate is Annual_Rate/12. In this case the rate is 6.75; we divide by 12, it's gonna be around a half, a little over a half percent.
+
+00:34:40.220 --> 00:35:20.720
+Okay, number of periods: it's Years, Years times 12, which is 15 years times 12, I think. And the present value is negative Principal. You know, capitalization doesn't matter.
+
+00:35:23.920 --> 00:35:56.260
+Oops, I didn't type it right. Okay, which is 20,000, right. So those are the things I have to have. Say OK.
+
+00:35:59.080 --> 00:36:41.400
+All right, and it says that, um, if I borrow 20,000 at 6.75 on a 12-year loan, okay, no balloon payment, because that's not what I'm doing... Years until Balloon would be a balloon payment... I owe monthly 176.98. Oh, that doesn't make sense. Oh, it's a balloon loan calculator, I'm sorry. And at five years I owe a bunch of money; didn't calculate that yet.
+
+00:36:44.680 --> 00:37:16.760
+All right, so let's go back to our instructions. Okay, and so, C14: enter a formula using the PV, present value, function to calculate the balloon payment, using defined names for rate, period and payment: Annual_Rate divided by 12; subtract the Years_until_Balloon from the Years and multiply the result by 12 to get the number of months as periods; and the negative monthly payment as the payment amount.
+
+00:37:20.920 --> 00:37:50.440
+Right, so this is in this cell here. Okay, we're going to insert a function, and that function is going to be based on the PV, or present value. Oops, PV. Hit Go. Select PV. Say OK.
+
+00:37:52.760 --> 00:38:20.440
+Okay, so we have our Rate, which is our Annual_Rate/12. I believe that's what it asks for. Okay: Years_until_Balloon from Years, and multiply the result by 12, and then use a negative monthly payment.
+
+00:38:20.440 --> 00:38:59.080
+Okay, so the period is Years minus Years_until_Balloon, and I'm putting this in parentheses because I want to do the subtraction first, and then I'll multiply the result by 12. Oh: Years_until_Balloon, underscore, not dash. Okay, so it should be 10, because we had 15 and 5.
+
+00:39:00.520 --> 00:39:43.640
+And our payment should be negative monthly payment. Okay, that's our present value. And if we go to our Excel spreadsheet, okay, so now it calculates everything: total monthly payments is gonna be ten thousand, total amount paid is gonna be twenty-six thousand, um, our balloon payment is gonna be fifteen thousand, and the total interest we'll pay over the life of the loan is six thousand. All right, I think that's the last thing to do.
+
+00:39:48.760 --> 00:40:31.000
+Oh, last one: number 15. To prepare for printing the Loans worksheet, set the range A1 to D15 as the print area. Okay, so we're gonna go select, on this sheet, A1 to D... so we get the Core Technology... 15. Okay: Page Layout, Print Area, Set Print Area. Okay, so now there should be a little line around it, like a little dashed line around it, that identifies: if I go to print this page, it's only going to print that much of it.
+
+00:40:35.000 --> 00:41:19.160
+Your workbook should look like this. You know, you can double-check some things: we had our 247,000, or 323,000, um, make sure we did the difference right; it should be negative 3, negative 15, plus 2. That's in Investments. So negative 3, negative 15, plus 2, you know, so we can check those. Then we can go back and look at our Loans. Let's just make sure our balloon payment is right, at fifteen thousand four hundred. Scroll down: fifteen thousand four hundred. You can see the little line around it, just like we have, right? So everything looks good, so we will save this,
+
+00:41:19.160 --> 00:41:57.960
+save our worksheet, our workbook. Close it. Go here, and I sort by Date Modified. Here's my _2 one. I can drop it in, submit it for grade, view the Graded Summary Report, and hopefully we got 25 out of 25, which we did.
+
+00:41:57.960 --> 00:42:18.620
+Okay, and if you didn't, just go through the list and figure out where you missed something. All right, so that's the last module for Excel, the most complex one too, but that's the last module we're covering for Excel. Thanks.`;
+
+  var player = null, timeUpdater = null, parsedTranscript = [], playerReady = false;
+
+  try {
+    if (!CSS.supports("selector(:focus-visible)")) { document.body.classList.add("no-fv"); }
+  } catch (e) { document.body.classList.add("no-fv"); }
+
+  /* ---------------- VTT parsing ---------------- */
+  function timeToSeconds(timeStr) {
+    if (!timeStr) { return 0; }
+    var parts = timeStr.trim().split(":");
+    if (parts.length === 2) {
+      return (parseInt(parts[0], 10) || 0) * 60 + (parseFloat(parts[1]) || 0);
+    }
+    if (parts.length === 3) {
+      return (parseInt(parts[0], 10) || 0) * 3600 + (parseInt(parts[1], 10) || 0) * 60 + (parseFloat(parts[2]) || 0);
+    }
+    return 0;
+  }
+
+  function formatTime(sec) {
+    sec = Math.max(0, Math.floor(sec));
+    var h = Math.floor(sec / 3600), m = Math.floor((sec % 3600) / 60), s = sec % 60;
+    var mm = (h > 0 && m < 10) ? "0" + m : String(m);
+    return (h > 0 ? h + ":" : "") + mm + ":" + (s < 10 ? "0" + s : s);
+  }
+
+  function parseVtt(vttText) {
+    var blocks = vttText.trim().split(/\n\n+/);
+    var cues = [];
+    blocks.forEach(function (block) {
+      var trimmed = block.trim();
+      if (!trimmed || trimmed.indexOf("WEBVTT") === 0 || trimmed.indexOf("NOTE") === 0) { return; }
+      var lines = trimmed.split("\n");
+      var timeLine = null, timeIndex = -1;
+      for (var i = 0; i < lines.length; i++) {
+        if (lines[i].indexOf("-->") !== -1) { timeLine = lines[i]; timeIndex = i; break; }
+      }
+      if (!timeLine) { return; }
+      var ends = timeLine.split("-->");
+      var text = lines.slice(timeIndex + 1).join(" ").trim();
+      if (!text) { return; }
+      cues.push({ start: timeToSeconds(ends[0]), end: timeToSeconds(ends[1]), text: text });
+    });
+    return cues;
+  }
+
+  /* ---------------- Transcript panel ---------------- */
+  function seek(seconds) {
+    if (!player || !player.seekTo) { return false; }
+    player.seekTo(seconds, true);
+    if (player.playVideo) { player.playVideo(); }
+    return true;
+  }
+
+  function scrollPlayerIntoView() {
+    var frame = document.getElementById("video-container");
+    if (frame && frame.scrollIntoView) { frame.scrollIntoView({ behavior: "smooth", block: "center" }); }
+  }
+
+  function populateTranscript() {
+    var container = document.getElementById("transcript-container");
+    if (!container) { return; }
+    container.innerHTML = "";
+    parsedTranscript.forEach(function (cue, i) {
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "transcript-line";
+      btn.dataset.start = cue.start;
+      btn.dataset.end = cue.end;
+      btn.dataset.index = i;
+
+      var stamp = document.createElement("span");
+      stamp.className = "t";
+      stamp.textContent = formatTime(cue.start);
+
+      var body = document.createElement("span");
+      body.className = "tx";
+      body.textContent = cue.text;
+
+      btn.appendChild(stamp);
+      btn.appendChild(body);
+      btn.setAttribute("aria-label", "Jump to " + formatTime(cue.start) + ". " + cue.text);
+
+      btn.addEventListener("click", function () {
+        if (seek(cue.start)) { scrollPlayerIntoView(); }
+      });
+      container.appendChild(btn);
+    });
+  }
+
+  /* ---------------- Active-line highlight ---------------- */
+  var lastAnnounced = null;
+  function announceLine(text) {
+    if (text === lastAnnounced) { return; }
+    lastAnnounced = text;
+    var s = document.getElementById("transcript-status");
+    if (s) { s.textContent = text || ""; }
+  }
+
+  function highlightCurrentLine() {
+    if (!player || !player.getCurrentTime) { return; }
+    var now = player.getCurrentTime();
+    var lines = document.querySelectorAll("#transcript-container .transcript-line");
+    var active = null;
+    Array.prototype.forEach.call(lines, function (line) {
+      var start = parseFloat(line.dataset.start), end = parseFloat(line.dataset.end);
+      if (now >= start && now < end) { active = line; }
+    });
+    var prev = document.querySelector("#transcript-container .is-active");
+    if (active === prev) { return; }
+    if (prev) { prev.classList.remove("is-active"); }
+    if (active) {
+      active.classList.add("is-active");
+      var body = active.querySelector(".tx");
+      announceLine(body ? body.textContent : active.textContent);
+      if (!active.hidden) { active.scrollIntoView({ behavior: "smooth", block: "center" }); }
+    }
+  }
+
+  /* ---------------- Panel height ---------------- */
+  function syncTranscriptHeight() {
+    var videoContainer = document.getElementById("video-container");
+    var panel = document.getElementById("transcript-container");
+    if (!videoContainer || !panel) { return; }
+    // Match the panel to the video only when the two columns actually sit side
+    // by side. Compared by rendered position rather than a viewport-width test,
+    // because in a Canvas iframe a media query measures the iframe, not the
+    // browser window, and can disagree with the flex-wrap result.
+    var videoCol = videoContainer.parentNode;
+    var transcriptCol = panel.parentNode;
+    var sideBySide = Math.abs(
+      transcriptCol.getBoundingClientRect().top - videoCol.getBoundingClientRect().top) < 40
+      && transcriptCol.getBoundingClientRect().left !== videoCol.getBoundingClientRect().left;
+    // Side by side, the panel should end level with the video, so subtract the
+    // heading/search row that sits above it inside the transcript column.
+    var head = transcriptCol.querySelector(".transcript-head");
+    var headH = head ? head.offsetHeight + 8 : 0;
+    var h = sideBySide ? Math.max(240, videoContainer.offsetHeight - headH) + "px" : "24rem";
+    panel.style.height = h;
+    panel.style.maxHeight = h;
+  }
+
+  /* ---------------- Transcript search ---------------- */
+  function escapeRe(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); }
+
+  function runFilter(term) {
+    var lines = document.querySelectorAll("#transcript-container .transcript-line");
+    var status = document.getElementById("transcript-filter-status");
+    var q = term.trim().toLowerCase();
+    var shown = 0;
+
+    Array.prototype.forEach.call(lines, function (line) {
+      var body = line.querySelector(".tx");
+      var cue = parsedTranscript[parseInt(line.dataset.index, 10)];
+      if (!body || !cue) { return; }
+      if (!q) {
+        body.textContent = cue.text;
+        line.hidden = false;
+        shown++;
+        return;
+      }
+      if (cue.text.toLowerCase().indexOf(q) === -1) {
+        body.textContent = cue.text;
+        line.hidden = true;
+        return;
+      }
+      line.hidden = false;
+      shown++;
+      // Rebuild with <mark> around the matches, without using innerHTML on
+      // user-supplied text.
+      body.textContent = "";
+      var re = new RegExp(escapeRe(term.trim()), "ig");
+      var last = 0, m;
+      while ((m = re.exec(cue.text)) !== null) {
+        if (m.index > last) { body.appendChild(document.createTextNode(cue.text.slice(last, m.index))); }
+        var mk = document.createElement("mark");
+        mk.textContent = m[0];
+        body.appendChild(mk);
+        last = m.index + m[0].length;
+        if (m[0].length === 0) { re.lastIndex++; }
+      }
+      if (last < cue.text.length) { body.appendChild(document.createTextNode(cue.text.slice(last))); }
+    });
+
+    if (status) {
+      status.textContent = q
+        ? (shown === 0 ? "No transcript lines match " + term : shown + " transcript line" + (shown === 1 ? "" : "s") + " match " + term)
+        : "Showing the whole transcript.";
+    }
+  }
+
+  function wireSearch() {
+    var input = document.getElementById("transcript-filter");
+    if (!input) { return; }
+    var t = null;
+    input.addEventListener("input", function () {
+      clearTimeout(t);
+      t = setTimeout(function () { runFilter(input.value); }, 250);
+    });
+  }
+
+  /* ---------------- Seek buttons (topic index + step pills) ----------------
+     Buttons wired to the embedded player, never youtu.be?t= links: a time link
+     would navigate the Canvas iframe away from this page. If the player never
+     comes up, the buttons are turned back into plain text so the index reads
+     as a reference list rather than as controls that silently do nothing. */
+  function wireSeekButtons() {
+    var btns = document.querySelectorAll("[data-seek]");
+    Array.prototype.forEach.call(btns, function (btn) {
+      var t = parseFloat(btn.getAttribute("data-seek")) || 0;
+      var item = btn.closest(".topic-index__item") || btn.closest(".todo > li") || btn.closest("tr");
+      var text = item ? item.querySelector(".topic-index__label, .todo__title, th[scope=row]") : null;
+      btn.setAttribute("aria-label", "Jump to " + formatTime(t) + (text ? " — " + text.textContent : "") + " in the video");
+      btn.addEventListener("click", function () {
+        if (seek(t)) { scrollPlayerIntoView(); }
+      });
+    });
+  }
+
+  function degradeToStatic(message) {
+    if (playerReady) { return; }
+    document.body.classList.add("no-player");
+    var idx = document.getElementById("topic-index");
+    if (idx) { idx.classList.add("topic-index--static"); }
+    Array.prototype.forEach.call(document.querySelectorAll("[data-seek]"), function (btn) {
+      btn.disabled = true;
+      btn.removeAttribute("aria-label");
+    });
+    var note = document.getElementById("topic-index-fallback");
+    if (note) { note.hidden = false; note.textContent = message; }
+  }
+
+  /* ---------------- Platform tabs ---------------- */
+  function wireTabs() {
+    var tablist = document.querySelector(".tablist");
+    if (!tablist) { return; }
+    var tabs = Array.prototype.slice.call(tablist.querySelectorAll('[role="tab"]'));
+
+    function select(tab, focus) {
+      tabs.forEach(function (t) {
+        var selected = t === tab;
+        t.setAttribute("aria-selected", selected ? "true" : "false");
+        t.tabIndex = selected ? 0 : -1;
+        var panel = document.getElementById(t.getAttribute("aria-controls"));
+        if (panel) { panel.hidden = !selected; }
+      });
+      if (focus) { tab.focus(); }
+    }
+
+    tabs.forEach(function (tab, i) {
+      tab.addEventListener("click", function () { select(tab, false); });
+      tab.addEventListener("keydown", function (e) {
+        var next = null;
+        if (e.key === "ArrowRight") { next = tabs[(i + 1) % tabs.length]; }
+        else if (e.key === "ArrowLeft") { next = tabs[(i - 1 + tabs.length) % tabs.length]; }
+        else if (e.key === "Home") { next = tabs[0]; }
+        else if (e.key === "End") { next = tabs[tabs.length - 1]; }
+        if (next) { e.preventDefault(); select(next, true); }
+      });
+    });
+  }
+
+  /* ---------------- YouTube player ---------------- */
+  window.onYouTubeIframeAPIReady = function () {
+    if (!VIDEO_ID || !document.getElementById("youtube-player")) { return; }
+    player = new YT.Player("youtube-player", {
+      events: {
+        onReady: function () {
+          playerReady = true;
+          syncTranscriptHeight();
+        },
+        onStateChange: function (event) {
+          clearInterval(timeUpdater);
+          if (event.data === YT.PlayerState.PLAYING) {
+            timeUpdater = setInterval(highlightCurrentLine, 300);
+          } else {
+            highlightCurrentLine();
+          }
+        }
+      }
+    });
+  };
+
+  document.addEventListener("DOMContentLoaded", function () {
+    parsedTranscript = parseVtt(vttContent);
+    populateTranscript();
+    wireSearch();
+    wireSeekButtons();
+    wireTabs();
+    setTimeout(syncTranscriptHeight, 100);
+
+    if (typeof YT === "undefined" || typeof YT.Player === "undefined") {
+      var tag = document.createElement("script");
+      tag.src = "https://www.youtube.com/iframe_api";
+      tag.onerror = function () {
+        degradeToStatic("The video player could not load, so the times below are listed for reference rather than as buttons. The full transcript is above.");
+      };
+      document.head.appendChild(tag);
+    } else {
+      window.onYouTubeIframeAPIReady();
+    }
+
+    // If the API never reports ready — blocked script, offline, restrictive
+    // network — fall back rather than leaving dead buttons on the page.
+    setTimeout(function () {
+      degradeToStatic("The video player did not load, so the times below are listed for reference rather than as buttons. The full transcript is above.");
+    }, 8000);
+  });
+
+  var resizeTimeout;
+  window.addEventListener("resize", function () {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(syncTranscriptHeight, 250);
+  });
+
+  /* Report height to a Canvas parent that listens for it. Harmless otherwise. */
+  function postHeight() {
+    try {
+      if (window.parent && window.parent !== window) {
+        var h = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
+        window.parent.postMessage({ subject: "lti.frameResize", height: h }, "*");
+      }
+    } catch (e) { /* cross-origin parent — ignore */ }
+  }
+  window.addEventListener("load", postHeight);
+  if (window.ResizeObserver) { new ResizeObserver(postHeight).observe(document.body); }
+})();
+</script>
+</body>
+</html>
