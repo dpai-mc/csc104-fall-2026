@@ -1,0 +1,1592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CSC 104 — Excel Module 2 Guided Assignment</title>
+<style>
+/* ============================================================
+   CSC 104 — Week 8 — Excel Module 2 Guided Assignment
+   Self-contained SPA for embedding in a Canvas iframe.
+   Vanilla CSS + vanilla JS, one file, no outbound links.
+   The only external resources are the YouTube player iframe and
+   the YouTube IFrame API (needed for click-to-seek); the page
+   degrades to a readable transcript and a plain topic list if
+   either is blocked.
+   Token block and layout match weeks/week03/01-guided-assign-word-1.html.
+   ============================================================ */
+
+:root {
+  color-scheme: light dark;
+  --surface:      #ffffff;
+  --panel:        #f6f8fb;
+  --panel-2:      #eef2f8;
+  --accent-bg:    #e8f0fe;
+  --ink:          #16202f;
+  --muted:        #46536b;
+  --brand:        #1d4ed8;
+  --brand-ink:    #17399c;
+  --border:       #c3cddc;
+  --border-soft:  #dde4ee;
+  --field-border: #6b7a92;
+  --btn-bg:       #1d4ed8;
+  --btn-fg:       #ffffff;
+  --btn-bg-hover: #17399c;
+  --btn2-bg:      #ffffff;
+  --btn2-fg:      #17399c;
+  --ok:           #1a6b3c;
+  --ok-bg:        #e6f4ec;
+  --warn-ink:     #7a4a06;
+  --warn-bg:      #fdf3e0;
+  --warn-rule:    #b8860b;
+  --focus:        #b4530a;
+  --hit:          #fff2b8;
+  --hit-ink:      #3a2c00;
+  --radius:       10px;
+  --maxw:         70rem;
+  --readw:        46rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --surface:      #0f1726;
+    --panel:        #17223a;
+    --panel-2:      #1e2b45;
+    --accent-bg:    #1a2a4d;
+    --ink:          #e9eefa;
+    --muted:        #b6c3d8;
+    --brand:        #9dbcff;
+    --brand-ink:    #bcd2ff;
+    --border:       #3a4a68;
+    --border-soft:  #2b3a56;
+    --field-border: #7b89a3;
+    --btn-bg:       #9dbcff;
+    --btn-fg:       #0b1424;
+    --btn-bg-hover: #c3d6ff;
+    --btn2-bg:      #17223a;
+    --btn2-fg:      #bcd2ff;
+    --ok:           #8fe0b0;
+    --ok-bg:        #123328;
+    --warn-ink:     #f6d59a;
+    --warn-bg:      #3a2c11;
+    --warn-rule:    #d9a441;
+    --focus:        #ffb066;
+    --hit:          #5c4a10;
+    --hit-ink:      #ffeeb8;
+  }
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--surface);
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; border-radius: 4px; }
+.no-fv :focus { outline: 3px solid var(--focus); outline-offset: 2px; }
+
+.skip-link {
+  position: absolute; left: -9999px; top: 0; z-index: 60;
+  background: var(--btn-bg); color: var(--btn-fg);
+  padding: 0.6rem 1rem; font-weight: 700; border-radius: 0 0 var(--radius) 0;
+}
+.skip-link:focus { left: 0; outline: 3px solid var(--focus); outline-offset: 2px; }
+
+.wrap { max-width: var(--maxw); margin: 0 auto; padding: 1rem 1rem 3rem; }
+.read { max-width: var(--readw); }
+
+/* ---------------------- Header ---------------------- */
+.page-head { background: var(--panel); border-bottom: 3px solid var(--brand); }
+.page-head .wrap { padding-bottom: 1.25rem; }
+
+.eyebrow {
+  font-size: 0.8125rem; letter-spacing: 0.09em; text-transform: uppercase;
+  font-weight: 700; color: var(--brand-ink); margin: 0.75rem 0 0.35rem;
+}
+h1 { font-size: clamp(1.5rem, 4.2vw, 2.15rem); line-height: 1.22; margin: 0 0 0.6rem; }
+.lede { margin: 0; color: var(--muted); max-width: var(--readw); }
+
+.facts { list-style: none; display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 1rem 0 0; padding: 0; }
+.facts li {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 999px; padding: 0.3rem 0.85rem; font-size: 0.875rem;
+}
+.facts .k { font-weight: 700; color: var(--brand-ink); }
+
+/* ---------------------- Typography ---------------------- */
+h2 {
+  font-size: clamp(1.25rem, 3.2vw, 1.6rem);
+  margin: 2.5rem 0 0.75rem; color: var(--brand-ink);
+  padding-bottom: 0.35rem; border-bottom: 2px solid var(--border-soft);
+}
+h3 { font-size: 1.125rem; margin: 1.75rem 0 0.5rem; }
+p { margin: 0 0 1rem; max-width: var(--readw); }
+ul, ol { margin: 0 0 1rem; padding-left: 1.35rem; max-width: var(--readw); }
+li { margin-bottom: 0.4rem; }
+.mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.9375em; }
+.ui { font-weight: 700; }
+
+.callout {
+  border-left: 5px solid var(--brand); background: var(--accent-bg);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding: 0.9rem 1.1rem; margin: 0 0 1.25rem; max-width: var(--readw);
+}
+.callout > :last-child { margin-bottom: 0; }
+.callout h3 { margin-top: 0; font-size: 1.05rem; }
+.callout--warn { border-left-color: var(--warn-rule); background: var(--warn-bg); color: var(--warn-ink); }
+.callout--wide { max-width: none; }
+
+/* ---------------------- Video + transcript ---------------------- */
+.video-row { display: flex; flex-wrap: wrap; gap: 1.25rem; margin: 0 0 1.5rem; }
+.video-col { flex: 1 1 32rem; min-width: min(100%, 20rem); }
+.transcript-col { flex: 1 1 20rem; min-width: min(100%, 17rem); display: flex; flex-direction: column; }
+
+.video-frame {
+  position: relative; width: 100%; padding-top: 56.25%;
+  background: #000; border-radius: var(--radius); overflow: hidden;
+  border: 1px solid var(--field-border);
+}
+.video-frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+.video-caption { font-size: 0.875rem; color: var(--muted); margin-top: 0.5rem; }
+
+.transcript-head { display: flex; flex-wrap: wrap; gap: 0.5rem 0.75rem; align-items: flex-end; margin-bottom: 0.5rem; }
+.transcript-head h3 { margin: 0 0 0.3rem; font-size: 1rem; flex: 0 1 auto; }
+.transcript-search { flex: 1 1 10rem; }
+.transcript-search label { display: block; font-size: 0.8125rem; font-weight: 600; color: var(--muted); }
+.transcript-search input {
+  font: inherit; width: 100%; min-height: 2.5rem; color: var(--ink);
+  background: var(--surface); border: 1px solid var(--field-border);
+  border-radius: 8px; padding: 0.35rem 0.55rem;
+}
+
+.transcript-panel {
+  height: 24rem; max-height: 24rem; overflow-y: auto;
+  border: 1px solid var(--field-border); border-radius: var(--radius);
+  background: var(--panel); padding: 0.4rem;
+}
+.transcript-line {
+  display: block; width: 100%; text-align: left; font: inherit;
+  font-size: 0.9375rem; line-height: 1.5; color: var(--ink);
+  background: transparent; border: 0; border-radius: 6px;
+  padding: 0.45rem 0.6rem; cursor: pointer;
+}
+.transcript-line:hover { background: var(--accent-bg); }
+.transcript-line .t {
+  display: inline-block; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.8125rem; font-weight: 700; color: var(--brand-ink); margin-right: 0.5rem;
+}
+.transcript-line.is-active {
+  background: var(--accent-bg);
+  box-shadow: inset 3px 0 0 0 var(--brand);
+  font-weight: 600;
+}
+.transcript-line[hidden] { display: none; }
+.transcript-line mark { background: var(--hit); color: var(--hit-ink); }
+.transcript-note { color: var(--muted); font-size: 0.875rem; padding: 0.6rem; margin: 0; }
+
+/* Static fallback when the player never loads */
+.no-player .transcript-line { cursor: default; }
+.no-player .transcript-line:hover { background: transparent; }
+
+/* ---------------------- Topic index ---------------------- */
+.topic-index { margin: 0 0 1.5rem; }
+.topic-index__group {
+  font-weight: 700; color: var(--brand-ink); margin: 1.25rem 0 0.4rem;
+  font-size: 0.9375rem; letter-spacing: 0.02em;
+}
+.topic-index__group:first-child { margin-top: 0; }
+.topic-index__list { list-style: none; padding: 0; margin: 0; max-width: none; }
+.topic-index__item {
+  display: flex; gap: 0.7rem; align-items: baseline;
+  padding: 0.28rem 0; margin: 0; border-bottom: 1px solid var(--border-soft);
+}
+.topic-index__list li:last-child { border-bottom: none; }
+.topic-index__time {
+  flex: 0 0 auto; font: inherit;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.875rem; font-weight: 700;
+  min-width: 4.25rem; min-height: 2rem; text-align: center;
+  color: var(--btn2-fg); background: var(--btn2-bg);
+  border: 1px solid var(--field-border); border-radius: 6px;
+  padding: 0.15rem 0.4rem; cursor: pointer;
+}
+.topic-index__time:hover { background: var(--accent-bg); }
+.topic-index__label { flex: 1 1 auto; }
+
+.topic-index--static .topic-index__time {
+  cursor: default; background: transparent; border-color: transparent;
+  color: var(--muted); text-align: left; padding-left: 0;
+}
+.topic-index--static .topic-index__time:hover { background: transparent; }
+
+@media (min-width: 52em) {
+  .topic-cols { column-count: 2; column-gap: 2.25rem; }
+  .topic-cols .topic-index__group { break-after: avoid; }
+  .topic-cols .topic-index__list { break-inside: avoid; }
+}
+
+/* ---------------------- To-do / step lists ---------------------- */
+.todo { list-style: none; padding: 0; margin: 0 0 1.5rem; max-width: none; }
+.todo > li {
+  background: var(--panel); border: 1px solid var(--border-soft);
+  border-radius: var(--radius); padding: 0.85rem 1rem;
+  margin: 0 0 0.75rem;
+}
+.todo__top { display: flex; flex-wrap: wrap; gap: 0.6rem; align-items: baseline; }
+.todo__num {
+  flex: 0 0 auto; min-width: 1.9rem; height: 1.9rem; padding: 0 0.4rem; border-radius: 999px;
+  background: var(--btn-bg); color: var(--btn-fg); font-weight: 700; font-size: 0.9375rem;
+  display: flex; align-items: center; justify-content: center; align-self: flex-start;
+}
+.todo__num--setup { background: var(--btn2-bg); color: var(--btn2-fg); border: 1px solid var(--field-border); }
+.todo__title { flex: 1 1 14rem; font-weight: 700; margin: 0; }
+.todo__body { margin: 0.35rem 0 0 2.5rem; max-width: var(--readw); }
+.todo__body p { margin: 0 0 0.5rem; }
+.todo__body ul { margin: 0 0 0.5rem; }
+.todo__body > :last-child { margin-bottom: 0; }
+.todo__meta { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0.5rem 0 0 2.5rem; }
+.pill {
+  font-size: 0.8125rem; font-weight: 700; border-radius: 999px;
+  padding: 0.1rem 0.6rem; border: 1px solid currentColor; white-space: nowrap;
+}
+.pill--graded { color: var(--ok); background: var(--ok-bg); }
+.pill--setup { color: var(--brand-ink); background: var(--accent-bg); }
+.pill--due { color: var(--warn-ink); background: var(--warn-bg); }
+.pill--time {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  color: var(--btn2-fg); background: var(--btn2-bg); border-color: var(--field-border);
+  cursor: pointer; font-size: 0.8125rem; min-height: 1.9rem;
+}
+.pill--time:hover { background: var(--accent-bg); }
+.no-player .pill--time { cursor: default; }
+
+/* ---------------------- Platform tabs ---------------------- */
+.tabs { margin: 0 0 1.5rem; }
+.tablist { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0 0 -1px; padding: 0; }
+.tab {
+  font: inherit; font-weight: 700; cursor: pointer;
+  color: var(--btn2-fg); background: var(--btn2-bg);
+  border: 1px solid var(--field-border); border-bottom-color: transparent;
+  border-radius: var(--radius) var(--radius) 0 0;
+  padding: 0.5rem 1rem; min-height: 2.5rem;
+}
+.tab[aria-selected="true"] { background: var(--accent-bg); border-bottom-color: var(--accent-bg); }
+.tab:hover { background: var(--accent-bg); }
+.tabpanel {
+  border: 1px solid var(--field-border); border-radius: 0 var(--radius) var(--radius) var(--radius);
+  background: var(--panel); padding: 1rem 1.1rem;
+}
+.tabpanel > :last-child { margin-bottom: 0; }
+.tabpanel h3:first-child { margin-top: 0; }
+
+/* ---------------------- Reference table ---------------------- */
+.table-scroll { overflow-x: auto; margin: 0 0 1.5rem; }
+table { border-collapse: collapse; width: 100%; min-width: 30rem; background: var(--surface); }
+caption { text-align: left; font-weight: 700; padding: 0 0 0.5rem; color: var(--muted); }
+th, td { border: 1px solid var(--border); padding: 0.6rem 0.7rem; text-align: left; vertical-align: top; }
+thead th { background: var(--panel-2); }
+tbody th { background: var(--panel); font-weight: 700; white-space: nowrap; }
+
+.status {
+  min-height: 1.4rem; font-weight: 600; color: var(--ok); background: var(--ok-bg);
+  border-radius: 8px; padding: 0.3rem 0.55rem; margin: 0.5rem 0 0;
+  max-width: var(--readw); font-size: 0.9375rem;
+}
+.status:empty { background: transparent; padding: 0; min-height: 0; }
+
+.footnote {
+  margin-top: 2.5rem; padding-top: 1rem; border-top: 1px solid var(--border-soft);
+  color: var(--muted); font-size: 0.9375rem; max-width: var(--readw);
+}
+
+.sr-only {
+  position: absolute !important; width: 1px; height: 1px; margin: -1px; padding: 0;
+  overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
+}
+
+@media print {
+  .skip-link, .video-frame, .transcript-search, .tablist { display: none !important; }
+  .transcript-panel { height: auto !important; max-height: none !important; overflow: visible; border: none; }
+  .topic-index__time, .pill--time { border: none; }
+  .tabpanel { display: block !important; border-radius: var(--radius); margin-bottom: 1rem; }
+  body { background: #fff; color: #000; }
+  .todo > li, .callout, table { break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+
+<a class="skip-link" href="#main">Skip to page content</a>
+
+<header class="page-head">
+  <div class="wrap">
+    <p class="eyebrow">CSC 104 &middot; Week 8 &middot; Guided Assignment</p>
+    <h1>Excel Module 2 &mdash; Guided Assignment Walkthrough</h1>
+    <p class="lede">Week 8 is formulas, functions and formatting. The video below walks through a budget workbook for
+      Trenchless Pipe Services: conditional formatting to find a duplicate, deleting a row, a subtraction formula,
+      managing and clearing rules, Percent Style and Currency formats, data bars, unmerging and spell check, fill
+      color, hiding a column, SUM and COUNT, and a formula that only works with parentheses. Every step is listed on
+      this page with a button that jumps the video straight to it, and the whole video is written out here so you can
+      read it instead of watching.</p>
+    <ul class="facts">
+      <li><span class="k">Video:</span> 18 minutes</li>
+      <li><span class="k">Week 8:</span> 10/19/2026 &ndash; 10/25/2026</li>
+      <li><span class="k">This assignment:</span> 25 pts in MindTap</li>
+      <li><span class="k">Attempts:</span> up to 10</li>
+      <li><span class="k">Due:</span> Sun 10/25, 11:59 PM</li>
+    </ul>
+  </div>
+</header>
+
+<main id="main" class="wrap" tabindex="-1">
+
+  <!-- ============ What to do this week ============ -->
+  <section aria-labelledby="todo-heading">
+    <h2 id="todo-heading" style="margin-top:1.25rem">What to do this week</h2>
+    <p>Same pattern as every week: a <strong>guided</strong> assignment we walk through together, then a
+      <strong>homework</strong> assignment you do on your own. Do them in that order. Each time stamp below jumps the
+      video to the part that explains it.</p>
+
+    <ol class="todo">
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">1</span>
+          <p class="todo__title">Watch the walkthrough with Excel open beside it</p>
+        </div>
+        <div class="todo__body">
+          <p>Pause after each step and do it in your own file. If the worksheet is too small to read, use the zoom
+            slider in the bottom-right corner of the Excel window. It changes only how the sheet looks on your screen,
+            not the file.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="0">0:00</button>
+          <button type="button" class="pill pill--time" data-seek="173.92">2:53</button>
+          <span class="pill pill--setup">Not graded</span>
+        </p>
+      </li>
+
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">2</span>
+          <p class="todo__title">Download the assignment files from MindTap</p>
+        </div>
+        <div class="todo__body">
+          <p>Two files again: an instruction file and an Excel start file with your name on it. No support file. Use
+            <span class="ui">Download All</span>, the same as always.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="24.48">0:24</button>
+          <span class="pill pill--setup">Not graded</span>
+        </p>
+      </li>
+
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">3</span>
+          <p class="todo__title">Do the eleven steps and submit the guided assignment</p>
+        </div>
+        <div class="todo__body">
+          <p>Every step is written out further down this page. Save as the <span class="mono">_2</span> version first,
+            work through the steps, then upload the file and select <span class="ui">Submit</span>. Check the
+            <span class="ui">Graded Summary Report</span> afterwards. It tells you exactly which steps earned
+            points.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="147.54">2:27</button>
+          <button type="button" class="pill pill--time" data-seek="1028.94">17:08</button>
+          <span class="pill pill--graded">Graded &mdash; 25 pts</span>
+          <span class="pill pill--due">Due Sun 10/25, 11:59 PM</span>
+        </p>
+      </li>
+
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">4</span>
+          <p class="todo__title">Do the Excel Module 2 homework on your own</p>
+        </div>
+        <div class="todo__body">
+          <p>The second MindTap assignment this week. It's a different workbook with the same commands, and there's
+            no walkthrough. That's the point. Start it right after the guided one is submitted, while you still
+            remember where Manage Rules, the decimal buttons and the AutoSum drop-down are.</p>
+        </div>
+        <p class="todo__meta">
+          <span class="pill pill--graded">Graded &mdash; 100 pts</span>
+          <span class="pill pill--due">Due Sun 10/25, 11:59 PM</span>
+        </p>
+      </li>
+
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">5</span>
+          <p class="todo__title">Do the module reading</p>
+        </div>
+        <div class="todo__body">
+          <p>The Excel Module 2 chapter in the Shelly Cashman text, on formulas, functions and formatting. Skim it for
+            <em>what</em> Excel can do, and come back to it as a step-by-step reference when an assignment names
+            something you haven't seen. Not graded.</p>
+        </div>
+        <p class="todo__meta">
+          <span class="pill pill--setup">Not graded</span>
+        </p>
+      </li>
+    </ol>
+  </section>
+
+  <!-- ============ Video + transcript ============ -->
+  <section aria-labelledby="video-heading">
+    <h2 id="video-heading">The walkthrough video</h2>
+    <p>Eighteen minutes, start to finish. It covers downloading the files, saving your copy, all eleven steps, a
+      quick check against the finished workbook, and submitting. If you're stuck on one step, use the topic index
+      below rather than scrubbing through.</p>
+
+    <div class="video-row">
+      <div class="video-col">
+        <div class="video-frame" id="video-container">
+          <iframe id="youtube-player"
+                  src="https://www.youtube.com/embed/gRQ3FxZI1AM?enablejsapi=1&amp;cc_load_policy=1&amp;iv_load_policy=3&amp;modestbranding=1&amp;rel=0"
+                  title="CSC 104 Excel Module 2 Guided Assignment Walkthrough"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  referrerpolicy="strict-origin-when-cross-origin"
+                  allowfullscreen loading="lazy"></iframe>
+        </div>
+        <p class="video-caption">Closed captions are on by default. Select any line of the transcript to jump the
+          video to that moment.</p>
+      </div>
+
+      <div class="transcript-col">
+        <div class="transcript-head">
+          <h3 id="transcript-heading">Transcript</h3>
+          <div class="transcript-search">
+            <label for="transcript-filter">Search the transcript</label>
+            <input type="search" id="transcript-filter" autocomplete="off" spellcheck="false"
+                   aria-describedby="transcript-filter-status">
+          </div>
+        </div>
+        <div class="transcript-panel" id="transcript-container" role="group" aria-labelledby="transcript-heading">
+          <p class="transcript-note">Loading transcript&hellip;</p>
+        </div>
+        <p class="sr-only" role="status" aria-live="polite" id="transcript-filter-status"></p>
+        <p class="sr-only" role="status" aria-live="polite" id="transcript-status"></p>
+        <p style="margin:0.5rem 0 0"><a href="#topic-index-heading">Skip past the transcript</a></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ Topic index ============ -->
+  <section aria-labelledby="topic-index-heading">
+    <h2 id="topic-index-heading">Find a moment in the video</h2>
+    <p><strong>Select any time below and the video jumps there.</strong> This is the detailed contents of the
+      walkthrough. If one step isn't working, find it here and watch just that minute.</p>
+
+    <p id="topic-index-fallback" class="status" hidden></p>
+
+    <div class="topic-index topic-cols" id="topic-index">
+
+      <div class="topic-index__group">Getting started</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="0">0:00</button><span class="topic-index__label">Week 8: formulas, functions and formatting</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="24.48">0:24</button><span class="topic-index__label">Two files; open the instructions at Page Width</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="54.48">0:54</button><span class="topic-index__label">Open the start file and zoom in</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="84.46">1:24</button><span class="topic-index__label">Save As the _2 copy; your name in B6</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="114.46">1:54</button><span class="topic-index__label">The scenario: Trenchless Pipe Services</span></li>
+      </ul>
+
+      <div class="topic-index__group">Step 1 &mdash; find the duplicate, delete its row</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="147.54">2:27</button><span class="topic-index__label">What step 1 asks for</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="173.92">2:53</button><span class="topic-index__label">The Annual Budget sheet tab, and zooming</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="193.12">3:13</button><span class="topic-index__label">Highlight Cells Rules &rsaquo; Duplicate Values</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="216.58">3:36</button><span class="topic-index__label">Select row 7 by its number, right-click &rsaquo; Delete</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="233.92">3:53</button><span class="topic-index__label">Why there's still a row 7: rows renumber</span></li>
+      </ul>
+
+      <div class="topic-index__group">Steps 2 and 3 &mdash; a formula, then clear a rule</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="263.92">4:23</button><span class="topic-index__label">What step 2 asks for: budgeted minus actual</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="287.52">4:47</button><span class="topic-index__label">=C4-D4, then the fill handle to E15</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="324.06">5:24</button><span class="topic-index__label">Step 3: Conditional Formatting &rsaquo; Manage Rules</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="347.5">5:47</button><span class="topic-index__label">Delete Rule, then Apply</span></li>
+      </ul>
+
+      <div class="topic-index__group">Steps 4 and 5 &mdash; percent and data bars</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="368">6:08</button><span class="topic-index__label">What step 4 asks for</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="377.5">6:17</button><span class="topic-index__label">Percent Style, then Increase Decimal twice</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="406.14">6:46</button><span class="topic-index__label">Decimal places, not decimal points</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="418.76">6:58</button><span class="topic-index__label">Step 5: Data Bars &rsaquo; Gradient Fill &rsaquo; Blue</span></li>
+      </ul>
+
+      <div class="topic-index__group">Step 6 &mdash; unmerge and spell check</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="462.32">7:42</button><span class="topic-index__label">What step 6 asks for; Merge &amp; Center drop-down</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="480.54">8:00</button><span class="topic-index__label">Unmerge Cells; Spelling finds nothing the first time</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="496.14">8:16</button><span class="topic-index__label">Click one cell, run Spelling again, continue from the beginning</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="510.94">8:30</button><span class="topic-index__label">Three corrections, starting in B3</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="552.22">9:12</button><span class="topic-index__label">Spelling starts from wherever you are</span></li>
+      </ul>
+
+      <div class="topic-index__group">Step 7 &mdash; fill color and a hidden column</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="561.26">9:21</button><span class="topic-index__label">What step 7 asks for</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="579.9">9:39</button><span class="topic-index__label">The Charitable sheet tab</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="601.02">10:01</button><span class="topic-index__label">Fill Color, next to Font Color</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="626.78">10:26</button><span class="topic-index__label">Teal, Accent 2, Lighter 80%</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="645.34">10:45</button><span class="topic-index__label">Select column F, right-click &rsaquo; Hide</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="664.6">11:04</button><span class="topic-index__label">Getting it back: select E to G, then Unhide</span></li>
+      </ul>
+
+      <div class="topic-index__group">Step 8 &mdash; Currency, not Accounting</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="685.04">11:25</button><span class="topic-index__label">What step 8 asks for</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="702.64">11:42</button><span class="topic-index__label">The $ button is Accounting; pick Currency, then Decrease Decimal twice</span></li>
+      </ul>
+
+      <div class="topic-index__group">Steps 9 and 10 &mdash; SUM and COUNT</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="733.02">12:13</button><span class="topic-index__label">Step 9: AutoSum in I3, then drag B4 to B12</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="762.64">12:42</button><span class="topic-index__label">Check it in the Formula Bar; Escape to back out</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="788.96">13:08</button><span class="topic-index__label">Step 10: AutoSum drop-down &rsaquo; Count Numbers in I4</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="818.94">13:38</button><span class="topic-index__label">Nine gifts</span></li>
+      </ul>
+
+      <div class="topic-index__group">Step 11 &mdash; parentheses matter</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="833.94">13:53</button><span class="topic-index__label">What step 11 asks for</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="848.94">14:08</button><span class="topic-index__label">I read it backwards, then correct it: I3 minus I5</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="857.78">14:17</button><span class="topic-index__label">The wrong way, on purpose: no parentheses</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="890.64">14:50</button><span class="topic-index__label">Why: Excel divides before it subtracts</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="916.62">15:16</button><span class="topic-index__label">=(I3-I5)/I5</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="938.94">15:38</button><span class="topic-index__label">Negative 23%: under the projection</span></li>
+      </ul>
+
+      <div class="topic-index__group">Checking and submitting</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="956.18">15:56</button><span class="topic-index__label">A quick check of the Annual Budget sheet</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="998.94">16:38</button><span class="topic-index__label">A quick check of the Charitable sheet</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1019.16">16:59</button><span class="topic-index__label">Save and close</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1028.94">17:08</button><span class="topic-index__label">Drag in the _2 file and Submit</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1058.94">17:38</button><span class="topic-index__label">The Graded Summary Report: 25 out of 25</span></li>
+      </ul>
+
+    </div>
+  </section>
+
+  <!-- ============ New ideas ============ -->
+  <section aria-labelledby="vocab-heading">
+    <h2 id="vocab-heading">New ideas this week</h2>
+    <p>Last week was the basics of a worksheet. This week adds rules that format cells for you, more number formats,
+      and your first functions besides SUM. The instruction file uses these words without explaining them, so here
+      they are in one place.</p>
+
+    <div class="table-scroll" tabindex="0" role="region" aria-label="New Excel ideas table, scrollable">
+      <table>
+        <caption>The Excel ideas this assignment uses, with the moment in the video where each one comes up.</caption>
+        <thead>
+          <tr><th scope="col">Idea</th><th scope="col">What it means</th><th scope="col">In the video</th></tr>
+        </thead>
+        <tbody>
+          <tr><th scope="row">Conditional formatting</th><td>Formatting that Excel applies only to cells that meet a rule, such as "this value appears more than once." Change the data and the formatting follows it.</td><td><button type="button" class="pill pill--time" data-seek="193.12">3:13</button></td></tr>
+          <tr><th scope="row">Manage Rules</th><td>The list of every conditional formatting rule on the sheet, with the range each one applies to. This is where you delete one rule without touching anything else.</td><td><button type="button" class="pill pill--time" data-seek="324.06">5:24</button></td></tr>
+          <tr><th scope="row">Data bars</th><td>A conditional format that draws a bar in each cell, sized by its value. Positive values bar to the right, negative to the left.</td><td><button type="button" class="pill pill--time" data-seek="418.76">6:58</button></td></tr>
+          <tr><th scope="row">Deleting a row</th><td>Removes the whole row, and every row below moves up and takes the next number. That's why there's still a row 7 afterwards.</td><td><button type="button" class="pill pill--time" data-seek="233.92">3:53</button></td></tr>
+          <tr><th scope="row">Percent Style</th><td>Shows a value like 0.0976 as 9.76%. The value underneath doesn't change, only how it's displayed.</td><td><button type="button" class="pill pill--time" data-seek="377.5">6:17</button></td></tr>
+          <tr><th scope="row">Decimal places</th><td>How many digits show after the decimal point. Increase Decimal and Decrease Decimal change it one place per click.</td><td><button type="button" class="pill pill--time" data-seek="406.14">6:46</button></td></tr>
+          <tr><th scope="row">Currency vs. Accounting</th><td>Both add a dollar sign. The $ button on the ribbon applies <em>Accounting</em>, which lines the dollar signs up at the left edge of the cell. <em>Currency</em> puts the $ right next to the number, and you pick it from the Number Format drop-down.</td><td><button type="button" class="pill pill--time" data-seek="702.64">11:42</button></td></tr>
+          <tr><th scope="row">Hide and Unhide</th><td>A hidden column is still there and still in every formula. It just isn't shown. To unhide it, select the columns on both sides of it.</td><td><button type="button" class="pill pill--time" data-seek="645.34">10:45</button></td></tr>
+          <tr><th scope="row">COUNT</th><td>A function that counts how many cells in a range contain numbers. AutoSum's drop-down calls it <em>Count Numbers</em>.</td><td><button type="button" class="pill pill--time" data-seek="788.96">13:08</button></td></tr>
+          <tr><th scope="row">Order of operations</th><td>Excel multiplies and divides before it adds and subtracts, left to right. Parentheses make it do the part inside them first.</td><td><button type="button" class="pill pill--time" data-seek="890.64">14:50</button></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout">
+      <h3>Why step 11 needs parentheses</h3>
+      <p>The step wants the difference between the total (I3) and the projection (I5), divided by the projection.
+        In the video the total is about $30,700 and the projection $40,000.</p>
+      <ul style="margin:0 0 0.75rem">
+        <li><span class="mono">=I3-I5/I5</span> divides first: I5/I5 is 1, so this is 30,700 &minus; 1. As a
+          percentage, that's a huge number. Wrong.</li>
+        <li><span class="mono">=(I3-I5)/I5</span> subtracts first: &minus;9,300 &divide; 40,000, about
+          &minus;23%. The office raised about 23% less than it projected. Right.</li>
+      </ul>
+      <p>Whenever an instruction says to do one thing <em>and then</em> divide or multiply the result, that's
+        your cue for parentheses.</p>
+    </div>
+  </section>
+
+  <!-- ============ The steps ============ -->
+  <section aria-labelledby="steps-heading">
+    <h2 id="steps-heading">The assignment, step by step</h2>
+    <p>Four setup items, then the eleven graded steps, then submitting. Each one says <em>what</em> to change; the
+      time button next to it shows you <em>how</em>. <strong>Always go by the instruction file MindTap gave you.</strong>
+      The wording below is a summary, and MindTap grades against its own file.</p>
+
+    <div class="callout">
+      <h3>Four details worth knowing</h3>
+      <ul style="margin:0 0 0.75rem">
+        <li><strong>Two worksheets, in order.</strong> Steps 1 through 6 happen on the <em>Annual Budget</em> sheet;
+          steps 7 through 11 on the <em>Charitable</em> sheet. Check the tabs at the bottom before you start each
+          group.</li>
+        <li><strong>Delete the row, don't just empty it.</strong> Step 1 wants the whole row containing the first
+          duplicate removed. Select it by clicking its row number, then right-click &rsaquo; Delete. The rows below
+          move up, so the totals row moves from 17 to 16 <em>(3:53)</em>.</li>
+        <li><strong>If Spelling finishes instantly, it only checked your selection.</strong> After unmerging A16,
+          several cells are still selected. Click one empty cell and run Spelling again; when Excel asks whether to
+          continue from the beginning, say <span class="ui">Yes</span> <em>(8:16)</em>.</li>
+        <li><strong>The $ button is the wrong one for step 8.</strong> It applies Accounting. Step 8 asks for
+          Currency, which is in the Number Format drop-down <em>(11:42)</em>.</li>
+      </ul>
+      <p style="margin:0">The numbers below follow the order of the instruction file. If your file groups or numbers
+        something differently, go by your file.</p>
+    </div>
+
+    <h3>Before you start</h3>
+    <ol class="todo">
+      <li>
+        <div class="todo__top">
+          <span class="todo__num todo__num--setup" aria-hidden="true">A</span>
+          <p class="todo__title">Download both files</p>
+        </div>
+        <div class="todo__body">
+          <p>The instruction file and an Excel start file with your name in it, ending in <span class="mono">_1</span>.
+            No support file this week. They land in your Downloads folder.</p>
+        </div>
+        <p class="todo__meta"><button type="button" class="pill pill--time" data-seek="24.48">0:24</button></p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num todo__num--setup" aria-hidden="true">B</span>
+          <p class="todo__title">Open the instruction file and read it</p>
+        </div>
+        <div class="todo__body">
+          <p>Select <span class="ui">Enable Editing</span>, then <span class="ui">View &rsaquo; Page Width</span> to
+            make it readable. Keep it open in a second window. The final figures at the end of the file show what
+            both worksheets should look like when you're done.</p>
+        </div>
+        <p class="todo__meta"><button type="button" class="pill pill--time" data-seek="24.48">0:24</button></p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num todo__num--setup" aria-hidden="true">C</span>
+          <p class="todo__title">Open the start file and save it as the _2 version</p>
+        </div>
+        <div class="todo__body">
+          <p><span class="ui">Enable Editing</span>, then <span class="ui">File &rsaquo; Save As</span>. Leave it in
+            Downloads, change the <span class="mono">1</span> at the end of the file name to a
+            <span class="mono">2</span>, and save. The title bar should now show the <span class="mono">_2</span>
+            name. <strong>Everything you do from here goes in the <span class="mono">_2</span> file.</strong></p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="54.48">0:54</button>
+          <button type="button" class="pill pill--time" data-seek="84.46">1:24</button>
+        </p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num todo__num--setup" aria-hidden="true">D</span>
+          <p class="todo__title">Check that it's your file</p>
+        </div>
+        <div class="todo__body">
+          <p>Your first and last name should be in cell <strong>B6</strong> of the <strong>Documentation</strong>
+            sheet, the same as last week. If it isn't your name, delete the file and download it again.</p>
+        </div>
+        <p class="todo__meta"><button type="button" class="pill pill--time" data-seek="84.46">1:24</button></p>
+      </li>
+    </ol>
+
+    <h3>The eleven graded steps</h3>
+    <p>Steps 1&ndash;6 are on the <strong>Annual Budget</strong> worksheet.</p>
+    <ol class="todo">
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">1</span>
+          <p class="todo__title">Highlight duplicates in B4:B16, then delete the first duplicate's row</p>
+        </div>
+        <div class="todo__body">
+          <p>Use conditional formatting to highlight <strong>Duplicate Values</strong> in <strong>B4</strong> through
+            <strong>B16</strong> with <strong>Yellow Fill with Dark Yellow Text</strong>. One item shows up twice.
+            Delete the <strong>entire row</strong> that holds its <em>first</em> appearance.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="147.54">2:27</button>
+          <button type="button" class="pill pill--time" data-seek="193.12">3:13</button>
+          <button type="button" class="pill pill--time" data-seek="216.58">3:36</button>
+        </p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">2</span>
+          <p class="todo__title">In E4, budgeted minus actual; fill it to E15</p>
+        </div>
+        <div class="todo__body">
+          <p>In <strong>E4</strong>, enter a formula <em>without a function</em> that subtracts the actual amount
+            (<strong>D4</strong>) from the budgeted amount (<strong>C4</strong>). Then fill <strong>E5:E15</strong>
+            with it using the fill handle. E4 should show $5,000.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="263.92">4:23</button>
+          <button type="button" class="pill pill--time" data-seek="287.52">4:47</button>
+        </p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">3</span>
+          <p class="todo__title">Clear the conditional formatting from C4:C15</p>
+        </div>
+        <div class="todo__body">
+          <p>The blue formatting in <strong>C4</strong> through <strong>C15</strong> comes from a rule. Remove that
+            rule, and only that rule. The duplicate rule from step 1 stays.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="324.06">5:24</button>
+          <button type="button" class="pill pill--time" data-seek="347.5">5:47</button>
+        </p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">4</span>
+          <p class="todo__title">Percent Style with two decimal places on F4:F16</p>
+        </div>
+        <div class="todo__body">
+          <p>Apply <strong>Percent Style</strong> to <strong>F4</strong> through <strong>F16</strong>, then show
+            <strong>two</strong> decimal places.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="368">6:08</button>
+          <button type="button" class="pill pill--time" data-seek="377.5">6:17</button>
+        </p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">5</span>
+          <p class="todo__title">Blue gradient data bars on E4:E15</p>
+        </div>
+        <div class="todo__body">
+          <p>Add a conditional formatting rule to <strong>E4</strong> through <strong>E15</strong> that uses
+            <strong>Gradient Fill</strong> &rsaquo; <strong>Blue Data Bar</strong>. Negative differences bar to the
+            left in red. That's expected.</p>
+        </div>
+        <p class="todo__meta"><button type="button" class="pill pill--time" data-seek="418.76">6:58</button></p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">6</span>
+          <p class="todo__title">Unmerge A16, then spell check the worksheet</p>
+        </div>
+        <div class="todo__body">
+          <p><strong>Unmerge</strong> cell <strong>A16</strong>. Then run <strong>Spelling</strong> on the whole
+            worksheet and correct every misspelling. There are three.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="462.32">7:42</button>
+          <button type="button" class="pill pill--time" data-seek="496.14">8:16</button>
+          <button type="button" class="pill pill--time" data-seek="510.94">8:30</button>
+        </p>
+      </li>
+    </ol>
+
+    <p>Steps 7&ndash;11 are on the <strong>Charitable</strong> worksheet.</p>
+    <ol class="todo" start="7">
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">7</span>
+          <p class="todo__title">Fill A1:F1 Teal, Accent 2, Lighter 80%; hide column F</p>
+        </div>
+        <div class="todo__body">
+          <p>Give the merged title range <strong>A1:F1</strong> the fill color <strong>Teal, Accent 2, Lighter
+            80%</strong>. Then <strong>hide column F</strong>.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="561.26">9:21</button>
+          <button type="button" class="pill pill--time" data-seek="601.02">10:01</button>
+          <button type="button" class="pill pill--time" data-seek="645.34">10:45</button>
+        </p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">8</span>
+          <p class="todo__title">Currency, $ sign, zero decimal places on B4:B12</p>
+        </div>
+        <div class="todo__body">
+          <p>Apply the <strong>Currency</strong> number format (not Accounting) to <strong>B4</strong> through
+            <strong>B12</strong>, with the dollar sign and <strong>0</strong> decimal places.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="685.04">11:25</button>
+          <button type="button" class="pill pill--time" data-seek="702.64">11:42</button>
+        </p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">9</span>
+          <p class="todo__title">SUM the donations in I3</p>
+        </div>
+        <div class="todo__body">
+          <p>In <strong>I3</strong>, enter a formula that uses the <strong>SUM</strong> function to total
+            <strong>B4:B12</strong>. AutoSum can't guess the range from I3, so drag across B4 to B12 yourself before
+            pressing Enter.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="733.02">12:13</button>
+          <button type="button" class="pill pill--time" data-seek="762.64">12:42</button>
+        </p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">10</span>
+          <p class="todo__title">COUNT the gifts in I4</p>
+        </div>
+        <div class="todo__body">
+          <p>In <strong>I4</strong>, enter a formula that uses the <strong>COUNT</strong> function on
+            <strong>B4:B12</strong>. The answer is 9.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="788.96">13:08</button>
+          <button type="button" class="pill pill--time" data-seek="818.94">13:38</button>
+        </p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">11</span>
+          <p class="todo__title">In I6, (total minus projected) divided by projected</p>
+        </div>
+        <div class="todo__body">
+          <p>In <strong>I6</strong>, enter a formula <em>without a function</em> that subtracts the projected amount
+            (<strong>I5</strong>) from the total (<strong>I3</strong>), then divides that result by
+            <strong>I5</strong>. It needs parentheses. The result is about &minus;23%.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="833.94">13:53</button>
+          <button type="button" class="pill pill--time" data-seek="890.64">14:50</button>
+          <button type="button" class="pill pill--time" data-seek="916.62">15:16</button>
+        </p>
+      </li>
+    </ol>
+
+    <h3>Submitting</h3>
+    <ol class="todo">
+      <li>
+        <div class="todo__top">
+          <span class="todo__num todo__num--setup" aria-hidden="true">E</span>
+          <p class="todo__title">Compare with the final figures, then save and close</p>
+        </div>
+        <div class="todo__body">
+          <p>Check both worksheets against the final figures in the instruction file. Save the
+            <span class="mono">_2</span> file and close it. A file still open in Excel can upload incomplete.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="956.18">15:56</button>
+          <button type="button" class="pill pill--time" data-seek="1019.16">16:59</button>
+        </p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num todo__num--setup" aria-hidden="true">F</span>
+          <p class="todo__title">Upload the _2 file and select Submit</p>
+        </div>
+        <div class="todo__body">
+          <p>Drag and drop it into the MindTap assignment and submit it for grading. If the file name is wrong,
+            MindTap won't accept it. Make sure it's the <span class="mono">_2</span> file, not the
+            <span class="mono">_1</span>.</p>
+        </div>
+        <p class="todo__meta"><button type="button" class="pill pill--time" data-seek="1028.94">17:08</button></p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num todo__num--setup" aria-hidden="true">G</span>
+          <p class="todo__title">Open the Graded Summary Report, and fix anything it flags</p>
+        </div>
+        <div class="todo__body">
+          <p>Your score is at the top. Read down the list to see which steps lost points. Fix just those in your
+            <span class="mono">_2</span> file, save and close it, then start a new attempt in MindTap and upload
+            again. You have up to ten attempts.</p>
+        </div>
+        <p class="todo__meta"><button type="button" class="pill pill--time" data-seek="1058.94">17:38</button></p>
+      </li>
+    </ol>
+  </section>
+
+  <!-- ============ Platform tabs ============ -->
+  <section aria-labelledby="platform-heading">
+    <h2 id="platform-heading">Windows and Mac differences</h2>
+    <p>The steps are the same on both. Almost everything this week is on the Home tab, which looks nearly the same on
+      Mac and Windows. The differences are mostly right-clicking, a few menu names and keyboard shortcuts. Pick your
+      platform.</p>
+
+    <div class="tabs">
+      <div class="tablist" role="tablist" aria-label="Choose your platform">
+        <button type="button" class="tab" role="tab" id="tab-win" aria-controls="panel-win" aria-selected="true">Windows</button>
+        <button type="button" class="tab" role="tab" id="tab-mac" aria-controls="panel-mac" aria-selected="false" tabindex="-1">Mac</button>
+      </div>
+
+      <div class="tabpanel" role="tabpanel" id="panel-win" aria-labelledby="tab-win" tabindex="0">
+        <h3>On Windows</h3>
+        <ul style="max-width:none">
+          <li><strong>Enable Editing.</strong> Downloaded files open in Protected View with a yellow bar across the
+            top. Select <span class="ui">Enable Editing</span> before anything works.</li>
+          <li><strong>Conditional formatting:</strong> <span class="ui">Home &rsaquo; Conditional Formatting</span>.
+            Highlight Cells Rules, Data Bars and Manage Rules are all in that one menu.</li>
+          <li><strong>Deleting a row:</strong> click the row number, then right-click &rsaquo;
+            <span class="ui">Delete</span>.</li>
+          <li><strong>Percent Style, decimals, Currency:</strong> the Home tab's Number group. The Number Format
+            drop-down box holds Currency.</li>
+          <li><strong>Unmerge:</strong> the small arrow beside <span class="ui">Merge &amp; Center</span> &rsaquo;
+            <span class="ui">Unmerge Cells</span>.</li>
+          <li><strong>Spelling:</strong> <span class="ui">Review &rsaquo; Spelling</span>, or
+            <span class="mono">F7</span>.</li>
+          <li><strong>Hide and Unhide:</strong> right-click the column letter.</li>
+          <li><strong>COUNT:</strong> the arrow beside the &Sigma; AutoSum button &rsaquo;
+            <span class="ui">Count Numbers</span>.</li>
+          <li><strong>Finding your file:</strong> File Explorer, <span class="ui">View &rsaquo; Details</span>, then
+            click the <span class="ui">Date modified</span> heading to sort newest first.</li>
+        </ul>
+      </div>
+
+      <div class="tabpanel" role="tabpanel" id="panel-mac" aria-labelledby="tab-mac" tabindex="0" hidden>
+        <h3>On Mac</h3>
+        <p>Cengage's material is written for Windows. Most of this assignment matches, but check these before you
+          decide something is broken. I've done these assignments on a Mac myself. If a command genuinely isn't where
+          I say it is, message me through the Canvas Inbox rather than guessing at a substitute.</p>
+        <ul style="max-width:none">
+          <li><strong>No Protected View.</strong> There's no Enable Editing bar. The file opens ready to edit.</li>
+          <li><strong>Right-click</strong> is Control-click, or a two-finger click on a trackpad. That's how you reach
+            Delete on a row and Hide or Unhide on a column.</li>
+          <li><strong>Conditional formatting:</strong> <span class="ui">Home &rsaquo; Conditional Formatting</span>,
+            the same menu. Manage Rules opens a window that lists rules for the current selection or the whole sheet;
+            switch it to <em>This Sheet</em> if you don't see the C4:C15 rule.</li>
+          <li><strong>Percent Style, decimals, Currency:</strong> on the Home tab, as on Windows.</li>
+          <li><strong>Unmerge:</strong> the arrow beside <span class="ui">Merge &amp; Center</span> &rsaquo;
+            <span class="ui">Unmerge Cells</span>.</li>
+          <li><strong>Spelling:</strong> <span class="ui">Review &rsaquo; Spelling</span>.</li>
+          <li><strong>COUNT:</strong> the arrow beside AutoSum &rsaquo; <span class="ui">Count Numbers</span>.</li>
+          <li><strong>Finding your file:</strong> Finder &rsaquo; Downloads, switch to
+            <span class="ui">List</span> view, then click <span class="ui">Date Modified</span> to sort newest
+            first.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ Corrections ============ -->
+  <section aria-labelledby="corrections-heading">
+    <h2 id="corrections-heading">Since this was recorded</h2>
+    <p>A few things in the video are worth a note. <strong>Where this page and the video disagree, this page is
+      right.</strong></p>
+
+    <div class="callout callout--warn callout--wide">
+      <ul style="margin:0; max-width:none">
+        <li><strong>I read step 11 backwards first.</strong> At 13:53 I say "I5 minus I3," then correct myself at
+          14:08: it's <strong>I3 minus I5</strong>, divided by I5.</li>
+        <li><strong>The formula at 14:17 is wrong on purpose.</strong> I type it without parentheses to show you the
+          huge number you get. Don't keep that one. The right formula goes in at 15:16.</li>
+        <li><strong>Spelling at 8:00.</strong> The first Spelling run finds nothing because cells are still
+          selected from unmerging, so it only checks those. Click a single cell and run it again, as I do at
+          8:16.</li>
+        <li><strong>Text as spoken.</strong> I read the instructions out loud, and the audio garbles some of them,
+          including the scenario's names and the misspelled words in step 6. Go by your instruction file for the
+          exact wording.</li>
+        <li><strong>One garbled spot.</strong> At 12:41, while I select B4 to B12, the automatic captions invented a
+          few words in other languages. The transcript leaves them out; no instructions are missing.</li>
+        <li><strong>Module release.</strong> Modules post on the Friday before the week begins, so Week 8 opened
+          <strong>Friday 10/16</strong>. You can start early.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ AI policy ============ -->
+  <section aria-labelledby="ai-heading">
+    <h2 id="ai-heading">Using AI on this assignment</h2>
+    <p>The course AI policy is <strong>Limited</strong>. You can ask an AI tool to explain why a formula gives the
+      answer it does, to tell you where something is in Mac Excel when the video shows Windows, to troubleshoot an
+      error, or to quiz you afterward. <strong>You build the Excel file yourself.</strong> Spell check is an ordinary
+      Excel feature and is always allowed.</p>
+    <p>The practical reason: the 200-point Excel Project in Week 11 expects you to write formulas like step 11's,
+      with the parentheses in the right place, on your own.</p>
+  </section>
+
+  <!-- ============ What's next ============ -->
+  <section aria-labelledby="next-heading">
+    <h2 id="next-heading">What's next</h2>
+    <p>Once the guided assignment is submitted, go straight to the <strong>Excel Module 2 homework</strong> in
+      MindTap. It's the same commands on a different workbook, with no walkthrough, for 100 points. Both are due
+      <strong>Sunday 10/25</strong>.</p>
+    <p>Next week is Excel Module 3, then Module 4 in Week 10, then the 200-point <strong>Excel Project</strong> in
+      Week 11, due <strong>Sunday 11/15 at 11:59 PM</strong>. It can't be dropped and it isn't accepted late unless
+      you arrange it with me before the due date.</p>
+    <p>Stuck on a step after re-watching it? Send me a message in the Canvas Inbox and say which step number and what
+      you tried. That's faster than burning attempts.</p>
+  </section>
+
+  <!-- ============ Quick reference ============ -->
+  <section aria-labelledby="reference-heading">
+    <h2 id="reference-heading">Quick reference</h2>
+    <div class="table-scroll" tabindex="0" role="region" aria-label="Quick reference table, scrollable">
+      <table>
+        <caption>Every value this assignment asks for, in one place. Confirm each one against your own instruction
+          file.</caption>
+        <thead>
+          <tr><th scope="col">Step</th><th scope="col">Where it lives</th><th scope="col">Exact setting</th></tr>
+        </thead>
+        <tbody>
+          <tr><th scope="row">Your name</th><td>Documentation sheet</td><td>Your first and last name in B6</td></tr>
+          <tr><th scope="row">1. Duplicates</th><td>Annual Budget; Conditional Formatting &rsaquo; Highlight Cells Rules</td><td>Duplicate Values in B4:B16, Yellow Fill with Dark Yellow Text; delete the whole row of the first duplicate</td></tr>
+          <tr><th scope="row">2. Difference</th><td>Type in the cell; fill handle</td><td>E4: <span class="mono">=C4-D4</span> (no function), filled to E5:E15</td></tr>
+          <tr><th scope="row">3. Clear a rule</th><td>Conditional Formatting &rsaquo; Manage Rules</td><td>Delete the rule on C4:C15 only</td></tr>
+          <tr><th scope="row">4. Percent</th><td>Home &rsaquo; Percent Style, Increase Decimal</td><td>F4:F16, Percent Style, 2 decimal places</td></tr>
+          <tr><th scope="row">5. Data bars</th><td>Conditional Formatting &rsaquo; Data Bars</td><td>E4:E15, Gradient Fill, Blue Data Bar</td></tr>
+          <tr><th scope="row">6. Unmerge, spelling</th><td>Merge &amp; Center &rsaquo; Unmerge Cells; Review &rsaquo; Spelling</td><td>A16 unmerged; all misspellings on the sheet corrected</td></tr>
+          <tr><th scope="row">7. Fill, hide</th><td>Charitable; Home &rsaquo; Fill Color; right-click &rsaquo; Hide</td><td>A1:F1 Teal, Accent 2, Lighter 80%; column F hidden</td></tr>
+          <tr><th scope="row">8. Currency</th><td>Home &rsaquo; Number Format, Decrease Decimal</td><td>B4:B12, Currency, $, 0 decimal places</td></tr>
+          <tr><th scope="row">9. Total</th><td>Home &rsaquo; AutoSum</td><td>I3: <span class="mono">=SUM(B4:B12)</span></td></tr>
+          <tr><th scope="row">10. Count</th><td>AutoSum drop-down &rsaquo; Count Numbers</td><td>I4: <span class="mono">=COUNT(B4:B12)</span></td></tr>
+          <tr><th scope="row">11. Over/under</th><td>Type in the cell</td><td>I6: <span class="mono">=(I3-I5)/I5</span> (no function)</td></tr>
+          <tr><th scope="row">File name</th><td>File &rsaquo; Save As</td><td>The <span class="mono">_2</span> version (.xlsx), in Downloads</td></tr>
+          <tr><th scope="row">Submission</th><td>MindTap</td><td>Upload the <span class="mono">_2</span> file, select Submit, read the Graded Summary Report</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <p class="footnote">CSC 104 &middot; Computers and Computer Applications &middot; Fall 2026, Section 0840 &middot;
+    Mendocino College &middot; Instructor: David Pai &middot; <span class="mono">dpai@mendocino.edu</span>.
+    Nothing you type on this page is saved or submitted. Use the Canvas navigation outside this page to get back to
+    the Week 8 module.</p>
+</main>
+
+
+
+
+<script>
+(function () {
+  "use strict";
+
+  var VIDEO_ID = "gRQ3FxZI1AM";
+
+  /* Transcript source: weeks/week08/csc104-excel-2-guided-corrected.vtt — the
+     Whisper output with its hallucinated passage removed, its repeated and
+     duplicate cues collapsed, and its Excel command names, cell references, proper
+     nouns and punctuation restored. Inlined rather than fetched so this page
+     stays self-contained inside the Canvas iframe. Keep the two copies in step:
+     if the YouTube captions are re-uploaded from the .vtt, re-paste it here
+     too. */
+  var vttContent = `WEBVTT
+
+NOTE
+CSC 104 — Week 8 — Excel Module 2 Guided Assignment Walkthrough (YouTube gRQ3FxZI1AM)
+Corrected transcript. Source: csc104-excel-2-guided.vtt (Whisper output).
+Cleanup applied: the hallucinated mixed-language word-salad at 12:41–12:42
+("your bunch and I can launch auto-sum free...", "Şey yür tycker den...")
+removed; the repeated cue at 3:51 ("and then I right-click and go to
+delete"), the rolling duplicate at 8:14 ("was check from where the spelling
+error was and then we're going to go down to a16..."), the stray "you" at
+15:36 and the repeated cue at 18:08 removed; sentence casing and punctuation
+restored throughout (Whisper dropped both from about 2:24 on); Excel command
+names and proper nouns corrected (Week 8, Excel, Enable Editing, Page Width,
+File, Save As, Annual Budget and Charitable worksheets, Conditional
+Formatting, Highlight Cells Rules, Duplicate Values, Yellow Fill with Dark
+Yellow Text, Computing Devices, Sponsorship, Delete, Manage Rules, Delete
+Rule, Apply, Percent Style, Number, Data Bars, Gradient Fill, Blue Data Bar,
+Merge & Center, Unmerge Cells, Review, Spelling, Change, Home, Font Color,
+Fill Color, Teal, Accent 2, Lighter 80%, Hide, Unhide, Currency, Accounting,
+Decrease Decimal, SUM, AutoSum, Formula Bar, Escape, COUNT, Count Numbers,
+Number of Gifts, Downloads, Submit, Graded Summary Report). "percentile" →
+Percent Style; "startup file" → start file; "if it's 5 to e15" → E5 to E15;
+"before" → B4; "the column that you hit" → hid; "I died no" → Unhide? No;
+"a ccc ount" → the misspelled "account"; "chair over" → over or under; "new
+conditional formula" → new conditional formatting rule. Cell references are
+written in capitals (B4 to B16, E4, I3). The scenario names (Maxwell Montego,
+Trenchless Pipe Services, Tallahassee, Clearwater) are written as heard;
+"adjusted from employees" is written as "solicited from employees". The
+misspelled words in step 6 are described by their correct spelling; the
+misspellings themselves are not reconstructed.
+Short cues merged into readable 1–2 sentence lines; timestamps normalized to
+HH:MM:SS.mmm. The instructor's voice and hedges are preserved, including "or
+not two decimal points but two decimal places", trying Unhide from one side
+at 11:04, reading step 11 as "I5 minus I3" and correcting it at 14:08, the
+deliberately wrong formula demonstration at 14:17, and "I think I did those
+right".
+
+00:00:00.000 --> 00:00:24.480
+Aloha, and welcome. This week, in Week 8, we're working in Excel on formulas, functions, and formatting. And so this is our guided assignment. So open the assignment just like we always do, and we will start it and then download all the files.
+
+00:00:24.480 --> 00:00:54.260
+Okay, so this week there's only two files: there's the instruction file and the start file. So we'll download them all, and then we will go to the folder where they're downloaded, and we have the instruction file. Okay, so here's our instruction file. So let's Enable Editing. Let's view it on Page Width,
+
+00:00:54.480 --> 00:01:24.460
+so we can see it well. And let me use the whole screen here. Okay, and then we also have our start file. And again, this is Excel, so we'll use the zoom to zoom in so that we can see it. All right, so we want to go to our instructions, and the first thing, as always, is to rename it,
+
+00:01:24.460 --> 00:01:53.280
+changing the 1 to a 2 at the end. So I'll do File, Save As. My Excel file, I'll go Save As, and then I will just overwrite that last 1 with a 2. Save it. And then the next thing is to check B6 to make sure our name is in there. If it's not, then delete it and start over. So my name's in there, so I'm all good to go.
+
+00:01:54.460 --> 00:02:27.540
+Okay. So the scenario is that you're Maxwell Montego. Or, you're not Maxwell Montego, but you're going to do something for Maxwell, who is the budget director for Trenchless Pipe Services out of Tallahassee, Florida. Okay. And so Maxwell created an Excel workbook to provide a snapshot of the annual budget for a satellite office in Clearwater, and lists charitable contributions solicited from employees. He wants you to update it to make it easier to use.
+
+00:02:27.540 --> 00:02:53.920
+Okay, so the first thing you're going to do is go to the Annual Budget worksheet, and for the range B4 to B16, use conditional formatting to highlight the cells with duplicate values in Yellow Fill with Dark Yellow Text. Okay, and then you delete the row containing the first duplicate value. Right, so we want to go to our Annual Budget worksheet,
+
+00:02:53.920 --> 00:03:13.120
+so down here we go to Annual Budget, and again we will use our zoom tool. And we might want to click... for some reason that takes us way out here. Click somewhere in here so that you can make it bigger if you want. I don't really want to make it too much bigger, because I still want to see everything on the screen.
+
+00:03:13.120 --> 00:03:36.580
+Okay, so B4 to B16. So I'm gonna highlight from B4 down to B16. We'll go to Conditional Formatting, Highlight Cells Rules, Duplicate Values, and then we will change the color to Yellow Fill with Dark Yellow Text. Say OK.
+
+00:03:36.580 --> 00:03:51.920
+All right, and we have Computing Devices appearing twice, and it says delete the first one. So we'll click on the 7 for that row. This is how I do it: I'm gonna click on the 7 to select the whole row, and then I right-click and go to Delete,
+
+00:03:53.920 --> 00:04:23.920
+and lo and behold, that row is gone. I still have a 7, because... here, let me undo it. See, there's 7. The last row is the totals, in 17; Sponsorship is 16. I delete this row. Okay, I still have 7, but now, instead of 17, the totals are on row 16. Okay, so it just keeps every number, because the row number is just relative, but I got rid of everything in that old row.
+
+00:04:23.920 --> 00:04:47.520
+All right. Okay, step 2: in cell E4, insert a formula without using a function that subtracts the actual advertising amount, D4, from the budgeted amount, C4. Okay, and then fill the range E5 to E15 with the formula from cell E4.
+
+00:04:47.520 --> 00:05:24.060
+Okay, so we want to go budgeted minus actual in E4. So let's go to E4. Let's go equals budgeted, so I'll click on that cell with the budgeted, minus actual, I'll click on the cell with the actual. So it's C4 minus D4. I'll hit Enter. It says $5,000. And then I want to grab it on the right-hand corner, drag it down to E15 to fill that same formula in all those cells.
+
+00:05:24.060 --> 00:05:47.320
+All right: clear the conditional formatting from the range C4 to C15. Okay, so here, in C4 to C15, we have this blue conditional formatting. To delete conditional formatting, you want to go up into the Conditional Formatting menu and go Manage Rules.
+
+00:05:47.500 --> 00:06:03.460
+That's how I do it. And here's this one rule, C4 to C15. If you look at it, that's what it applies to. You just click Delete Rule and then say Apply. It's gone. Okay.
+
+00:06:08.000 --> 00:06:17.200
+Okay: apply the Percent Style number format to the range F4 to F16 and display two decimal places. Okay, so step 4.
+
+00:06:17.500 --> 00:06:46.140
+So F4 to F16, all the way down here. We want to make it a percent, so under Number we can just click the Percent Style to make it a percent style, and then it doesn't have any decimal points, and we want two. So right here, next to the Number, we can add or subtract decimal points. So let's add two decimal points: one, two. And they all have two decimal points.
+
+00:06:46.140 --> 00:06:58.760
+All right, or not two decimal points, but two decimal places after the decimal point.
+
+00:06:58.760 --> 00:07:38.840
+All right: in the range E4 to E15, create a conditional formatting rule that uses Gradient Fill Blue Data Bars to compare values. Okay, so we're going to go to E4 to E15, okay, and we're going to create a new conditional formatting rule: Data Bars, Gradient Fill, and we want the blue one, Blue Data Bar. Click on that, and now we have what you see: relative bars, blue being positive to the right, red being negative to the left.
+
+00:07:42.320 --> 00:08:00.540
+Okay, so that was step 5. Step 6: unmerge cell A16, and then check the spelling in the worksheet and correct any spelling errors. Okay, so first we're going to go down to A16, and we will go under Merge & Center,
+
+00:08:00.540 --> 00:08:16.120
+click Unmerge Cells. Okay, now if we run Spelling right now... we can run Spelling right now, but if we go to Review and go Spelling, it says spell check, you're good to go, because all it did was
+
+00:08:16.140 --> 00:08:29.660
+check where the cell is. Okay, so if I click outside the cell, like below the thing, and I do Spelling again, it'll say, do you want to continue checking at the beginning? Yes, because I want the beginning.
+
+00:08:30.940 --> 00:08:44.860
+Okay, now it says, hey, I found this misspelled "account." Do you want it to be account or accounts? So I want account. It's this one here, B3, that's misspelled, so we'll change it.
+
+00:08:46.140 --> 00:09:08.860
+See, B3 changed. Now it has a misspelled "remaining," and we want to change it to Remaining. Change. And then there's one, Services; we want it to be Services, and we'll say Change. And it says, hey, you did everything, good to go. Everything's good to go now. Say OK.
+
+00:09:12.220 --> 00:09:21.260
+So that's one thing about spelling: it starts wherever you're at and works the rest of the spreadsheet. It doesn't start at the beginning unless you pick A1. You could start at cell A1 and then do the spelling from there.
+
+00:09:21.260 --> 00:09:39.260
+Okay, step 7: go to the Charitable worksheet. Fill the merged range A1 to F1 with Teal, Accent 2, Lighter 80%, and then hide column F.
+
+00:09:39.900 --> 00:09:58.860
+So we're going to go to the Charitable worksheet. Okay, so we're on Annual Budget; now we want to go to Charitable. Again, I'm out here in K. I'm going to click somewhere inside, so then I can expand this and try to make it all fit on one page here. Okay, so the first, it said...
+
+00:10:01.020 --> 00:10:26.780
+Let's go back to our directions here. It says fill the merged range A1 to F1, Teal, Accent 2, Lighter... Okay, if I click here, A1 to F1, it's this whole thing, and we want to fill. So we'll go Home, and right next to our Font Color there's a background color, or Fill Color, and we're going to click that little down arrow,
+
+00:10:26.780 --> 00:10:45.020
+and then we're going to go to Teal, um, Lighter 80%. Okay, and there it is: Teal, Lighter 80. And then it says it wants us to hide column F. So the easiest way I know how to hide:
+
+00:10:45.340 --> 00:11:04.600
+I just click on the F to select the column, right-click, and go Hide. So it's gone. It's hidden; it's still there. You can see E to G. If you want to get it back, you can highlight E to G and go Unhide.
+
+00:11:04.600 --> 00:11:25.040
+And I think you can just do it from E and go Unhide. No. Or G, from the right side, Unhide? No. Okay, so you have to pick the range E to G, and then you can right-click and go Unhide, and it'll unhide the column that you hid, or columns, if you have more than one. Okay.
+
+00:11:25.040 --> 00:11:42.640
+All right, number 8: apply the Currency number format to the range B4 to B12, using the dollar sign and zero decimal places. All right, so if we go to Currency... so we've got B4 to B12,
+
+00:11:42.640 --> 00:12:10.260
+and we can go up here under Number. This is not Currency, this dollar sign; this is Accounting. We want to click on the drop-down, and we want to go to Currency. Okay, notice this dollar sign: it's got two decimal points, and we can just remove them using the Decrease Decimal button twice to remove all the decimal points.
+
+00:12:13.020 --> 00:12:41.800
+Okay: in cell I3, enter a formula using the SUM function that totals the donations and sponsorships, so from B4 to B12. So we want to go up to I3 here, and we can use AutoSum. Again, it won't know what to pick, because there's no numbers next to it, but it's sitting there; the cursor is inside the parentheses. So what I can do is I can click and drag from B4 to B12,
+
+00:12:42.640 --> 00:13:08.960
+and it'll put that in there, and then I can hit Enter to accept that. All right, so if I click on it again, click in the Formula Bar, you can see it summing all these numbers together. Okay, then hit Escape to get out of whatever. If you ever want to get out of something and not actually do it, you hit Escape.
+
+00:13:08.960 --> 00:13:38.940
+All right, number 10: in cell I4, enter a formula using the COUNT function that counts the number of donations and sponsorships. So just counting how many donations and sponsorships you had. Okay, so Number of Gifts, and it wants to use the COUNT function. Again, you can go up here, and if you click the down arrow, you can do Sum, Average, Count Numbers. So we'll just Count Numbers, and what we want to do is count these: how many of these are
+
+00:13:38.940 --> 00:13:53.940
+numbers, B4 to B12. Hit Enter: there's nine. All right, and then in cell I6, number 11:
+
+00:13:53.940 --> 00:14:08.760
+enter a formula without using a function that first subtracts the projected dollar amount, I5, from the total donations, I3, and divides the result by the projected donations, I5. So it's I5 minus I3
+
+00:14:08.940 --> 00:14:17.780
+divided by I5. Okay, I mean, it's I3 minus I5, sorry, because it's I5 from I3, divided by I5.
+
+00:14:17.780 --> 00:14:50.640
+All right, so when we do our formula, it's important that we tell it exactly how to do it. So we could say equals... if we said I3 minus I5 divided by I5, we're gonna get the wrong answer. Okay, if I do that, I get... let's see here... I get some huge number. All right,
+
+00:14:50.640 --> 00:15:16.620
+and that's because of what this formula is doing: equals I3 minus I5 divided by I5. Well, it's doing the division first. So it's taking I3 minus I5 divided by I5, which is one, right? So it's taking thirty thousand seven hundred minus one. That's not what we want.
+
+00:15:16.620 --> 00:15:36.940
+Okay, what we want is... and we need to use parentheses. We want I3 minus I5, okay, and we want that result divided by I5. So you want the difference from I3 to I5. I think I did those right.
+
+00:15:38.940 --> 00:15:56.180
+Yeah, and then hit Enter. I get negative 23, meaning I'm under, right? I projected 40, I only got 30, so I'm under.
+
+00:15:56.180 --> 00:16:15.440
+And then what we want to do is look at our workbook. All right, so we will look at this. There's ways to look at them. I think you look at some of the bars, look at the totals, because, like, 9.76 is what we calculated, or what they calculated, from these numbers. Okay, so we want to go over here
+
+00:16:15.440 --> 00:16:38.740
+to Annual Budget: 9.76, 5.42, 5.01, 40,000. Right, our biggest is 30, our most negative is 10,000. Okay, and you can kind of do a quick check that way. And then we go to Charitable. Then scroll down to Charitable,
+
+00:16:38.940 --> 00:16:59.160
+we will look at it, and see negative 23, which we just did, right? F is hidden. Okay, over or under: negative 23. Number of gifts: nine. So we're good. Everything looks pretty good.
+
+00:16:59.160 --> 00:17:08.740
+All right, so we're in Excel. We'll save our file. Save it; we made all those changes. Let's save it and then close it,
+
+00:17:08.940 --> 00:17:38.940
+and then we can go back to our assignment, and our Downloads, and make sure that we pick the latest one here at the top, the _2. Drop it in. If it's the right name, it'll load; if it's the wrong name, it won't load. We'll Submit that for grade.
+
+00:17:38.940 --> 00:18:15.320
+We'll open up our Graded Summary Report. It opens up in Excel. Let's Enable Editing, and let's blow this up a little bit. Okay, so we got 25 out of 25. If you didn't get 25, it'll tell you: as you go down the list, it'll show you where you missed, and then you can update just that part. You don't have to do everything over. Right, so that's fun formulas in Excel. Thanks.`;
+
+  var player = null, timeUpdater = null, parsedTranscript = [], playerReady = false;
+
+  try {
+    if (!CSS.supports("selector(:focus-visible)")) { document.body.classList.add("no-fv"); }
+  } catch (e) { document.body.classList.add("no-fv"); }
+
+  /* ---------------- VTT parsing ---------------- */
+  function timeToSeconds(timeStr) {
+    if (!timeStr) { return 0; }
+    var parts = timeStr.trim().split(":");
+    if (parts.length === 2) {
+      return (parseInt(parts[0], 10) || 0) * 60 + (parseFloat(parts[1]) || 0);
+    }
+    if (parts.length === 3) {
+      return (parseInt(parts[0], 10) || 0) * 3600 + (parseInt(parts[1], 10) || 0) * 60 + (parseFloat(parts[2]) || 0);
+    }
+    return 0;
+  }
+
+  function formatTime(sec) {
+    sec = Math.max(0, Math.floor(sec));
+    var h = Math.floor(sec / 3600), m = Math.floor((sec % 3600) / 60), s = sec % 60;
+    var mm = (h > 0 && m < 10) ? "0" + m : String(m);
+    return (h > 0 ? h + ":" : "") + mm + ":" + (s < 10 ? "0" + s : s);
+  }
+
+  function parseVtt(vttText) {
+    var blocks = vttText.trim().split(/\n\n+/);
+    var cues = [];
+    blocks.forEach(function (block) {
+      var trimmed = block.trim();
+      if (!trimmed || trimmed.indexOf("WEBVTT") === 0 || trimmed.indexOf("NOTE") === 0) { return; }
+      var lines = trimmed.split("\n");
+      var timeLine = null, timeIndex = -1;
+      for (var i = 0; i < lines.length; i++) {
+        if (lines[i].indexOf("-->") !== -1) { timeLine = lines[i]; timeIndex = i; break; }
+      }
+      if (!timeLine) { return; }
+      var ends = timeLine.split("-->");
+      var text = lines.slice(timeIndex + 1).join(" ").trim();
+      if (!text) { return; }
+      cues.push({ start: timeToSeconds(ends[0]), end: timeToSeconds(ends[1]), text: text });
+    });
+    return cues;
+  }
+
+  /* ---------------- Transcript panel ---------------- */
+  function seek(seconds) {
+    if (!player || !player.seekTo) { return false; }
+    player.seekTo(seconds, true);
+    if (player.playVideo) { player.playVideo(); }
+    return true;
+  }
+
+  function scrollPlayerIntoView() {
+    var frame = document.getElementById("video-container");
+    if (frame && frame.scrollIntoView) { frame.scrollIntoView({ behavior: "smooth", block: "center" }); }
+  }
+
+  function populateTranscript() {
+    var container = document.getElementById("transcript-container");
+    if (!container) { return; }
+    container.innerHTML = "";
+    parsedTranscript.forEach(function (cue, i) {
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "transcript-line";
+      btn.dataset.start = cue.start;
+      btn.dataset.end = cue.end;
+      btn.dataset.index = i;
+
+      var stamp = document.createElement("span");
+      stamp.className = "t";
+      stamp.textContent = formatTime(cue.start);
+
+      var body = document.createElement("span");
+      body.className = "tx";
+      body.textContent = cue.text;
+
+      btn.appendChild(stamp);
+      btn.appendChild(body);
+      btn.setAttribute("aria-label", "Jump to " + formatTime(cue.start) + ". " + cue.text);
+
+      btn.addEventListener("click", function () {
+        if (seek(cue.start)) { scrollPlayerIntoView(); }
+      });
+      container.appendChild(btn);
+    });
+  }
+
+  /* ---------------- Active-line highlight ---------------- */
+  var lastAnnounced = null;
+  function announceLine(text) {
+    if (text === lastAnnounced) { return; }
+    lastAnnounced = text;
+    var s = document.getElementById("transcript-status");
+    if (s) { s.textContent = text || ""; }
+  }
+
+  function highlightCurrentLine() {
+    if (!player || !player.getCurrentTime) { return; }
+    var now = player.getCurrentTime();
+    var lines = document.querySelectorAll("#transcript-container .transcript-line");
+    var active = null;
+    Array.prototype.forEach.call(lines, function (line) {
+      var start = parseFloat(line.dataset.start), end = parseFloat(line.dataset.end);
+      if (now >= start && now < end) { active = line; }
+    });
+    var prev = document.querySelector("#transcript-container .is-active");
+    if (active === prev) { return; }
+    if (prev) { prev.classList.remove("is-active"); }
+    if (active) {
+      active.classList.add("is-active");
+      var body = active.querySelector(".tx");
+      announceLine(body ? body.textContent : active.textContent);
+      if (!active.hidden) { active.scrollIntoView({ behavior: "smooth", block: "center" }); }
+    }
+  }
+
+  /* ---------------- Panel height ---------------- */
+  function syncTranscriptHeight() {
+    var videoContainer = document.getElementById("video-container");
+    var panel = document.getElementById("transcript-container");
+    if (!videoContainer || !panel) { return; }
+    // Match the panel to the video only when the two columns actually sit side
+    // by side. Compared by rendered position rather than a viewport-width test,
+    // because in a Canvas iframe a media query measures the iframe, not the
+    // browser window, and can disagree with the flex-wrap result.
+    var videoCol = videoContainer.parentNode;
+    var transcriptCol = panel.parentNode;
+    var sideBySide = Math.abs(
+      transcriptCol.getBoundingClientRect().top - videoCol.getBoundingClientRect().top) < 40
+      && transcriptCol.getBoundingClientRect().left !== videoCol.getBoundingClientRect().left;
+    // Side by side, the panel should end level with the video, so subtract the
+    // heading/search row that sits above it inside the transcript column.
+    var head = transcriptCol.querySelector(".transcript-head");
+    var headH = head ? head.offsetHeight + 8 : 0;
+    var h = sideBySide ? Math.max(240, videoContainer.offsetHeight - headH) + "px" : "24rem";
+    panel.style.height = h;
+    panel.style.maxHeight = h;
+  }
+
+  /* ---------------- Transcript search ---------------- */
+  function escapeRe(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); }
+
+  function runFilter(term) {
+    var lines = document.querySelectorAll("#transcript-container .transcript-line");
+    var status = document.getElementById("transcript-filter-status");
+    var q = term.trim().toLowerCase();
+    var shown = 0;
+
+    Array.prototype.forEach.call(lines, function (line) {
+      var body = line.querySelector(".tx");
+      var cue = parsedTranscript[parseInt(line.dataset.index, 10)];
+      if (!body || !cue) { return; }
+      if (!q) {
+        body.textContent = cue.text;
+        line.hidden = false;
+        shown++;
+        return;
+      }
+      if (cue.text.toLowerCase().indexOf(q) === -1) {
+        body.textContent = cue.text;
+        line.hidden = true;
+        return;
+      }
+      line.hidden = false;
+      shown++;
+      // Rebuild with <mark> around the matches, without using innerHTML on
+      // user-supplied text.
+      body.textContent = "";
+      var re = new RegExp(escapeRe(term.trim()), "ig");
+      var last = 0, m;
+      while ((m = re.exec(cue.text)) !== null) {
+        if (m.index > last) { body.appendChild(document.createTextNode(cue.text.slice(last, m.index))); }
+        var mk = document.createElement("mark");
+        mk.textContent = m[0];
+        body.appendChild(mk);
+        last = m.index + m[0].length;
+        if (m[0].length === 0) { re.lastIndex++; }
+      }
+      if (last < cue.text.length) { body.appendChild(document.createTextNode(cue.text.slice(last))); }
+    });
+
+    if (status) {
+      status.textContent = q
+        ? (shown === 0 ? "No transcript lines match " + term : shown + " transcript line" + (shown === 1 ? "" : "s") + " match " + term)
+        : "Showing the whole transcript.";
+    }
+  }
+
+  function wireSearch() {
+    var input = document.getElementById("transcript-filter");
+    if (!input) { return; }
+    var t = null;
+    input.addEventListener("input", function () {
+      clearTimeout(t);
+      t = setTimeout(function () { runFilter(input.value); }, 250);
+    });
+  }
+
+  /* ---------------- Seek buttons (topic index + step pills) ----------------
+     Buttons wired to the embedded player, never youtu.be?t= links: a time link
+     would navigate the Canvas iframe away from this page. If the player never
+     comes up, the buttons are turned back into plain text so the index reads
+     as a reference list rather than as controls that silently do nothing. */
+  function wireSeekButtons() {
+    var btns = document.querySelectorAll("[data-seek]");
+    Array.prototype.forEach.call(btns, function (btn) {
+      var t = parseFloat(btn.getAttribute("data-seek")) || 0;
+      var item = btn.closest(".topic-index__item") || btn.closest(".todo > li") || btn.closest("tr");
+      var text = item ? item.querySelector(".topic-index__label, .todo__title, th[scope=row]") : null;
+      btn.setAttribute("aria-label", "Jump to " + formatTime(t) + (text ? " — " + text.textContent : "") + " in the video");
+      btn.addEventListener("click", function () {
+        if (seek(t)) { scrollPlayerIntoView(); }
+      });
+    });
+  }
+
+  function degradeToStatic(message) {
+    if (playerReady) { return; }
+    document.body.classList.add("no-player");
+    var idx = document.getElementById("topic-index");
+    if (idx) { idx.classList.add("topic-index--static"); }
+    Array.prototype.forEach.call(document.querySelectorAll("[data-seek]"), function (btn) {
+      btn.disabled = true;
+      btn.removeAttribute("aria-label");
+    });
+    var note = document.getElementById("topic-index-fallback");
+    if (note) { note.hidden = false; note.textContent = message; }
+  }
+
+  /* ---------------- Platform tabs ---------------- */
+  function wireTabs() {
+    var tablist = document.querySelector(".tablist");
+    if (!tablist) { return; }
+    var tabs = Array.prototype.slice.call(tablist.querySelectorAll('[role="tab"]'));
+
+    function select(tab, focus) {
+      tabs.forEach(function (t) {
+        var selected = t === tab;
+        t.setAttribute("aria-selected", selected ? "true" : "false");
+        t.tabIndex = selected ? 0 : -1;
+        var panel = document.getElementById(t.getAttribute("aria-controls"));
+        if (panel) { panel.hidden = !selected; }
+      });
+      if (focus) { tab.focus(); }
+    }
+
+    tabs.forEach(function (tab, i) {
+      tab.addEventListener("click", function () { select(tab, false); });
+      tab.addEventListener("keydown", function (e) {
+        var next = null;
+        if (e.key === "ArrowRight") { next = tabs[(i + 1) % tabs.length]; }
+        else if (e.key === "ArrowLeft") { next = tabs[(i - 1 + tabs.length) % tabs.length]; }
+        else if (e.key === "Home") { next = tabs[0]; }
+        else if (e.key === "End") { next = tabs[tabs.length - 1]; }
+        if (next) { e.preventDefault(); select(next, true); }
+      });
+    });
+  }
+
+  /* ---------------- YouTube player ---------------- */
+  window.onYouTubeIframeAPIReady = function () {
+    if (!VIDEO_ID || !document.getElementById("youtube-player")) { return; }
+    player = new YT.Player("youtube-player", {
+      events: {
+        onReady: function () {
+          playerReady = true;
+          syncTranscriptHeight();
+        },
+        onStateChange: function (event) {
+          clearInterval(timeUpdater);
+          if (event.data === YT.PlayerState.PLAYING) {
+            timeUpdater = setInterval(highlightCurrentLine, 300);
+          } else {
+            highlightCurrentLine();
+          }
+        }
+      }
+    });
+  };
+
+  document.addEventListener("DOMContentLoaded", function () {
+    parsedTranscript = parseVtt(vttContent);
+    populateTranscript();
+    wireSearch();
+    wireSeekButtons();
+    wireTabs();
+    setTimeout(syncTranscriptHeight, 100);
+
+    if (typeof YT === "undefined" || typeof YT.Player === "undefined") {
+      var tag = document.createElement("script");
+      tag.src = "https://www.youtube.com/iframe_api";
+      tag.onerror = function () {
+        degradeToStatic("The video player could not load, so the times below are listed for reference rather than as buttons. The full transcript is above.");
+      };
+      document.head.appendChild(tag);
+    } else {
+      window.onYouTubeIframeAPIReady();
+    }
+
+    // If the API never reports ready — blocked script, offline, restrictive
+    // network — fall back rather than leaving dead buttons on the page.
+    setTimeout(function () {
+      degradeToStatic("The video player did not load, so the times below are listed for reference rather than as buttons. The full transcript is above.");
+    }, 8000);
+  });
+
+  var resizeTimeout;
+  window.addEventListener("resize", function () {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(syncTranscriptHeight, 250);
+  });
+
+  /* Report height to a Canvas parent that listens for it. Harmless otherwise. */
+  function postHeight() {
+    try {
+      if (window.parent && window.parent !== window) {
+        var h = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
+        window.parent.postMessage({ subject: "lti.frameResize", height: h }, "*");
+      }
+    } catch (e) { /* cross-origin parent — ignore */ }
+  }
+  window.addEventListener("load", postHeight);
+  if (window.ResizeObserver) { new ResizeObserver(postHeight).observe(document.body); }
+})();
+</script>
+</body>
+</html>
