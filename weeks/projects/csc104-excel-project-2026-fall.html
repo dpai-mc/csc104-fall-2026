@@ -16,6 +16,8 @@
    what Excel Modules 1–4 covered this semester.
    Starter file (attached to the Canvas assignment, not linked here):
    coastal_coffee_fall26_starter.xlsx
+   Intro video RbhjhlVv3OA (4:25), transcript
+   csc104-excel-project-fall-26-corrected.vtt (inlined below; keep in step).
    ============================================================ */
 
 :root {
@@ -44,6 +46,8 @@
   --focus:        #b4530a;
   --code-bg:      #f1f4f9;
   --grid-head:    #e4e9f1;
+  --hit:          #fff2b8;
+  --hit-ink:      #3a2c00;
   --radius:       10px;
   --maxw:         62rem;
   --readw:        46rem;
@@ -75,6 +79,8 @@
     --focus:        #ffb066;
     --code-bg:      #111c30;
     --grid-head:    #22314f;
+    --hit:          #5c4a10;
+    --hit-ink:      #ffeeb8;
   }
 }
 
@@ -257,12 +263,113 @@ thead th { background: var(--panel-2); font-size: 0.8125rem; text-transform: upp
 
 .footnote { color: var(--muted); font-size: 0.875rem; border-top: 1px solid var(--border-soft); padding-top: 1rem; margin-top: 2.5rem; max-width: none; }
 
+/* ---------------------- Video + transcript ---------------------- */
+.video-row { display: flex; flex-wrap: wrap; gap: 1.25rem; margin: 0 0 1.5rem; }
+.video-col { flex: 1 1 32rem; min-width: min(100%, 20rem); }
+.transcript-col { flex: 1 1 20rem; min-width: min(100%, 17rem); display: flex; flex-direction: column; }
+
+.video-frame {
+  position: relative; width: 100%; padding-top: 56.25%;
+  background: #000; border-radius: var(--radius); overflow: hidden;
+  border: 1px solid var(--field-border);
+}
+.video-frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+.video-caption { font-size: 0.875rem; color: var(--muted); margin-top: 0.5rem; }
+
+.transcript-head { display: flex; flex-wrap: wrap; gap: 0.5rem 0.75rem; align-items: flex-end; margin-bottom: 0.5rem; }
+.transcript-head h3 { margin: 0 0 0.3rem; font-size: 1rem; flex: 0 1 auto; }
+.transcript-search { flex: 1 1 10rem; }
+.transcript-search label { display: block; font-size: 0.8125rem; font-weight: 600; color: var(--muted); }
+.transcript-search input {
+  font: inherit; width: 100%; min-height: 2.5rem; color: var(--ink);
+  background: var(--surface); border: 1px solid var(--field-border);
+  border-radius: 8px; padding: 0.35rem 0.55rem;
+}
+
+.transcript-panel {
+  height: 24rem; max-height: 24rem; overflow-y: auto;
+  border: 1px solid var(--field-border); border-radius: var(--radius);
+  background: var(--panel); padding: 0.4rem;
+}
+.transcript-line {
+  display: block; width: 100%; text-align: left; font: inherit;
+  font-size: 0.9375rem; line-height: 1.5; color: var(--ink);
+  background: transparent; border: 0; border-radius: 6px;
+  padding: 0.45rem 0.6rem; cursor: pointer;
+}
+.transcript-line:hover { background: var(--accent-bg); }
+.transcript-line .t {
+  display: inline-block; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.8125rem; font-weight: 700; color: var(--brand-ink); margin-right: 0.5rem;
+}
+.transcript-line.is-active {
+  background: var(--accent-bg);
+  box-shadow: inset 3px 0 0 0 var(--brand);
+  font-weight: 600;
+}
+.transcript-line[hidden] { display: none; }
+.transcript-line mark { background: var(--hit); color: var(--hit-ink); }
+.transcript-note { color: var(--muted); font-size: 0.875rem; padding: 0.6rem; margin: 0; }
+
+/* Static fallback when the player never loads */
+.no-player .transcript-line { cursor: default; }
+.no-player .transcript-line:hover { background: transparent; }
+
+/* ---------------------- Topic index ---------------------- */
+.topic-index { margin: 0 0 1.5rem; }
+.topic-index__group {
+  font-weight: 700; color: var(--brand-ink); margin: 1.25rem 0 0.4rem;
+  font-size: 0.9375rem; letter-spacing: 0.02em;
+}
+.topic-index__group:first-child { margin-top: 0; }
+.topic-index__list { list-style: none; padding: 0; margin: 0; max-width: none; }
+.topic-index__item {
+  display: flex; gap: 0.7rem; align-items: baseline;
+  padding: 0.28rem 0; margin: 0; border-bottom: 1px solid var(--border-soft);
+}
+.topic-index__list li:last-child { border-bottom: none; }
+.topic-index__time {
+  flex: 0 0 auto; font: inherit;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.875rem; font-weight: 700;
+  min-width: 4.25rem; min-height: 2rem; text-align: center;
+  color: var(--btn2-fg); background: var(--btn2-bg);
+  border: 1px solid var(--field-border); border-radius: 6px;
+  padding: 0.15rem 0.4rem; cursor: pointer;
+}
+.topic-index__time:hover { background: var(--accent-bg); }
+.topic-index__label { flex: 1 1 auto; }
+
+.topic-index--static .topic-index__time {
+  cursor: default; background: transparent; border-color: transparent;
+  color: var(--muted); text-align: left; padding-left: 0;
+}
+.topic-index--static .topic-index__time:hover { background: transparent; }
+
+@media (min-width: 52em) {
+  .topic-cols { column-count: 2; column-gap: 2.25rem; }
+  .topic-cols .topic-index__group { break-after: avoid; }
+  .topic-cols .topic-index__list { break-inside: avoid; }
+}
+
+.status {
+  min-height: 1.4rem; font-weight: 600; color: var(--ok); background: var(--ok-bg);
+  border-radius: 8px; padding: 0.3rem 0.55rem; margin: 0.5rem 0 0;
+  max-width: var(--readw); font-size: 0.9375rem;
+}
+.status:empty { background: transparent; padding: 0; min-height: 0; }
+.sr-only {
+  position: absolute !important; width: 1px; height: 1px; margin: -1px; padding: 0;
+  overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; border: 0;
+}
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
 }
 
 @media print {
-  .skip-link, .parts-tools, .part__chev { display: none !important; }
+  .skip-link, .parts-tools, .part__chev, .video-frame, .transcript-search { display: none !important; }
+  .transcript-panel { height: auto !important; max-height: none !important; overflow: visible; border: none; }
+  .topic-index__time { border: none; }
   .part__panel[hidden] { display: block !important; }
   .part { break-inside: auto; }
   .part__trigger { background: none; }
@@ -293,6 +400,87 @@ thead th { background: var(--panel-2); font-size: 0.8125rem; text-transform: upp
 </header>
 
 <main id="main" class="wrap" tabindex="-1">
+
+  <section aria-labelledby="video-heading">
+    <h2 id="video-heading">Project intro video</h2>
+    <p>A four-and-a-half-minute introduction: where the starter file is, how this page is laid out, the file name
+      Canvas expects, and what's left in the course after Excel.</p>
+
+    <div class="video-row">
+      <div class="video-col">
+        <div class="video-frame" id="video-container">
+          <iframe id="youtube-player"
+                  src="https://www.youtube.com/embed/RbhjhlVv3OA?enablejsapi=1&amp;cc_load_policy=1&amp;iv_load_policy=3&amp;modestbranding=1&amp;rel=0"
+                  title="CSC 104 Excel Project introduction"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  referrerpolicy="strict-origin-when-cross-origin"
+                  allowfullscreen loading="lazy"></iframe>
+        </div>
+        <p class="video-caption">Closed captions are on by default. Select any line of the transcript to jump the
+          video to that moment.</p>
+      </div>
+
+      <div class="transcript-col">
+        <div class="transcript-head">
+          <h3 id="transcript-heading">Transcript</h3>
+          <div class="transcript-search">
+            <label for="transcript-filter">Search the transcript</label>
+            <input type="search" id="transcript-filter" autocomplete="off" spellcheck="false"
+                   aria-describedby="transcript-filter-status">
+          </div>
+        </div>
+        <div class="transcript-panel" id="transcript-container" role="group" aria-labelledby="transcript-heading">
+          <p class="transcript-note">Loading transcript&hellip;</p>
+        </div>
+        <p class="sr-only" role="status" aria-live="polite" id="transcript-filter-status"></p>
+        <p class="sr-only" role="status" aria-live="polite" id="transcript-status"></p>
+        <p style="margin:0.5rem 0 0"><a href="#topic-index-heading">Skip past the transcript</a></p>
+      </div>
+    </div>
+
+    <h3 id="topic-index-heading">Find a moment in the video</h3>
+    <p id="topic-index-fallback" class="status" hidden></p>
+    <div class="topic-index topic-cols" id="topic-index">
+      <div class="topic-index__group">The project</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="0.32">0:00</button><span class="topic-index__label">Like the MindTap assignments</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="17.76">0:17</button><span class="topic-index__label">Submitted in Canvas, not MindTap</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="33.84">0:33</button><span class="topic-index__label">Download the starter file</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="73.6">1:13</button><span class="topic-index__label">Two sheets of starter data</span></li>
+      </ul>
+      <div class="topic-index__group">Finding your way around this page</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="95.92">1:35</button><span class="topic-index__label">Follow the instructions</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="108">1:48</button><span class="topic-index__label">Where saving and submitting is</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="122.72">2:02</button><span class="topic-index__label">Excel for Mac</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="130.32">2:10</button><span class="topic-index__label">The starter preview and the parts</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="163.92">2:43</button><span class="topic-index__label">Numbers to check against</span></li>
+      </ul>
+      <div class="topic-index__group">Submitting and grading</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="175.84">2:55</button><span class="topic-index__label">The file name, and .xlsx only</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="190.16">3:10</button><span class="topic-index__label">Due Sunday the 15th; the grading details</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="204.88">3:24</button><span class="topic-index__label">200 points, and getting help</span></li>
+      </ul>
+      <div class="topic-index__group">After Excel</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="223.44">3:43</button><span class="topic-index__label">PowerPoint, then Outlook</span></li>
+      </ul>
+    </div>
+
+    <div class="callout callout--warn">
+      <h3>Since this was recorded</h3>
+      <ul style="margin:0">
+        <li><strong>Excel for Mac (2:02).</strong> I say it's no different from the PC. Almost everything is the same,
+          but a few command names and locations differ, so watch for the blue Mac notes under the tasks.</li>
+        <li><strong>The list of parts (2:10).</strong> When I read the parts off the page I skip <em>Bonus with defined
+          names</em>. It's a graded part, worth 20 points. Do all nine parts listed under
+          <a href="#parts">The project, part by part</a>.</li>
+        <li><strong>"The previous four Excel projects" (2:35).</strong> I mean Excel Modules 1 through 4.</li>
+      </ul>
+      <p style="margin-top:0.6rem">Where the video and this page disagree, this page is right.</p>
+    </div>
+  </section>
 
   <h2 id="before">Before you start</h2>
 
@@ -1058,6 +1246,363 @@ thead th { background: var(--panel-2); font-size: 0.8125rem; text-transform: upp
 (function () {
   "use strict";
 
+  var VIDEO_ID = "RbhjhlVv3OA";
+
+  /* Transcript source: weeks/projects/csc104-excel-project-fall-26-corrected.vtt, the
+     cleaned Whisper output. Inlined so the page stays self-contained inside the
+     Canvas iframe; keep the two copies in step. */
+  var vttContent = `WEBVTT
+
+NOTE
+CSC 104 — Fall 2026 — Excel Project intro (YouTube RbhjhlVv3OA)
+Corrected transcript. Source: excel-project.vtt (Whisper output).
+Cleanup applied: the hallucinated trailing "you" cue at 4:24 deleted;
+sentence casing and punctuation restored throughout; names corrected
+(Excel, MindTap, Canvas, Excel for Mac, PowerPoint, Outlook, Sheet1/Sheet2,
+coastal_coffee_fall26_starter.xlsx, Coffee_LastName_FirstName.xlsx, ".slxx"
+to .xlsx, "special machine loan" to espresso machine loan); short cues merged
+into readable 1–2 sentence lines; timestamps normalized to HH:MM:SS.mmm.
+The instructor's voice is preserved, including "maybe I got them wrong" at 2:55.
+
+00:00:00.320 --> 00:00:17.760
+Aloha, and welcome. So when we get to the end of Excel — we have four modules on Excel — then we have this project to do. The project itself is very similar to your MindTap kind of assignments,
+
+00:00:17.760 --> 00:00:31.840
+except you submit it through Canvas. All right, you don't submit it through MindTap; you submit it through Canvas. And it walks you through the scenario and what you need to do.
+
+00:00:33.840 --> 00:00:54.160
+The first thing you need to do is download the starter file. So right underneath the assignment instructions, you'll see this link for coastal_coffee_fall26_starter.xlsx, and you'll click on that
+
+00:00:55.040 --> 00:01:11.040
+to download it. Okay, so you'll click it to download it, and you can see over here it downloaded. And when I open it — okay, you'll have some data,
+
+00:01:13.600 --> 00:01:33.760
+and you'll have two sheets. You have data in Sheet1 and some other data in Sheet2. Okay, and this is your starter data and your starter setup. And so then you will use this file to do the assignment.
+
+00:01:35.920 --> 00:01:48.000
+Right, so then you'll open that file, grab it, and then you'll follow this instruction set. Okay, you download it.
+
+00:01:48.000 --> 00:02:02.720
+There is a file naming and saving and submitting part; you can click on this. It's just another — well, it should show down below. It's just another little location on the page.
+
+00:02:02.720 --> 00:02:10.320
+Excel for Mac works just the same as for the PC; it shouldn't be any different. Obviously, you do this yourself.
+
+00:02:10.320 --> 00:02:22.480
+You can look in here — this kind of shows you what should be in the starter file. It should match what's in the file. Here's the categories: you know, workbook setup, titles and headings, formulas and number formats,
+
+00:02:25.600 --> 00:02:43.920
+quarter statistics, conditional formatting, sparklines, sales chart, espresso machine loan, and finishing and printing. So it should be something we've done across all the previous four Excel projects.
+
+00:02:43.920 --> 00:02:54.720
+All right, and then you'll finish. You know, so we have all this, part by part: do this, do this, do this. And then you can do some double checks here — what your numbers should be. And if you don't match those numbers, maybe
+
+00:02:55.840 --> 00:03:10.160
+I got them wrong, or maybe you need to double-check. Okay, and then save it as Coffee_LastName_FirstName.xlsx. It has to be .xlsx — that's the only file
+
+00:03:10.160 --> 00:03:24.480
+you can upload. And it's due Sunday the 15th, since you have a full week to work on it. All right, and then the grading details — here it shows the grading details: what you get points for, how many points
+
+00:03:24.880 --> 00:03:42.000
+it's worth. The whole thing's worth 200 points. Okay, so, um, I think that covers it. If you have questions, obviously send me messages or make an appointment so that I can help you resolve them.
+
+00:03:43.440 --> 00:03:54.400
+All right, so we're almost done. We only have PowerPoint and then Outlook to do after this, and I think you'll find those go rather smoothly —
+
+00:03:55.360 --> 00:04:07.280
+or typically those go rather smoothly for everybody. There are some differences for Outlook: we don't have projects in Outlook; it's more of an exam,
+
+00:04:07.280 --> 00:04:24.800
+and you'll see that when we get there. But it's really not that, um, cumbersome, if you will. For most people it goes pretty smoothly at this point. All right, good luck, and I'll talk to you next week.`;
+
+  var player = null, timeUpdater = null, parsedTranscript = [], playerReady = false;
+
+
+  /* ---------------- VTT parsing ---------------- */
+  function timeToSeconds(timeStr) {
+    if (!timeStr) { return 0; }
+    var parts = timeStr.trim().split(":");
+    if (parts.length === 2) {
+      return (parseInt(parts[0], 10) || 0) * 60 + (parseFloat(parts[1]) || 0);
+    }
+    if (parts.length === 3) {
+      return (parseInt(parts[0], 10) || 0) * 3600 + (parseInt(parts[1], 10) || 0) * 60 + (parseFloat(parts[2]) || 0);
+    }
+    return 0;
+  }
+
+  function formatTime(sec) {
+    sec = Math.max(0, Math.floor(sec));
+    var h = Math.floor(sec / 3600), m = Math.floor((sec % 3600) / 60), s = sec % 60;
+    var mm = (h > 0 && m < 10) ? "0" + m : String(m);
+    return (h > 0 ? h + ":" : "") + mm + ":" + (s < 10 ? "0" + s : s);
+  }
+
+  function parseVtt(vttText) {
+    var blocks = vttText.trim().split(/\n\n+/);
+    var cues = [];
+    blocks.forEach(function (block) {
+      var trimmed = block.trim();
+      if (!trimmed || trimmed.indexOf("WEBVTT") === 0 || trimmed.indexOf("NOTE") === 0) { return; }
+      var lines = trimmed.split("\n");
+      var timeLine = null, timeIndex = -1;
+      for (var i = 0; i < lines.length; i++) {
+        if (lines[i].indexOf("-->") !== -1) { timeLine = lines[i]; timeIndex = i; break; }
+      }
+      if (!timeLine) { return; }
+      var ends = timeLine.split("-->");
+      var text = lines.slice(timeIndex + 1).join(" ").trim();
+      if (!text) { return; }
+      cues.push({ start: timeToSeconds(ends[0]), end: timeToSeconds(ends[1]), text: text });
+    });
+    return cues;
+  }
+
+  /* ---------------- Transcript panel ---------------- */
+  function seek(seconds) {
+    if (!player || !player.seekTo) { return false; }
+    player.seekTo(seconds, true);
+    if (player.playVideo) { player.playVideo(); }
+    return true;
+  }
+
+  function scrollPlayerIntoView() {
+    var frame = document.getElementById("video-container");
+    if (frame && frame.scrollIntoView) { frame.scrollIntoView({ behavior: "smooth", block: "center" }); }
+  }
+
+  function populateTranscript() {
+    var container = document.getElementById("transcript-container");
+    if (!container) { return; }
+    container.innerHTML = "";
+    parsedTranscript.forEach(function (cue, i) {
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "transcript-line";
+      btn.dataset.start = cue.start;
+      btn.dataset.end = cue.end;
+      btn.dataset.index = i;
+
+      var stamp = document.createElement("span");
+      stamp.className = "t";
+      stamp.textContent = formatTime(cue.start);
+
+      var body = document.createElement("span");
+      body.className = "tx";
+      body.textContent = cue.text;
+
+      btn.appendChild(stamp);
+      btn.appendChild(body);
+      btn.setAttribute("aria-label", "Jump to " + formatTime(cue.start) + ". " + cue.text);
+
+      btn.addEventListener("click", function () {
+        if (seek(cue.start)) { scrollPlayerIntoView(); }
+      });
+      container.appendChild(btn);
+    });
+  }
+
+  /* ---------------- Active-line highlight ---------------- */
+  var lastAnnounced = null;
+  function announceLine(text) {
+    if (text === lastAnnounced) { return; }
+    lastAnnounced = text;
+    var s = document.getElementById("transcript-status");
+    if (s) { s.textContent = text || ""; }
+  }
+
+  function highlightCurrentLine() {
+    if (!player || !player.getCurrentTime) { return; }
+    var now = player.getCurrentTime();
+    var lines = document.querySelectorAll("#transcript-container .transcript-line");
+    var active = null;
+    Array.prototype.forEach.call(lines, function (line) {
+      var start = parseFloat(line.dataset.start), end = parseFloat(line.dataset.end);
+      if (now >= start && now < end) { active = line; }
+    });
+    var prev = document.querySelector("#transcript-container .is-active");
+    if (active === prev) { return; }
+    if (prev) { prev.classList.remove("is-active"); }
+    if (active) {
+      active.classList.add("is-active");
+      var body = active.querySelector(".tx");
+      announceLine(body ? body.textContent : active.textContent);
+      if (!active.hidden) { active.scrollIntoView({ behavior: "smooth", block: "center" }); }
+    }
+  }
+
+  /* ---------------- Panel height ---------------- */
+  function syncTranscriptHeight() {
+    var videoContainer = document.getElementById("video-container");
+    var panel = document.getElementById("transcript-container");
+    if (!videoContainer || !panel) { return; }
+    // Match the panel to the video only when the two columns actually sit side
+    // by side. Compared by rendered position rather than a viewport-width test,
+    // because in a Canvas iframe a media query measures the iframe, not the
+    // browser window, and can disagree with the flex-wrap result.
+    var videoCol = videoContainer.parentNode;
+    var transcriptCol = panel.parentNode;
+    var sideBySide = Math.abs(
+      transcriptCol.getBoundingClientRect().top - videoCol.getBoundingClientRect().top) < 40
+      && transcriptCol.getBoundingClientRect().left !== videoCol.getBoundingClientRect().left;
+    // Side by side, the panel should end level with the video, so subtract the
+    // heading/search row that sits above it inside the transcript column.
+    var head = transcriptCol.querySelector(".transcript-head");
+    var headH = head ? head.offsetHeight + 8 : 0;
+    var h = sideBySide ? Math.max(240, videoContainer.offsetHeight - headH) + "px" : "24rem";
+    panel.style.height = h;
+    panel.style.maxHeight = h;
+  }
+
+  /* ---------------- Transcript search ---------------- */
+  function escapeRe(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); }
+
+  function runFilter(term) {
+    var lines = document.querySelectorAll("#transcript-container .transcript-line");
+    var status = document.getElementById("transcript-filter-status");
+    var q = term.trim().toLowerCase();
+    var shown = 0;
+
+    Array.prototype.forEach.call(lines, function (line) {
+      var body = line.querySelector(".tx");
+      var cue = parsedTranscript[parseInt(line.dataset.index, 10)];
+      if (!body || !cue) { return; }
+      if (!q) {
+        body.textContent = cue.text;
+        line.hidden = false;
+        shown++;
+        return;
+      }
+      if (cue.text.toLowerCase().indexOf(q) === -1) {
+        body.textContent = cue.text;
+        line.hidden = true;
+        return;
+      }
+      line.hidden = false;
+      shown++;
+      // Rebuild with <mark> around the matches, without using innerHTML on
+      // user-supplied text.
+      body.textContent = "";
+      var re = new RegExp(escapeRe(term.trim()), "ig");
+      var last = 0, m;
+      while ((m = re.exec(cue.text)) !== null) {
+        if (m.index > last) { body.appendChild(document.createTextNode(cue.text.slice(last, m.index))); }
+        var mk = document.createElement("mark");
+        mk.textContent = m[0];
+        body.appendChild(mk);
+        last = m.index + m[0].length;
+        if (m[0].length === 0) { re.lastIndex++; }
+      }
+      if (last < cue.text.length) { body.appendChild(document.createTextNode(cue.text.slice(last))); }
+    });
+
+    if (status) {
+      status.textContent = q
+        ? (shown === 0 ? "No transcript lines match " + term : shown + " transcript line" + (shown === 1 ? "" : "s") + " match " + term)
+        : "Showing the whole transcript.";
+    }
+  }
+
+  function wireSearch() {
+    var input = document.getElementById("transcript-filter");
+    if (!input) { return; }
+    var t = null;
+    input.addEventListener("input", function () {
+      clearTimeout(t);
+      t = setTimeout(function () { runFilter(input.value); }, 250);
+    });
+  }
+
+  /* ---------------- Seek buttons (topic index + step pills) ----------------
+     Buttons wired to the embedded player, never youtu.be?t= links: a time link
+     would navigate the Canvas iframe away from this page. If the player never
+     comes up, the buttons are turned back into plain text so the index reads
+     as a reference list rather than as controls that silently do nothing. */
+  function wireSeekButtons() {
+    var btns = document.querySelectorAll("[data-seek]");
+    Array.prototype.forEach.call(btns, function (btn) {
+      var t = parseFloat(btn.getAttribute("data-seek")) || 0;
+      var item = btn.closest(".topic-index__item") || btn.closest(".todo > li");
+      var text = item ? item.querySelector(".topic-index__label, .todo__title") : null;
+      btn.setAttribute("aria-label", "Jump to " + formatTime(t) + (text ? " — " + text.textContent : "") + " in the video");
+      btn.addEventListener("click", function () {
+        if (seek(t)) { scrollPlayerIntoView(); }
+      });
+    });
+  }
+
+  function degradeToStatic(message) {
+    if (playerReady) { return; }
+    document.body.classList.add("no-player");
+    var idx = document.getElementById("topic-index");
+    if (idx) { idx.classList.add("topic-index--static"); }
+    Array.prototype.forEach.call(document.querySelectorAll("[data-seek]"), function (btn) {
+      btn.disabled = true;
+      btn.removeAttribute("aria-label");
+    });
+    var note = document.getElementById("topic-index-fallback");
+    if (note) { note.hidden = false; note.textContent = message; }
+  }
+
+
+  /* ---------------- YouTube player ---------------- */
+  window.onYouTubeIframeAPIReady = function () {
+    if (!VIDEO_ID || !document.getElementById("youtube-player")) { return; }
+    player = new YT.Player("youtube-player", {
+      events: {
+        onReady: function () {
+          playerReady = true;
+          syncTranscriptHeight();
+        },
+        onStateChange: function (event) {
+          clearInterval(timeUpdater);
+          if (event.data === YT.PlayerState.PLAYING) {
+            timeUpdater = setInterval(highlightCurrentLine, 300);
+          } else {
+            highlightCurrentLine();
+          }
+        }
+      }
+    });
+  };
+
+  document.addEventListener("DOMContentLoaded", function () {
+    parsedTranscript = parseVtt(vttContent);
+    populateTranscript();
+    wireSearch();
+    wireSeekButtons();
+    setTimeout(syncTranscriptHeight, 100);
+
+    if (typeof YT === "undefined" || typeof YT.Player === "undefined") {
+      var tag = document.createElement("script");
+      tag.src = "https://www.youtube.com/iframe_api";
+      tag.onerror = function () {
+        degradeToStatic("The video player could not load, so the times below are listed for reference rather than as buttons. The full transcript is above.");
+      };
+      document.head.appendChild(tag);
+    } else {
+      window.onYouTubeIframeAPIReady();
+    }
+
+    // If the API never reports ready — blocked script, offline, restrictive
+    // network — fall back rather than leaving dead buttons on the page.
+    setTimeout(function () {
+      degradeToStatic("The video player did not load, so the times below are listed for reference rather than as buttons. The full transcript is above.");
+    }, 8000);
+  });
+
+  var resizeTimeout;
+  window.addEventListener("resize", function () {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(syncTranscriptHeight, 250);
+  });
+
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+
   try {
     if (!CSS.supports("selector(:focus-visible)")) { document.body.classList.add("no-fv"); }
   } catch (e) { document.body.classList.add("no-fv"); }
@@ -1096,6 +1641,7 @@ thead th { background: var(--panel-2); font-size: 0.8125rem; text-transform: upp
   postHeight();
   window.addEventListener("load", postHeight);
   window.addEventListener("resize", postHeight);
+  if (window.ResizeObserver) { new ResizeObserver(postHeight).observe(document.body); }
 }());
 </script>
 </body>
