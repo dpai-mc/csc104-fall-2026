@@ -1,0 +1,1102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CSC 104 — Excel Project: Coastal Coffee Shop</title>
+<style>
+/* ============================================================
+   CSC 104 — Fall 2026 — Excel Project (Week 11: 11/9–11/15; due Sun 11/15; 200 pts, Canvas)
+   Self-contained SPA for embedding in a Canvas iframe.
+   Vanilla CSS + vanilla JS, one file, no outbound links,
+   no external resources, no browser storage.
+   Adapted from weeks/projects/csc104-excel-project-2026-spring.html
+   (Coastal Coffee Shop, Q4 2024), rebuilt on the layout of
+   weeks/projects/csc104-word-project-2026-fall.html and extended to
+   what Excel Modules 1–4 covered this semester.
+   Starter file (attached to the Canvas assignment, not linked here):
+   coastal_coffee_fall26_starter.xlsx
+   ============================================================ */
+
+:root {
+  color-scheme: light dark;
+  --surface:      #ffffff;
+  --panel:        #f6f8fb;
+  --panel-2:      #eef2f8;
+  --accent-bg:    #e8f0fe;
+  --ink:          #16202f;
+  --muted:        #46536b;
+  --brand:        #1d4ed8;
+  --brand-ink:    #17399c;
+  --border:       #c3cddc;
+  --border-soft:  #dde4ee;
+  --field-border: #6b7a92;
+  --btn-bg:       #1d4ed8;
+  --btn-fg:       #ffffff;
+  --btn-bg-hover: #17399c;
+  --btn2-bg:      #ffffff;
+  --btn2-fg:      #17399c;
+  --ok:           #1a6b3c;
+  --ok-bg:        #e6f4ec;
+  --warn-ink:     #7a4a06;
+  --warn-bg:      #fdf3e0;
+  --warn-rule:    #b8860b;
+  --focus:        #b4530a;
+  --code-bg:      #f1f4f9;
+  --grid-head:    #e4e9f1;
+  --radius:       10px;
+  --maxw:         62rem;
+  --readw:        46rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --surface:      #0f1726;
+    --panel:        #17223a;
+    --panel-2:      #1e2b45;
+    --accent-bg:    #1a2a4d;
+    --ink:          #e9eefa;
+    --muted:        #b6c3d8;
+    --brand:        #9dbcff;
+    --brand-ink:    #bcd2ff;
+    --border:       #3a4a68;
+    --border-soft:  #2b3a56;
+    --field-border: #7b89a3;
+    --btn-bg:       #9dbcff;
+    --btn-fg:       #0b1424;
+    --btn-bg-hover: #c3d6ff;
+    --btn2-bg:      #17223a;
+    --btn2-fg:      #bcd2ff;
+    --ok:           #8fe0b0;
+    --ok-bg:        #123328;
+    --warn-ink:     #f6d59a;
+    --warn-bg:      #3a2c11;
+    --warn-rule:    #d9a441;
+    --focus:        #ffb066;
+    --code-bg:      #111c30;
+    --grid-head:    #22314f;
+  }
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--surface);
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; border-radius: 4px; }
+.no-fv :focus { outline: 3px solid var(--focus); outline-offset: 2px; }
+
+.skip-link {
+  position: absolute; left: -9999px; top: 0; z-index: 60;
+  background: var(--btn-bg); color: var(--btn-fg);
+  padding: 0.6rem 1rem; font-weight: 700; border-radius: 0 0 var(--radius) 0;
+}
+.skip-link:focus { left: 0; outline: 3px solid var(--focus); outline-offset: 2px; }
+
+.wrap { max-width: var(--maxw); margin: 0 auto; padding: 1rem 1rem 3rem; }
+
+/* ---------------- Header ---------------- */
+.page-head { background: var(--panel); border-bottom: 3px solid var(--brand); }
+.page-head .wrap { padding-bottom: 1.25rem; }
+.eyebrow {
+  font-size: 0.8125rem; letter-spacing: 0.09em; text-transform: uppercase;
+  font-weight: 700; color: var(--brand-ink); margin: 0.75rem 0 0.35rem;
+}
+h1 { font-size: clamp(1.5rem, 4.2vw, 2.15rem); line-height: 1.22; margin: 0 0 0.6rem; }
+.lede { margin: 0; color: var(--muted); max-width: var(--readw); }
+.facts { list-style: none; display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 1rem 0 0; padding: 0; }
+.facts li {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 999px; padding: 0.3rem 0.85rem; font-size: 0.875rem; margin: 0;
+}
+.facts .k { font-weight: 700; color: var(--brand-ink); }
+
+/* ---------------- Typography ---------------- */
+h2 {
+  font-size: clamp(1.25rem, 3.2vw, 1.6rem);
+  margin: 2.5rem 0 0.75rem; color: var(--brand-ink);
+  padding-bottom: 0.35rem; border-bottom: 2px solid var(--border-soft);
+}
+h3 { font-size: 1.125rem; margin: 1.5rem 0 0.5rem; }
+p { margin: 0 0 1rem; max-width: var(--readw); }
+ul, ol { margin: 0 0 1rem; padding-left: 1.35rem; max-width: var(--readw); }
+li { margin-bottom: 0.4rem; }
+code, .mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.9em; background: var(--code-bg); border: 1px solid var(--border-soft);
+  border-radius: 4px; padding: 0.05em 0.35em; overflow-wrap: anywhere;
+}
+
+.callout {
+  border-left: 5px solid var(--brand); background: var(--accent-bg);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding: 0.9rem 1.1rem; margin: 0 0 1.25rem; max-width: var(--readw);
+}
+.callout > :last-child { margin-bottom: 0; }
+.callout h3 { margin-top: 0; font-size: 1.05rem; }
+.callout--warn { border-left-color: var(--warn-rule); background: var(--warn-bg); color: var(--warn-ink); }
+.callout--warn h3 { color: var(--warn-ink); }
+
+/* ---------------- Order of work ---------------- */
+.order { list-style: none; counter-reset: ord; padding: 0; margin: 0 0 1.5rem; max-width: none; display: grid; gap: 0.5rem; grid-template-columns: repeat(auto-fit, minmax(13.5rem, 1fr)); }
+.order li {
+  counter-increment: ord; margin: 0; position: relative;
+  background: var(--panel); border: 1px solid var(--border-soft); border-radius: var(--radius);
+  padding: 0.6rem 0.8rem 0.6rem 2.9rem; font-size: 0.9375rem;
+}
+.order li::before {
+  content: counter(ord); position: absolute; left: 0.7rem; top: 0.6rem;
+  width: 1.6rem; height: 1.6rem; border-radius: 50%;
+  background: var(--btn-bg); color: var(--btn-fg); font-weight: 700;
+  display: grid; place-items: center; font-size: 0.875rem;
+}
+.order .pts-inline { color: var(--muted); white-space: nowrap; }
+
+/* ---------------- Accordion parts ---------------- */
+.parts-tools { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0 0 1rem; }
+.btn {
+  font: inherit; font-weight: 600; font-size: 0.9375rem;
+  min-height: 2.5rem; padding: 0.4rem 0.95rem; border-radius: 8px; cursor: pointer;
+  background: var(--btn2-bg); color: var(--btn2-fg); border: 1px solid var(--field-border);
+}
+.btn:hover { background: var(--accent-bg); }
+
+.part {
+  border: 1px solid var(--border); border-radius: var(--radius);
+  margin: 0 0 0.9rem; background: var(--surface); overflow: hidden;
+}
+.part h3 { margin: 0; font-size: 1rem; }
+.part__trigger {
+  width: 100%; display: flex; align-items: center; gap: 0.75rem;
+  font: inherit; font-weight: 700; color: var(--ink); text-align: left;
+  background: var(--panel); border: 0; padding: 0.85rem 1rem; cursor: pointer; min-height: 3rem;
+}
+.part__trigger:hover { background: var(--panel-2); }
+.part__trigger:focus-visible { outline-offset: -3px; }
+.part__badge {
+  flex: 0 0 auto; font-size: 0.75rem; letter-spacing: 0.06em; text-transform: uppercase;
+  background: var(--btn-bg); color: var(--btn-fg); border-radius: 5px; padding: 0.15rem 0.5rem;
+}
+.part__title { flex: 1 1 auto; min-width: 0; }
+.part__pts { flex: 0 0 auto; font-weight: 600; font-size: 0.875rem; color: var(--muted); white-space: nowrap; }
+.part__chev { flex: 0 0 auto; width: 1.1rem; height: 1.1rem; transition: transform 0.2s ease; }
+.part__trigger[aria-expanded="true"] .part__chev { transform: rotate(180deg); }
+.part__panel { padding: 0.9rem 1.1rem 1.2rem; border-top: 1px solid var(--border); }
+.part__panel[hidden] { display: none; }
+
+/* Task rows */
+.tasks { list-style: none; padding: 0; margin: 0 0 1rem; max-width: none; counter-reset: task; }
+.task {
+  counter-increment: task;
+  display: grid; grid-template-columns: 2rem 1fr auto; gap: 0.25rem 0.75rem; align-items: start;
+  padding: 0.7rem 0; margin: 0; border-bottom: 1px solid var(--border-soft);
+}
+.task:last-child { border-bottom: 0; }
+.task::before {
+  content: counter(task); grid-row: 1 / span 2;
+  width: 1.75rem; height: 1.75rem; border-radius: 50%;
+  border: 2px solid var(--brand); color: var(--brand-ink); font-weight: 700; font-size: 0.875rem;
+  display: grid; place-items: center; margin-top: 0.1rem;
+}
+.task__body { min-width: 0; }
+.task__body p { margin: 0 0 0.35rem; }
+.task__body p:last-child { margin-bottom: 0; }
+.task__body ul { margin: 0.25rem 0 0.35rem; }
+.task__body li { margin-bottom: 0.15rem; }
+.task__meta { display: flex; flex-direction: column; align-items: flex-end; gap: 0.3rem; }
+.task__pts { font-weight: 700; font-size: 0.875rem; white-space: nowrap; }
+.mac-note {
+  margin: 0.45rem 0 0; padding: 0.45rem 0.75rem; font-size: 0.9rem;
+  background: var(--accent-bg); border-left: 4px solid var(--brand); border-radius: 0 6px 6px 0;
+  max-width: var(--readw);
+}
+.tip { color: var(--muted); font-size: 0.9375rem; }
+
+@media (max-width: 34em) {
+  .task { grid-template-columns: 2rem 1fr; }
+  .task__meta { grid-column: 2; flex-direction: row; align-items: center; justify-content: flex-start; flex-wrap: wrap; }
+}
+
+/* Tables */
+.table-scroll { overflow-x: auto; max-width: 100%; margin: 0.5rem 0 1rem; border-radius: 8px; }
+table { border-collapse: collapse; width: 100%; font-size: 0.9375rem; }
+caption { text-align: left; font-weight: 700; padding: 0 0 0.4rem; color: var(--ink); }
+th, td { border: 1px solid var(--border); padding: 0.5rem 0.7rem; text-align: left; vertical-align: top; }
+thead th { background: var(--panel-2); font-size: 0.8125rem; text-transform: uppercase; letter-spacing: 0.04em; }
+
+/* Spreadsheet-style preview of the starter file */
+.sheet { width: auto; min-width: 100%; font-size: 0.8125rem; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+.sheet caption { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 0.9375rem; }
+.sheet th, .sheet td { padding: 0.25rem 0.5rem; white-space: nowrap; }
+.sheet thead th { background: var(--grid-head); text-align: center; text-transform: none; letter-spacing: 0; font-size: 0.8125rem; }
+.sheet tbody th { background: var(--grid-head); text-align: center; font-weight: 700; width: 2.5rem; }
+.sheet td.n { text-align: right; }
+.sheet td.typo { text-decoration: underline wavy var(--warn-rule); text-underline-offset: 3px; }
+
+.checks td.v { text-align: right; white-space: nowrap; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+.checks td.c { white-space: nowrap; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+
+.rubric td.pts, .rubric th.pts { text-align: center; white-space: nowrap; width: 4.5rem; font-weight: 700; }
+.rubric tr.group th {
+  background: var(--accent-bg); color: var(--brand-ink); font-size: 0.875rem;
+  text-transform: none; letter-spacing: 0; font-weight: 700;
+}
+.rubric tfoot td, .rubric tfoot th { background: var(--panel-2); font-weight: 700; }
+
+.submit-box {
+  border: 2px solid var(--brand); border-radius: var(--radius); background: var(--panel);
+  padding: 1rem 1.2rem; margin: 0 0 1.5rem;
+}
+.submit-box > :last-child { margin-bottom: 0; }
+.filename { font-size: 1.05rem; }
+
+.footnote { color: var(--muted); font-size: 0.875rem; border-top: 1px solid var(--border-soft); padding-top: 1rem; margin-top: 2.5rem; max-width: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
+}
+
+@media print {
+  .skip-link, .parts-tools, .part__chev { display: none !important; }
+  .part__panel[hidden] { display: block !important; }
+  .part { break-inside: auto; }
+  .part__trigger { background: none; }
+  .table-scroll { overflow: visible; }
+  body { background: #fff; color: #000; }
+}
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to page content</a>
+
+<header class="page-head">
+  <div class="wrap">
+    <p class="eyebrow">CSC 104 · Week 11 · Excel Project</p>
+    <h1>Excel Project: Coastal Coffee Shop Quarterly Analysis</h1>
+    <p class="lede">This is the end of the Excel unit. You take a starter workbook of raw numbers and turn it into a finished
+      quarterly report: formulas and functions, formatting, conditional formatting, sparklines, a chart, and a loan analysis
+      with what-if tools. There's no walkthrough this time. Every skill here is covered in the textbook and in the
+      assignments you've already done, so if you don't remember how to do something, look it up.</p>
+    <ul class="facts" aria-label="Project facts">
+      <li><span class="k">Worth:</span> 200 pts, not droppable</li>
+      <li><span class="k">Due:</span> Sun 11/15, 11:59 PM</li>
+      <li><span class="k">Submit to:</span> Canvas, not MindTap</li>
+      <li><span class="k">Covers:</span> Excel Modules 1–4</li>
+      <li><span class="k">Late:</span> only if arranged before the due date</li>
+    </ul>
+  </div>
+</header>
+
+<main id="main" class="wrap" tabindex="-1">
+
+  <h2 id="before">Before you start</h2>
+
+  <p>You're the assistant manager at <strong>Coastal Coffee Shop</strong>, a local café in its third year. The owner wants a
+    report on the third quarter of 2026 (July through September): what each product category sold, which ones earned the
+    staff bonus, and how sales trended. She's also thinking about financing a new espresso machine and wants to know what
+    the payments would look like. The numbers are already in the starter file. Your job is everything else.</p>
+
+  <p>There's no MindTap module this week. The whole week is this project, and it's worth more than 10% of your grade.
+    Plan on about two hours, and don't start it Sunday night. Veterans Day is Wednesday 11/11; the campus is closed, but
+    the course is asynchronous, so the due date doesn't move.</p>
+
+  <div class="callout">
+    <h3>The starter file</h3>
+    <p>Download <code>coastal_coffee_fall26_starter.xlsx</code> from the Excel Project assignment in Canvas and open it in
+      the <strong>desktop</strong> version of Excel. The web and phone versions don't have all of these commands. Select
+      <strong>Enable Editing</strong> if Excel asks, then save your own copy right away with the file name under
+      <a href="#submit">Saving and submitting</a>.</p>
+    <p>I check your work cell by cell, so <strong>don't insert, delete or move any rows or columns</strong>, and don't
+      retype the numbers. Every cell address on this page assumes the layout of the starter file.</p>
+  </div>
+
+  <div class="callout">
+    <h3>Mac users</h3>
+    <p>Everything in this project works in Excel for Mac. A few names or locations differ; where that matters, a blue
+      note under the task says so. If you're still stuck, message me through Canvas Inbox.</p>
+  </div>
+
+  <div class="callout callout--warn">
+    <h3>About AI on this project</h3>
+    <p>The course AI policy is <strong>limited</strong>. You can ask an AI tool to explain a function, tell you where a
+      command is on the Mac ribbon, or help you figure out why a formula returns an error. You can't have it build or edit
+      the workbook you submit, and you can't paste in formulas it wrote for you. You make every change in Excel yourself.
+      Spell check is an ordinary Excel feature and always fine.</p>
+  </div>
+
+  <!-- ================= STARTER PREVIEW ================= -->
+  <section class="part" aria-labelledby="t0">
+    <h3>
+      <button type="button" class="part__trigger" id="t0" aria-expanded="false" aria-controls="p0">
+        <span class="part__badge">Look</span>
+        <span class="part__title">What's in the starter file</span>
+        <span class="part__pts">2 sheets</span>
+        <svg class="part__chev" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="5 8 10 13 15 8"/></svg>
+      </button>
+    </h3>
+    <div class="part__panel" id="p0" hidden>
+      <p>Use this to make sure you're in the right cells. Blank cells are where your work goes. The two underlined labels
+        are spelled wrong on purpose. Part 1 has you fix them.</p>
+
+      <div class="table-scroll" tabindex="0" role="region" aria-label="Sheet1 of the starter file, rows 1 to 19, columns A to H">
+        <table class="sheet">
+          <caption>Sheet1 (you'll rename it Q3 Sales)</caption>
+          <thead>
+            <tr><td></td><th scope="col">A</th><th scope="col">B</th><th scope="col">C</th><th scope="col">D</th><th scope="col">E</th><th scope="col">F</th><th scope="col">G</th><th scope="col">H</th></tr>
+          </thead>
+          <tbody>
+            <tr><th scope="row">1</th><td>Coastal Coffee Shop</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+            <tr><th scope="row">2</th><td>Third Quarter Sales Analysis: July to September 2026</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+            <tr><th scope="row">3</th><td>Prepared:</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+            <tr><th scope="row">4</th><td>Category</td><td>July</td><td>August</td><td>September</td><td>Quarter Total</td><td>% of Total</td><td>Trend</td><td>Bonus</td></tr>
+            <tr><th scope="row">5</th><td>Hot Beverages</td><td class="n">6850</td><td class="n">6420</td><td class="n">7180</td><td></td><td></td><td></td><td></td></tr>
+            <tr><th scope="row">6</th><td>Iced Beverages</td><td class="n">8940</td><td class="n">9310</td><td class="n">7260</td><td></td><td></td><td></td><td></td></tr>
+            <tr><th scope="row">7</th><td>Pastries</td><td class="n">4120</td><td class="n">3980</td><td class="n">4350</td><td></td><td></td><td></td><td></td></tr>
+            <tr><th scope="row">8</th><td class="typo">Breakfast Sandwhiches</td><td class="n">3560</td><td class="n">3720</td><td class="n">3890</td><td></td><td></td><td></td><td></td></tr>
+            <tr><th scope="row">9</th><td>Retail Beans and Merchandise</td><td class="n">1840</td><td class="n">1620</td><td class="n">2210</td><td></td><td></td><td></td><td></td></tr>
+            <tr><th scope="row">10</th><td>Total</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+            <tr><th scope="row">11</th><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+            <tr><th scope="row">12</th><td>Quarter Statistics</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+            <tr><th scope="row">13</th><td>Highest Monthly Total</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+            <tr><th scope="row">14</th><td>Lowest Monthly Total</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+            <tr><th scope="row">15</th><td class="typo">Avarage Monthly Total</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+            <tr><th scope="row">16</th><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+            <tr><th scope="row">17</th><td>Bonus Program</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+            <tr><th scope="row">18</th><td>Bonus Threshold</td><td class="n">15000</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+            <tr><th scope="row">19</th><td>Bonus Rate</td><td class="n">0.05</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="table-scroll" tabindex="0" role="region" aria-label="Sheet2 of the starter file, rows 1 to 18, columns A and B">
+        <table class="sheet">
+          <caption>Sheet2 (you'll rename it Espresso Loan)</caption>
+          <thead>
+            <tr><td></td><th scope="col">A</th><th scope="col">B</th></tr>
+          </thead>
+          <tbody>
+            <tr><th scope="row">1</th><td>Espresso Machine Loan</td><td></td></tr>
+            <tr><th scope="row">2</th><td></td><td></td></tr>
+            <tr><th scope="row">3</th><td>Machine Price</td><td class="n">18500</td></tr>
+            <tr><th scope="row">4</th><td>Down Payment</td><td class="n">3000</td></tr>
+            <tr><th scope="row">5</th><td>Annual Rate</td><td class="n">0.069</td></tr>
+            <tr><th scope="row">6</th><td>Years</td><td class="n">5</td></tr>
+            <tr><th scope="row">7</th><td>Loan Amount</td><td></td></tr>
+            <tr><th scope="row">8</th><td>Monthly Payment</td><td></td></tr>
+            <tr><th scope="row">9</th><td>Total Cost</td><td></td></tr>
+            <tr><th scope="row">10</th><td></td><td></td></tr>
+            <tr><th scope="row">11</th><td>Payment by Annual Rate</td><td></td></tr>
+            <tr><th scope="row">12</th><td>Annual Rate</td><td>Monthly Payment</td></tr>
+            <tr><th scope="row">13</th><td></td><td></td></tr>
+            <tr><th scope="row">14</th><td class="n">0.05</td><td></td></tr>
+            <tr><th scope="row">15</th><td class="n">0.06</td><td></td></tr>
+            <tr><th scope="row">16</th><td class="n">0.07</td><td></td></tr>
+            <tr><th scope="row">17</th><td class="n">0.08</td><td></td></tr>
+            <tr><th scope="row">18</th><td class="n">0.09</td><td></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <h3>Work in this order</h3>
+  <p>The order matters in a few places. Set the theme <em>first</em>, because every color and cell style after it depends
+    on it. Fix the spelling <em>before</em> you build the chart, so the chart picks up the corrected labels. Run Goal Seek
+    <em>last</em> on the loan sheet. And save AutoFit for the end, after every column has its final contents.</p>
+  <ol class="order" aria-label="Order of the nine parts">
+    <li>Workbook setup <span class="pts-inline">· 15 pts</span></li>
+    <li>Titles and headings <span class="pts-inline">· 25 pts</span></li>
+    <li>Formulas and number formats <span class="pts-inline">· 30 pts</span></li>
+    <li>Bonus with defined names <span class="pts-inline">· 20 pts</span></li>
+    <li>Quarter statistics <span class="pts-inline">· 15 pts</span></li>
+    <li>Conditional formatting and sparklines <span class="pts-inline">· 20 pts</span></li>
+    <li>Sales chart <span class="pts-inline">· 20 pts</span></li>
+    <li>Espresso machine loan <span class="pts-inline">· 35 pts</span></li>
+    <li>Finishing and printing <span class="pts-inline">· 15 pts</span></li>
+  </ol>
+  <p class="tip">Saving with the right file name is the last 5 points. Save early and often. A copy in OneDrive or on a USB
+    drive protects you if your laptop dies the night before.</p>
+
+  <h2 id="parts">The project, part by part</h2>
+  <p>Each task is graded on its own, so a miss in one doesn't cost you points in another. Unless a task says otherwise,
+    Parts 1 through 6 happen on the <strong>Q3 Sales</strong> sheet.</p>
+  <div class="parts-tools">
+    <button type="button" class="btn" id="open-all">Open all parts</button>
+    <button type="button" class="btn" id="close-all">Close all parts</button>
+  </div>
+
+  <!-- ================= PART 1 ================= -->
+  <section class="part" aria-labelledby="t1">
+    <h3>
+      <button type="button" class="part__trigger" id="t1" aria-expanded="true" aria-controls="p1">
+        <span class="part__badge">Part 1</span>
+        <span class="part__title">Workbook setup</span>
+        <span class="part__pts">15 pts</span>
+        <svg class="part__chev" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="5 8 10 13 15 8"/></svg>
+      </button>
+    </h3>
+    <div class="part__panel" id="p1">
+      <p>Open the starter file, save your own copy, then do these four things before anything else.</p>
+      <ol class="tasks">
+        <li class="task">
+          <div class="task__body">
+            <p><strong>Theme:</strong> set the workbook theme to <strong>Office 2013 – 2022</strong>. Every color named
+              later in this project ("Blue, Accent 1", "Gold, Accent 4" and so on) comes from this theme.</p>
+            <p class="mac-note"><strong>Mac:</strong> it's in the same Themes gallery. If you can't find it, message me
+              before you go on, since the colors in later parts depend on it.</p>
+          </div>
+          <div class="task__meta"><span class="task__pts">4 pts</span></div>
+        </li>
+        <li class="task">
+          <div class="task__body">
+            <p><strong>Spelling:</strong> run spell check on Sheet1. It finds two misspelled words in column A. Correct both
+              with Excel's suggestion.</p>
+          </div>
+          <div class="task__meta"><span class="task__pts">5 pts</span></div>
+        </li>
+        <li class="task">
+          <div class="task__body">
+            <p><strong>Rename</strong> Sheet1 to <code>Q3 Sales</code>.</p>
+          </div>
+          <div class="task__meta"><span class="task__pts">3 pts</span></div>
+        </li>
+        <li class="task">
+          <div class="task__body">
+            <p><strong>Tab color:</strong> make the Q3 Sales sheet tab <strong>Blue</strong>, from the Standard Colors
+              row.</p>
+          </div>
+          <div class="task__meta"><span class="task__pts">3 pts</span></div>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ================= PART 2 ================= -->
+  <section class="part" aria-labelledby="t2">
+    <h3>
+      <button type="button" class="part__trigger" id="t2" aria-expanded="false" aria-controls="p2">
+        <span class="part__badge">Part 2</span>
+        <span class="part__title">Titles and headings</span>
+        <span class="part__pts">25 pts</span>
+        <svg class="part__chev" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="5 8 10 13 15 8"/></svg>
+      </button>
+    </h3>
+    <div class="part__panel" id="p2" hidden>
+      <ol class="tasks">
+        <li class="task">
+          <div class="task__body">
+            <p><strong>Title:</strong> merge and center <strong>A1:H1</strong>. Apply the <strong>Title</strong> cell style,
+              then change the font size to <strong>20 pt</strong>.</p>
+          </div>
+          <div class="task__meta"><span class="task__pts">6 pts</span></div>
+        </li>
+        <li class="task">
+          <div class="task__body">
+            <p><strong>Subtitle:</strong> merge and center <strong>A2:H2</strong>. Make it <strong>italic</strong> with font
+              color <strong>Green, Accent 6, Darker 50%</strong>.</p>
+          </div>
+          <div class="task__meta"><span class="task__pts">5 pts</span></div>
+        </li>
+        <li class="task">
+          <div class="task__body">
+            <p><strong>Column headings:</strong> apply the <strong>Heading 3</strong> cell style to <strong>A4:H4</strong>
+              and center them.</p>
+          </div>
+          <div class="task__meta"><span class="task__pts">4 pts</span></div>
+        </li>
+        <li class="task">
+          <div class="task__body">
+            <p><strong>Section labels with Format Painter:</strong> format <strong>A12</strong> (<em>Quarter Statistics</em>)
+              as <strong>Bold</strong>, <strong>12 pt</strong>, font color <strong>Blue, Accent 1, Darker 25%</strong>.
+              Then use the <strong>Format Painter</strong> to copy that formatting to <strong>A17</strong>
+              (<em>Bonus Program</em>). The two labels should look identical.</p>
+          </div>
+          <div class="task__meta"><span class="task__pts">5 pts</span></div>
+        </li>
+        <li class="task">
+          <div class="task__body">
+            <p><strong>Total row:</strong> apply the <strong>Total</strong> cell style to <strong>A10:H10</strong>.</p>
+          </div>
+          <div class="task__meta"><span class="task__pts">5 pts</span></div>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ================= PART 3 ================= -->
+  <section class="part" aria-labelledby="t3">
+    <h3>
+      <button type="button" class="part__trigger" id="t3" aria-expanded="false" aria-controls="p3">
+        <span class="part__badge">Part 3</span>
+        <span class="part__title">Formulas and number formats</span>
+        <span class="part__pts">30 pts</span>
+        <svg class="part__chev" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="5 8 10 13 15 8"/></svg>
+      </button>
+    </h3>
+    <div class="part__panel" id="p3" hidden>
+      <p>Every number you add must be a formula or function, never a value you worked out and typed in. I check the Formula
+        Bar, and a typed number earns no points even when it's right.</p>
+      <ol class="tasks">
+        <li class="task">
+          <div class="task__body">
+            <p><strong>Quarter Total:</strong> in <strong>E5</strong>, use the <strong>SUM</strong> function to add July
+              through September for Hot Beverages. Copy it down through <strong>E9</strong>.</p>
+          </div>
+          <div class="task__meta"><span class="task__pts">5 pts</span></div>
+        </li>
+        <li class="task">
+          <div class="task__body">
+            <p><strong>Monthly totals:</strong> in <strong>B10:E10</strong>, use <strong>SUM</strong> to total each column
+              (rows 5 through 9).</p>
+          </div>
+          <div class="task__meta"><span class="task__pts">5 pts</span></div>
+        </li>
+        <li class="task">
+          <div class="task__body">
+            <p><strong>% of Total:</strong> in <strong>F5</strong>, write a formula that divides the category's Quarter
+              Total by the grand total in <strong>E10</strong>. Use an <strong>absolute reference</strong> for E10 so the
+              formula copies correctly, then copy it down through <strong>F9</strong>. In <strong>F10</strong>, use SUM to
+              total F5:F9. It should come to 100%.</p>
+          </div>
+          <div class="task__meta"><span class="task__pts">8 pts</span></div>
+        </li>
+        <li class="task">
+          <div class="task__body">
+            <p><strong>Accounting format:</strong> format <strong>B5:E10</strong> as <strong>Accounting</strong> with
+              <strong>0</strong> decimal places.</p>
+          </div>
+          <div class="task__meta"><span class="task__pts">4 pts</span></div>
+        </li>
+        <li class="task">
+          <div class="task__body">
+            <p><strong>Percent format:</strong> format <strong>F5:F10</strong> as <strong>Percent Style</strong> with
+              <strong>1</strong> decimal place.</p>
+          </div>
+          <div class="task__meta"><span class="task__pts">4 pts</span></div>
+        </li>
+        <li class="task">
+          <div class="task__body">
+            <p><strong>Date prepared:</strong> in <strong>B3</strong>, use the <strong>NOW</strong> function, then format
+              B3 as a <strong>Short Date</strong>. It will show whatever day you open the file, and that's expected.</p>
+          </div>
+          <div class="task__meta"><span class="task__pts">4 pts</span></div>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ================= PART 4 ================= -->
+  <section class="part" aria-labelledby="t4">
+    <h3>
+      <button type="button" class="part__trigger" id="t4" aria-expanded="false" aria-controls="p4">
+        <span class="part__badge">Part 4</span>
+        <span class="part__title">Bonus with defined names</span>
+        <span class="part__pts">20 pts</span>
+        <svg class="part__chev" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="5 8 10 13 15 8"/></svg>
+      </button>
+    </h3>
+    <div class="part__panel" id="p4" hidden>
+      <p>The owner pays a staff bonus on any category that sells at least $15,000 in the quarter. The bonus is 5% of that
+        category's Quarter Total. Both numbers live in B18 and B19, so she can change them later without touching a
+        formula.</p>
+      <ol class="tasks">
+        <li class="task">
+          <div class="task__body">
+            <p><strong>Defined names:</strong> select <strong>A18:B19</strong> and create names from the labels in the
+              <strong>left column</strong>. You should end up with two names, <code>Bonus_Threshold</code> (B18) and
+              <code>Bonus_Rate</code> (B19).</p>
+          </div>
+          <div class="task__meta"><span class="task__pts">5 pts</span></div>
+        </li>
+        <li class="task">
+          <div class="task__body">
+            <p><strong>Format the settings:</strong> B18 as <strong>Accounting</strong>, 0 decimal places; B19 as
+              <strong>Percent Style</strong>, 0 decimal places (it shows 5%). Give <strong>B18:B19</strong> a fill color of
+              <strong>Gold, Accent 4, Lighter 60%</strong>.</p>
+          </div>
+          <div class="task__meta"><span class="task__pts">4 pts</span></div>
+        </li>
+        <li class="task">
+          <div class="task__body">
+            <p><strong>Bonus formula:</strong> in <strong>H5</strong>, use the <strong>IF</strong> function. If the Quarter
+              Total in E5 is greater than or equal to the threshold, the result is the Quarter Total times the bonus rate.
+              Otherwise the result is 0. Use the names <code>Bonus_Threshold</code> and <code>Bonus_Rate</code> in the
+              formula, not B18 and B19. Copy it down through <strong>H9</strong>.</p>
+          </div>
+          <div class="task__meta"><span class="task__pts">8 pts</span></div>
+        </li>
+        <li class="task">
+          <div class="task__body">
+            <p><strong>Bonus total:</strong> in <strong>H10</strong>, use SUM to total the bonuses. Format
+              <strong>H5:H10</strong> as <strong>Accounting</strong> with <strong>2</strong> decimal places.</p>
+          </div>
+          <div class="task__meta"><span class="task__pts">3 pts</span></div>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ================= PART 5 ================= -->
+  <section class="part" aria-labelledby="t5">
+    <h3>
+      <button type="button" class="part__trigger" id="t5" aria-expanded="false" aria-controls="p5">
+        <span class="part__badge">Part 5</span>
+        <span class="part__title">Quarter statistics</span>
+        <span class="part__pts">15 pts</span>
+        <svg class="part__chev" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="5 8 10 13 15 8"/></svg>
+      </button>
+    </h3>
+    <div class="part__panel" id="p5" hidden>
+      <p>All three statistics look at the three <strong>monthly totals</strong> in <strong>B10:D10</strong>, not at the
+        individual categories.</p>
+      <ol class="tasks">
+        <li class="task">
+          <div class="task__body">
+            <p>In <strong>B13</strong>, use the <strong>MAX</strong> function to find the highest monthly total.</p>
+          </div>
+          <div class="task__meta"><span class="task__pts">4 pts</span></div>
+        </li>
+        <li class="task">
+          <div class="task__body">
+            <p>In <strong>B14</strong>, use the <strong>MIN</strong> function to find the lowest monthly total.</p>
+          </div>
+          <div class="task__meta"><span class="task__pts">4 pts</span></div>
+        </li>
+        <li class="task">
+          <div class="task__body">
+            <p>In <strong>B15</strong>, use the <strong>AVERAGE</strong> function to find the average monthly total.</p>
+          </div>
+          <div class="task__meta"><span class="task__pts">4 pts</span></div>
+        </li>
+        <li class="task">
+          <div class="task__body">
+            <p>Format <strong>B13:B15</strong> as <strong>Accounting</strong> with <strong>0</strong> decimal places.</p>
+          </div>
+          <div class="task__meta"><span class="task__pts">3 pts</span></div>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ================= PART 6 ================= -->
+  <section class="part" aria-labelledby="t6">
+    <h3>
+      <button type="button" class="part__trigger" id="t6" aria-expanded="false" aria-controls="p6">
+        <span class="part__badge">Part 6</span>
+        <span class="part__title">Conditional formatting and sparklines</span>
+        <span class="part__pts">20 pts</span>
+        <svg class="part__chev" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="5 8 10 13 15 8"/></svg>
+      </button>
+    </h3>
+    <div class="part__panel" id="p6" hidden>
+      <p>The owner wants to see the strong and weak categories at a glance. Two rules go on the same range, so check that you
+        add the second rule rather than replace the first.</p>
+      <ol class="tasks">
+        <li class="task">
+          <div class="task__body">
+            <p><strong>High sellers:</strong> on <strong>E5:E9</strong>, highlight values <strong>greater than
+              20000</strong> with <strong>Light Red Fill with Dark Red Text</strong>.</p>
+          </div>
+          <div class="task__meta"><span class="task__pts">4 pts</span></div>
+        </li>
+        <li class="task">
+          <div class="task__body">
+            <p><strong>Low sellers:</strong> on the same range, <strong>E5:E9</strong>, add a second rule that highlights
+              values <strong>less than 10000</strong> with <strong>Yellow Fill with Dark Yellow Text</strong>. Both rules
+              should be listed when you manage the rules for this sheet.</p>
+          </div>
+          <div class="task__meta"><span class="task__pts">4 pts</span></div>
+        </li>
+        <li class="task">
+          <div class="task__body">
+            <p><strong>Data bars:</strong> on <strong>F5:F9</strong>, add <strong>Gradient Fill</strong> data bars in
+              <strong>Blue</strong>. Leave F10 out.</p>
+          </div>
+          <div class="task__meta"><span class="task__pts">4 pts</span></div>
+        </li>
+        <li class="task">
+          <div class="task__body">
+            <p><strong>Sparklines:</strong> in <strong>G5:G9</strong>, insert <strong>Line</strong> sparklines, one per
+              category, showing that category's July through September sales (<strong>B5:D9</strong>).</p>
+          </div>
+          <div class="task__meta"><span class="task__pts">5 pts</span></div>
+        </li>
+        <li class="task">
+          <div class="task__body">
+            <p><strong>Markers:</strong> turn on <strong>Markers</strong> for the sparklines so each month shows as a dot.</p>
+          </div>
+          <div class="task__meta"><span class="task__pts">3 pts</span></div>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ================= PART 7 ================= -->
+  <section class="part" aria-labelledby="t7">
+    <h3>
+      <button type="button" class="part__trigger" id="t7" aria-expanded="false" aria-controls="p7">
+        <span class="part__badge">Part 7</span>
+        <span class="part__title">Sales chart</span>
+        <span class="part__pts">20 pts</span>
+        <svg class="part__chev" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="5 8 10 13 15 8"/></svg>
+      </button>
+    </h3>
+    <div class="part__panel" id="p7" hidden>
+      <p>One chart, comparing the five categories' Quarter Totals. The category names and the totals aren't next to each
+        other, so you'll need to select two separate ranges.</p>
+      <ol class="tasks">
+        <li class="task">
+          <div class="task__body">
+            <p><strong>Create the chart:</strong> a <strong>2-D Clustered Column</strong> chart from
+              <strong>A4:A9</strong> and <strong>E4:E9</strong>. It should have five columns, one per category, and nothing
+              from the other columns.</p>
+          </div>
+          <div class="task__meta"><span class="task__pts">6 pts</span></div>
+        </li>
+        <li class="task">
+          <div class="task__body">
+            <p><strong>Move it</strong> to a new chart sheet named <code>Sales Chart</code>.</p>
+          </div>
+          <div class="task__meta"><span class="task__pts">5 pts</span></div>
+        </li>
+        <li class="task">
+          <div class="task__body">
+            <p><strong>Chart title:</strong> <code>Q3 2026 Sales by Category</code></p>
+          </div>
+          <div class="task__meta"><span class="task__pts">4 pts</span></div>
+        </li>
+        <li class="task">
+          <div class="task__body">
+            <p><strong>Data labels:</strong> add data labels so each column shows its dollar amount. Any chart style is
+              fine, as long as the labels are readable.</p>
+          </div>
+          <div class="task__meta"><span class="task__pts">5 pts</span></div>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ================= PART 8 ================= -->
+  <section class="part" aria-labelledby="t8">
+    <h3>
+      <button type="button" class="part__trigger" id="t8" aria-expanded="false" aria-controls="p8">
+        <span class="part__badge">Part 8</span>
+        <span class="part__title">Espresso machine loan</span>
+        <span class="part__pts">35 pts</span>
+        <svg class="part__chev" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="5 8 10 13 15 8"/></svg>
+      </button>
+    </h3>
+    <div class="part__panel" id="p8" hidden>
+      <p>Everything in this part happens on <strong>Sheet2</strong>. The owner is looking at an $18,500 espresso machine,
+        financed over 5 years at 6.9%. Do the tasks in the order listed. Goal Seek changes the down payment, so it comes
+        last.</p>
+      <ol class="tasks">
+        <li class="task">
+          <div class="task__body">
+            <p><strong>Rename</strong> Sheet2 to <code>Espresso Loan</code>.</p>
+          </div>
+          <div class="task__meta"><span class="task__pts">3 pts</span></div>
+        </li>
+        <li class="task">
+          <div class="task__body">
+            <p><strong>Defined names:</strong> select <strong>A3:B9</strong> and create names from the labels in the
+              <strong>left column</strong>. Check the list of names afterwards. You should have seven new ones:
+              <code>Machine_Price</code>, <code>Down_Payment</code>, <code>Annual_Rate</code>, <code>Years</code>,
+              <code>Loan_Amount</code>, <code>Monthly_Payment</code> and <code>Total_Cost</code>.</p>
+          </div>
+          <div class="task__meta"><span class="task__pts">5 pts</span></div>
+        </li>
+        <li class="task">
+          <div class="task__body">
+            <p><strong>Loan Amount and Total Cost:</strong> using names only, no cell references:</p>
+            <ul>
+              <li>In <strong>B7</strong>, the machine price minus the down payment.</li>
+              <li>In <strong>B9</strong>, the monthly payment times the number of months, plus the down payment.</li>
+            </ul>
+            <p class="tip">B9 shows 0 until B8 has its formula. That's expected.</p>
+          </div>
+          <div class="task__meta"><span class="task__pts">6 pts</span></div>
+        </li>
+        <li class="task">
+          <div class="task__body">
+            <p><strong>Monthly Payment:</strong> in <strong>B8</strong>, use the <strong>PMT</strong> function, with names
+              for every argument. Payments are monthly, so the rate and the number of periods both need converting. Make
+              the loan amount negative so the payment shows as a positive number.</p>
+          </div>
+          <div class="task__meta"><span class="task__pts">7 pts</span></div>
+        </li>
+        <li class="task">
+          <div class="task__body">
+            <p><strong>Number formats:</strong> <strong>B3:B4</strong> and <strong>B7:B9</strong> as
+              <strong>Currency</strong>, 2 decimal places (Currency, not Accounting). <strong>B5</strong> as Percent Style
+              with 1 decimal place (6.9%). <strong>A14:A18</strong> as Percent Style with 0 decimal places.</p>
+          </div>
+          <div class="task__meta"><span class="task__pts">4 pts</span></div>
+        </li>
+        <li class="task">
+          <div class="task__body">
+            <p><strong>Data table:</strong> the owner wants to see the monthly payment at five different interest rates.
+              In <strong>B13</strong>, enter a formula that refers to the monthly payment (use its name). Then build a
+              <strong>one-variable data table</strong> on <strong>A13:B18</strong> that substitutes each rate in A14:A18
+              into the Annual Rate cell. Format <strong>B13:B18</strong> as Currency, 2 decimal places.</p>
+          </div>
+          <div class="task__meta"><span class="task__pts">6 pts</span></div>
+        </li>
+        <li class="task">
+          <div class="task__body">
+            <p><strong>Goal Seek (last):</strong> the owner can afford exactly <strong>$250</strong> a month. Use
+              <strong>Goal Seek</strong> to set the monthly payment in B8 to 250 by changing the down payment in
+              <strong>B4</strong>. Keep the solution. The loan amount, total cost and data table all update on their
+              own.</p>
+          </div>
+          <div class="task__meta"><span class="task__pts">4 pts</span></div>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ================= PART 9 ================= -->
+  <section class="part" aria-labelledby="t9">
+    <h3>
+      <button type="button" class="part__trigger" id="t9" aria-expanded="false" aria-controls="p9">
+        <span class="part__badge">Part 9</span>
+        <span class="part__title">Finishing and printing</span>
+        <span class="part__pts">15 pts</span>
+        <svg class="part__chev" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="5 8 10 13 15 8"/></svg>
+      </button>
+    </h3>
+    <div class="part__panel" id="p9" hidden>
+      <p>Last touches, once every formula and format is in place.</p>
+      <ol class="tasks">
+        <li class="task">
+          <div class="task__body">
+            <p><strong>AutoFit</strong> columns <strong>A through H</strong> on Q3 Sales, so nothing shows as
+              <code>#####</code> or gets cut off. Do the same for columns A and B on Espresso Loan.</p>
+          </div>
+          <div class="task__meta"><span class="task__pts">3 pts</span></div>
+        </li>
+        <li class="task">
+          <div class="task__body">
+            <p><strong>Freeze panes</strong> on Q3 Sales so rows 1 through 4 (the titles and column headings) stay on
+              screen when you scroll down.</p>
+          </div>
+          <div class="task__meta"><span class="task__pts">3 pts</span></div>
+        </li>
+        <li class="task">
+          <div class="task__body">
+            <p><strong>Orientation:</strong> set Q3 Sales to print in <strong>Landscape</strong>.</p>
+          </div>
+          <div class="task__meta"><span class="task__pts">3 pts</span></div>
+        </li>
+        <li class="task">
+          <div class="task__body">
+            <p><strong>Fit to one page:</strong> scale Q3 Sales to <strong>1 page wide by 1 page tall</strong>. Check it in
+              Print Preview.</p>
+          </div>
+          <div class="task__meta"><span class="task__pts">3 pts</span></div>
+        </li>
+        <li class="task">
+          <div class="task__body">
+            <p><strong>Print area:</strong> on Espresso Loan, set the print area to <strong>A1:B9</strong>, so only the loan
+              summary prints and the data table doesn't.</p>
+          </div>
+          <div class="task__meta"><span class="task__pts">3 pts</span></div>
+        </li>
+      </ol>
+      <p>When you're done, the workbook has three tabs: <strong>Q3 Sales</strong>, <strong>Espresso Loan</strong> and
+        <strong>Sales Chart</strong>. The order of the tabs isn't graded. Click into Q3 Sales and press Ctrl+Home (Mac:
+        Fn+Control+Left Arrow) before you save, so it opens at the top.</p>
+    </div>
+  </section>
+
+  <h2 id="checks">Numbers to check against</h2>
+  <p>If your results match these, your formulas are working. If one doesn't match, look at the formula behind it before
+    you look anywhere else. Matching these numbers isn't the whole grade; I also check that each one comes from the formula
+    the task asks for.</p>
+  <div class="table-scroll" tabindex="0" role="region" aria-label="Check values for the Q3 Sales sheet">
+    <table class="checks">
+      <caption>Q3 Sales</caption>
+      <thead>
+        <tr><th scope="col">Cell</th><th scope="col">What it is</th><th scope="col">Should show</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="c">E5</td><td>Hot Beverages, Quarter Total</td><td class="v">$20,450</td></tr>
+        <tr><td class="c">E9</td><td>Retail Beans and Merchandise, Quarter Total</td><td class="v">$5,670</td></tr>
+        <tr><td class="c">B10 · C10 · D10</td><td>Monthly totals: July, August, September</td><td class="v">$25,310 · $25,050 · $24,890</td></tr>
+        <tr><td class="c">E10</td><td>Grand total for the quarter</td><td class="v">$75,250</td></tr>
+        <tr><td class="c">F5 · F6</td><td>Hot Beverages · Iced Beverages, % of Total</td><td class="v">27.2% · 33.9%</td></tr>
+        <tr><td class="c">F10</td><td>Sum of the percentages</td><td class="v">100.0%</td></tr>
+        <tr><td class="c">H5 · H6</td><td>Bonus: Hot Beverages · Iced Beverages</td><td class="v">$1,022.50 · $1,275.50</td></tr>
+        <tr><td class="c">H7:H9</td><td>Bonus: the other three categories</td><td class="v">$ - (zero)</td></tr>
+        <tr><td class="c">H10</td><td>Total bonus</td><td class="v">$2,298.00</td></tr>
+        <tr><td class="c">B13 · B14 · B15</td><td>Highest · lowest · average monthly total</td><td class="v">$25,310 · $24,890 · $25,083</td></tr>
+        <tr><td class="c">E5:E9</td><td>Conditional formatting</td><td>Red: Hot and Iced Beverages. Yellow: Retail Beans and Merchandise. The other two: no highlight.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="table-scroll" tabindex="0" role="region" aria-label="Check values for the Espresso Loan sheet">
+    <table class="checks">
+      <caption>Espresso Loan</caption>
+      <thead>
+        <tr><th scope="col">Cell</th><th scope="col">What it is</th><th scope="col">Should show</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="c">B7 · B8 · B9</td><td><em>Before</em> Goal Seek: loan amount · monthly payment · total cost</td><td class="v">$15,500.00 · $306.19 · $21,371.27</td></tr>
+        <tr><td class="c">B4</td><td><em>After</em> Goal Seek: down payment</td><td class="v">$5,844.37</td></tr>
+        <tr><td class="c">B7 · B8 · B9</td><td><em>After</em> Goal Seek: loan amount · monthly payment · total cost</td><td class="v">$12,655.63 · $250.00 · $20,844.37</td></tr>
+        <tr><td class="c">B14:B18</td><td><em>After</em> Goal Seek: payment at 5%, 6%, 7%, 8%, 9%</td><td class="v">$238.83 · $244.67 · $250.60 · $256.61 · $262.71</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="tip">Goal Seek may land a cent or two off in the last place. That's fine.</p>
+
+  <h2 id="submit">Saving and submitting</h2>
+  <div class="submit-box">
+    <p>Save your workbook as an Excel workbook named</p>
+    <p class="filename"><code>Coffee_LastName_FirstName.xlsx</code></p>
+    <p>For example, <code>Coffee_Smith_Jane.xlsx</code>. Close Excel, then upload that one <code>.xlsx</code> file to the
+      <strong>Excel Project</strong> assignment in Canvas by <strong>Sunday 11/15, 11:59 PM</strong>. All three sheets
+      travel inside that one file. I open your workbook and check every item in the rubric below.</p>
+    <p>You can submit as many times as you like before the due date. I grade only the last file you submit. I grade
+      it myself, not MindTap, so it takes a little longer to get your score back.</p>
+    <p><strong>Mac:</strong> make sure the format is <em>Excel Workbook (.xlsx)</em>, not <em>.numbers</em>.</p>
+    <p><strong>Late work:</strong> the Excel Project isn't accepted late unless you arrange it with me <em>before</em> the
+      due date. Then there's no penalty. Ask early. Nothing is submitted from this page. Canvas is the only place your file
+      goes.</p>
+  </div>
+
+  <h2 id="rubric">Grading rubric</h2>
+  <p>Every row is graded on its own. Missing one step doesn't cost you points anywhere else, and a formula that's wrong
+    in one cell doesn't cost you the formatting on that cell.</p>
+  <div class="table-scroll" tabindex="0" role="region" aria-label="Grading rubric, 200 points">
+    <table class="rubric">
+      <thead>
+        <tr><th scope="col">Task</th><th scope="col" class="pts">Pts</th></tr>
+      </thead>
+      <tbody>
+        <tr class="group"><th scope="rowgroup" colspan="2">Part 1: Workbook setup (15)</th></tr>
+        <tr><td>Theme set to Office 2013 – 2022</td><td class="pts">4</td></tr>
+        <tr><td>Both misspellings corrected</td><td class="pts">5</td></tr>
+        <tr><td>Sheet1 renamed Q3 Sales</td><td class="pts">3</td></tr>
+        <tr><td>Q3 Sales tab color Blue</td><td class="pts">3</td></tr>
+
+        <tr class="group"><th scope="rowgroup" colspan="2">Part 2: Titles and headings (25)</th></tr>
+        <tr><td>A1:H1 merged and centered, Title style, 20 pt</td><td class="pts">6</td></tr>
+        <tr><td>A2:H2 merged and centered, italic, Green Accent 6 Darker 50%</td><td class="pts">5</td></tr>
+        <tr><td>A4:H4 Heading 3 style, centered</td><td class="pts">4</td></tr>
+        <tr><td>A12 and A17 Bold, 12 pt, Blue Accent 1 Darker 25% (Format Painter)</td><td class="pts">5</td></tr>
+        <tr><td>A10:H10 Total style</td><td class="pts">5</td></tr>
+
+        <tr class="group"><th scope="rowgroup" colspan="2">Part 3: Formulas and number formats (30)</th></tr>
+        <tr><td>E5:E9 SUM of each category's three months</td><td class="pts">5</td></tr>
+        <tr><td>B10:E10 SUM of each column</td><td class="pts">5</td></tr>
+        <tr><td>F5:F9 divide by $E$10 (absolute), F10 SUM</td><td class="pts">8</td></tr>
+        <tr><td>B5:E10 Accounting, 0 decimal places</td><td class="pts">4</td></tr>
+        <tr><td>F5:F10 Percent Style, 1 decimal place</td><td class="pts">4</td></tr>
+        <tr><td>B3 NOW function, Short Date</td><td class="pts">4</td></tr>
+
+        <tr class="group"><th scope="rowgroup" colspan="2">Part 4: Bonus with defined names (20)</th></tr>
+        <tr><td>Bonus_Threshold and Bonus_Rate created from the left column</td><td class="pts">5</td></tr>
+        <tr><td>B18 Accounting 0, B19 Percent 0, Gold Accent 4 Lighter 60% fill</td><td class="pts">4</td></tr>
+        <tr><td>H5:H9 IF formula using both names</td><td class="pts">8</td></tr>
+        <tr><td>H10 SUM, H5:H10 Accounting 2 decimal places</td><td class="pts">3</td></tr>
+
+        <tr class="group"><th scope="rowgroup" colspan="2">Part 5: Quarter statistics (15)</th></tr>
+        <tr><td>B13 MAX of B10:D10</td><td class="pts">4</td></tr>
+        <tr><td>B14 MIN of B10:D10</td><td class="pts">4</td></tr>
+        <tr><td>B15 AVERAGE of B10:D10</td><td class="pts">4</td></tr>
+        <tr><td>B13:B15 Accounting, 0 decimal places</td><td class="pts">3</td></tr>
+
+        <tr class="group"><th scope="rowgroup" colspan="2">Part 6: Conditional formatting and sparklines (20)</th></tr>
+        <tr><td>E5:E9 greater than 20000, Light Red Fill with Dark Red Text</td><td class="pts">4</td></tr>
+        <tr><td>E5:E9 less than 10000, Yellow Fill with Dark Yellow Text (second rule)</td><td class="pts">4</td></tr>
+        <tr><td>F5:F9 Blue gradient data bars</td><td class="pts">4</td></tr>
+        <tr><td>G5:G9 line sparklines from B5:D9</td><td class="pts">5</td></tr>
+        <tr><td>Sparkline markers on</td><td class="pts">3</td></tr>
+
+        <tr class="group"><th scope="rowgroup" colspan="2">Part 7: Sales chart (20)</th></tr>
+        <tr><td>Clustered column chart of the five Quarter Totals only</td><td class="pts">6</td></tr>
+        <tr><td>Moved to a chart sheet named Sales Chart</td><td class="pts">5</td></tr>
+        <tr><td>Title "Q3 2026 Sales by Category"</td><td class="pts">4</td></tr>
+        <tr><td>Data labels on the columns</td><td class="pts">5</td></tr>
+
+        <tr class="group"><th scope="rowgroup" colspan="2">Part 8: Espresso machine loan (35)</th></tr>
+        <tr><td>Sheet2 renamed Espresso Loan</td><td class="pts">3</td></tr>
+        <tr><td>Seven names created from A3:B9, left column</td><td class="pts">5</td></tr>
+        <tr><td>B7 and B9 formulas using names only</td><td class="pts">6</td></tr>
+        <tr><td>B8 PMT with names, monthly rate and periods, negative loan amount</td><td class="pts">7</td></tr>
+        <tr><td>Currency 2 places on B3:B4 and B7:B9; B5 Percent 1; A14:A18 Percent 0</td><td class="pts">4</td></tr>
+        <tr><td>One-variable data table on A13:B18, Currency 2 places</td><td class="pts">6</td></tr>
+        <tr><td>Goal Seek result kept: payment $250.00, down payment about $5,844.37</td><td class="pts">4</td></tr>
+
+        <tr class="group"><th scope="rowgroup" colspan="2">Part 9: Finishing and printing (15)</th></tr>
+        <tr><td>Columns AutoFit on both sheets, nothing cut off or #####</td><td class="pts">3</td></tr>
+        <tr><td>Rows 1–4 frozen on Q3 Sales</td><td class="pts">3</td></tr>
+        <tr><td>Q3 Sales Landscape</td><td class="pts">3</td></tr>
+        <tr><td>Q3 Sales scaled to 1 page wide by 1 page tall</td><td class="pts">3</td></tr>
+        <tr><td>Espresso Loan print area A1:B9</td><td class="pts">3</td></tr>
+
+        <tr class="group"><th scope="rowgroup" colspan="2">Submission (5)</th></tr>
+        <tr><td>Saved as a .xlsx named Coffee_LastName_FirstName.xlsx</td><td class="pts">5</td></tr>
+      </tbody>
+      <tfoot>
+        <tr><th scope="row">Total</th><td class="pts">200</td></tr>
+      </tfoot>
+    </table>
+  </div>
+
+  <p class="footnote">CSC 104 · Computers and Computer Applications · Fall 2026 · Mendocino College. Questions go to Canvas
+    Inbox or dpai@mendocino.edu.</p>
+</main>
+
+<script>
+(function () {
+  "use strict";
+
+  try {
+    if (!CSS.supports("selector(:focus-visible)")) { document.body.classList.add("no-fv"); }
+  } catch (e) { document.body.classList.add("no-fv"); }
+
+  /* ---------- Accordion: independent panels, aria-expanded + hidden ---------- */
+  var triggers = Array.prototype.slice.call(document.querySelectorAll(".part__trigger"));
+  var stepTriggers = triggers.filter(function (b) { return b.id !== "t0"; });
+
+  function setOpen(btn, open) {
+    btn.setAttribute("aria-expanded", open ? "true" : "false");
+    document.getElementById(btn.getAttribute("aria-controls")).hidden = !open;
+  }
+  triggers.forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      setOpen(btn, btn.getAttribute("aria-expanded") !== "true");
+      postHeight();
+    });
+  });
+  document.getElementById("open-all").addEventListener("click", function () {
+    stepTriggers.forEach(function (b) { setOpen(b, true); }); postHeight();
+  });
+  document.getElementById("close-all").addEventListener("click", function () {
+    stepTriggers.forEach(function (b) { setOpen(b, false); }); postHeight();
+  });
+
+  /* ---------- Canvas iframe auto-resize ---------- */
+  function postHeight() {
+    setTimeout(function () {
+      var h = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
+      try {
+        window.parent.postMessage({ subject: "lti.frameResize", height: h }, "*");
+        window.parent.postMessage(h, "*");
+      } catch (e) { /* standalone */ }
+    }, 60);
+  }
+  postHeight();
+  window.addEventListener("load", postHeight);
+  window.addEventListener("resize", postHeight);
+}());
+</script>
+</body>
+</html>
