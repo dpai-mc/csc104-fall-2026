@@ -1,0 +1,1244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CSC 104 — Managing Email with Outlook</title>
+<style>
+/* ============================================================
+   CSC 104 — Week 15 — Managing Email with Outlook
+   Self-contained SPA for embedding in a Canvas iframe.
+   Vanilla CSS + vanilla JS, one file, no outbound links.
+   The only external resources are the YouTube player iframe and
+   the YouTube IFrame API (needed for click-to-seek); the page
+   degrades to a readable transcript and a plain topic list if
+   either is blocked.
+   Token block and layout match weeks/week03/01-guided-assign-word-1.html.
+   ============================================================ */
+
+:root {
+  color-scheme: light dark;
+  --surface:      #ffffff;
+  --panel:        #f6f8fb;
+  --panel-2:      #eef2f8;
+  --accent-bg:    #e8f0fe;
+  --ink:          #16202f;
+  --muted:        #46536b;
+  --brand:        #1d4ed8;
+  --brand-ink:    #17399c;
+  --border:       #c3cddc;
+  --border-soft:  #dde4ee;
+  --field-border: #6b7a92;
+  --btn-bg:       #1d4ed8;
+  --btn-fg:       #ffffff;
+  --btn-bg-hover: #17399c;
+  --btn2-bg:      #ffffff;
+  --btn2-fg:      #17399c;
+  --ok:           #1a6b3c;
+  --ok-bg:        #e6f4ec;
+  --warn-ink:     #7a4a06;
+  --warn-bg:      #fdf3e0;
+  --warn-rule:    #b8860b;
+  --focus:        #b4530a;
+  --hit:          #fff2b8;
+  --hit-ink:      #3a2c00;
+  --radius:       10px;
+  --maxw:         70rem;
+  --readw:        46rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --surface:      #0f1726;
+    --panel:        #17223a;
+    --panel-2:      #1e2b45;
+    --accent-bg:    #1a2a4d;
+    --ink:          #e9eefa;
+    --muted:        #b6c3d8;
+    --brand:        #9dbcff;
+    --brand-ink:    #bcd2ff;
+    --border:       #3a4a68;
+    --border-soft:  #2b3a56;
+    --field-border: #7b89a3;
+    --btn-bg:       #9dbcff;
+    --btn-fg:       #0b1424;
+    --btn-bg-hover: #c3d6ff;
+    --btn2-bg:      #17223a;
+    --btn2-fg:      #bcd2ff;
+    --ok:           #8fe0b0;
+    --ok-bg:        #123328;
+    --warn-ink:     #f6d59a;
+    --warn-bg:      #3a2c11;
+    --warn-rule:    #d9a441;
+    --focus:        #ffb066;
+    --hit:          #5c4a10;
+    --hit-ink:      #ffeeb8;
+  }
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--surface);
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; border-radius: 4px; }
+.no-fv :focus { outline: 3px solid var(--focus); outline-offset: 2px; }
+
+.skip-link {
+  position: absolute; left: -9999px; top: 0; z-index: 60;
+  background: var(--btn-bg); color: var(--btn-fg);
+  padding: 0.6rem 1rem; font-weight: 700; border-radius: 0 0 var(--radius) 0;
+}
+.skip-link:focus { left: 0; outline: 3px solid var(--focus); outline-offset: 2px; }
+
+.wrap { max-width: var(--maxw); margin: 0 auto; padding: 1rem 1rem 3rem; }
+.read { max-width: var(--readw); }
+
+/* ---------------------- Header ---------------------- */
+.page-head { background: var(--panel); border-bottom: 3px solid var(--brand); }
+.page-head .wrap { padding-bottom: 1.25rem; }
+
+.eyebrow {
+  font-size: 0.8125rem; letter-spacing: 0.09em; text-transform: uppercase;
+  font-weight: 700; color: var(--brand-ink); margin: 0.75rem 0 0.35rem;
+}
+h1 { font-size: clamp(1.5rem, 4.2vw, 2.15rem); line-height: 1.22; margin: 0 0 0.6rem; }
+.lede { margin: 0; color: var(--muted); max-width: var(--readw); }
+
+.facts { list-style: none; display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 1rem 0 0; padding: 0; }
+.facts li {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 999px; padding: 0.3rem 0.85rem; font-size: 0.875rem;
+}
+.facts .k { font-weight: 700; color: var(--brand-ink); }
+
+/* ---------------------- Typography ---------------------- */
+h2 {
+  font-size: clamp(1.25rem, 3.2vw, 1.6rem);
+  margin: 2.5rem 0 0.75rem; color: var(--brand-ink);
+  padding-bottom: 0.35rem; border-bottom: 2px solid var(--border-soft);
+}
+h3 { font-size: 1.125rem; margin: 1.75rem 0 0.5rem; }
+p { margin: 0 0 1rem; max-width: var(--readw); }
+ul, ol { margin: 0 0 1rem; padding-left: 1.35rem; max-width: var(--readw); }
+li { margin-bottom: 0.4rem; }
+.mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.9375em; }
+.ui { font-weight: 700; }
+
+.callout {
+  border-left: 5px solid var(--brand); background: var(--accent-bg);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding: 0.9rem 1.1rem; margin: 0 0 1.25rem; max-width: var(--readw);
+}
+.callout > :last-child { margin-bottom: 0; }
+.callout h3 { margin-top: 0; font-size: 1.05rem; }
+.callout--warn { border-left-color: var(--warn-rule); background: var(--warn-bg); color: var(--warn-ink); }
+.callout--wide { max-width: none; }
+
+/* ---------------------- Video + transcript ---------------------- */
+.video-row { display: flex; flex-wrap: wrap; gap: 1.25rem; margin: 0 0 1.5rem; }
+.video-col { flex: 1 1 32rem; min-width: min(100%, 20rem); }
+.transcript-col { flex: 1 1 20rem; min-width: min(100%, 17rem); display: flex; flex-direction: column; }
+
+.video-frame {
+  position: relative; width: 100%; padding-top: 56.25%;
+  background: #000; border-radius: var(--radius); overflow: hidden;
+  border: 1px solid var(--field-border);
+}
+.video-frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+.video-caption { font-size: 0.875rem; color: var(--muted); margin-top: 0.5rem; }
+
+.transcript-head { display: flex; flex-wrap: wrap; gap: 0.5rem 0.75rem; align-items: flex-end; margin-bottom: 0.5rem; }
+.transcript-head h3 { margin: 0 0 0.3rem; font-size: 1rem; flex: 0 1 auto; }
+.transcript-search { flex: 1 1 10rem; }
+.transcript-search label { display: block; font-size: 0.8125rem; font-weight: 600; color: var(--muted); }
+.transcript-search input {
+  font: inherit; width: 100%; min-height: 2.5rem; color: var(--ink);
+  background: var(--surface); border: 1px solid var(--field-border);
+  border-radius: 8px; padding: 0.35rem 0.55rem;
+}
+
+.transcript-panel {
+  height: 24rem; max-height: 24rem; overflow-y: auto;
+  border: 1px solid var(--field-border); border-radius: var(--radius);
+  background: var(--panel); padding: 0.4rem;
+}
+.transcript-line {
+  display: block; width: 100%; text-align: left; font: inherit;
+  font-size: 0.9375rem; line-height: 1.5; color: var(--ink);
+  background: transparent; border: 0; border-radius: 6px;
+  padding: 0.45rem 0.6rem; cursor: pointer;
+}
+.transcript-line:hover { background: var(--accent-bg); }
+.transcript-line .t {
+  display: inline-block; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.8125rem; font-weight: 700; color: var(--brand-ink); margin-right: 0.5rem;
+}
+.transcript-line.is-active {
+  background: var(--accent-bg);
+  box-shadow: inset 3px 0 0 0 var(--brand);
+  font-weight: 600;
+}
+.transcript-line[hidden] { display: none; }
+.transcript-line mark { background: var(--hit); color: var(--hit-ink); }
+.transcript-note { color: var(--muted); font-size: 0.875rem; padding: 0.6rem; margin: 0; }
+
+/* Static fallback when the player never loads */
+.no-player .transcript-line { cursor: default; }
+.no-player .transcript-line:hover { background: transparent; }
+
+/* ---------------------- Topic index ---------------------- */
+.topic-index { margin: 0 0 1.5rem; }
+.topic-index__group {
+  font-weight: 700; color: var(--brand-ink); margin: 1.25rem 0 0.4rem;
+  font-size: 0.9375rem; letter-spacing: 0.02em;
+}
+.topic-index__group:first-child { margin-top: 0; }
+.topic-index__list { list-style: none; padding: 0; margin: 0; max-width: none; }
+.topic-index__item {
+  display: flex; gap: 0.7rem; align-items: baseline;
+  padding: 0.28rem 0; margin: 0; border-bottom: 1px solid var(--border-soft);
+}
+.topic-index__list li:last-child { border-bottom: none; }
+.topic-index__time {
+  flex: 0 0 auto; font: inherit;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.875rem; font-weight: 700;
+  min-width: 4.25rem; min-height: 2rem; text-align: center;
+  color: var(--btn2-fg); background: var(--btn2-bg);
+  border: 1px solid var(--field-border); border-radius: 6px;
+  padding: 0.15rem 0.4rem; cursor: pointer;
+}
+.topic-index__time:hover { background: var(--accent-bg); }
+.topic-index__label { flex: 1 1 auto; }
+
+.topic-index--static .topic-index__time {
+  cursor: default; background: transparent; border-color: transparent;
+  color: var(--muted); text-align: left; padding-left: 0;
+}
+.topic-index--static .topic-index__time:hover { background: transparent; }
+
+@media (min-width: 52em) {
+  .topic-cols { column-count: 2; column-gap: 2.25rem; }
+  .topic-cols .topic-index__group { break-after: avoid; }
+  .topic-cols .topic-index__list { break-inside: avoid; }
+}
+
+/* ---------------------- To-do / step lists ---------------------- */
+.todo { list-style: none; padding: 0; margin: 0 0 1.5rem; max-width: none; }
+.todo > li {
+  background: var(--panel); border: 1px solid var(--border-soft);
+  border-radius: var(--radius); padding: 0.85rem 1rem;
+  margin: 0 0 0.75rem;
+}
+.todo__top { display: flex; flex-wrap: wrap; gap: 0.6rem; align-items: baseline; }
+.todo__num {
+  flex: 0 0 auto; min-width: 1.9rem; height: 1.9rem; padding: 0 0.4rem; border-radius: 999px;
+  background: var(--btn-bg); color: var(--btn-fg); font-weight: 700; font-size: 0.9375rem;
+  display: flex; align-items: center; justify-content: center; align-self: flex-start;
+}
+.todo__num--setup { background: var(--btn2-bg); color: var(--btn2-fg); border: 1px solid var(--field-border); }
+.todo__title { flex: 1 1 14rem; font-weight: 700; margin: 0; }
+.todo__body { margin: 0.35rem 0 0 2.5rem; max-width: var(--readw); }
+.todo__body p { margin: 0 0 0.5rem; }
+.todo__body ul { margin: 0 0 0.5rem; }
+.todo__body > :last-child { margin-bottom: 0; }
+.todo__meta { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0.5rem 0 0 2.5rem; }
+.pill {
+  font-size: 0.8125rem; font-weight: 700; border-radius: 999px;
+  padding: 0.1rem 0.6rem; border: 1px solid currentColor; white-space: nowrap;
+}
+.pill--graded { color: var(--ok); background: var(--ok-bg); }
+.pill--setup { color: var(--brand-ink); background: var(--accent-bg); }
+.pill--due { color: var(--warn-ink); background: var(--warn-bg); }
+.pill--time {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  color: var(--btn2-fg); background: var(--btn2-bg); border-color: var(--field-border);
+  cursor: pointer; font-size: 0.8125rem; min-height: 1.9rem;
+}
+.pill--time:hover { background: var(--accent-bg); }
+.no-player .pill--time { cursor: default; }
+
+/* ---------------------- Platform tabs ---------------------- */
+.tabs { margin: 0 0 1.5rem; }
+.tablist { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0 0 -1px; padding: 0; }
+.tab {
+  font: inherit; font-weight: 700; cursor: pointer;
+  color: var(--btn2-fg); background: var(--btn2-bg);
+  border: 1px solid var(--field-border); border-bottom-color: transparent;
+  border-radius: var(--radius) var(--radius) 0 0;
+  padding: 0.5rem 1rem; min-height: 2.5rem;
+}
+.tab[aria-selected="true"] { background: var(--accent-bg); border-bottom-color: var(--accent-bg); }
+.tab:hover { background: var(--accent-bg); }
+.tabpanel {
+  border: 1px solid var(--field-border); border-radius: 0 var(--radius) var(--radius) var(--radius);
+  background: var(--panel); padding: 1rem 1.1rem;
+}
+.tabpanel > :last-child { margin-bottom: 0; }
+.tabpanel h3:first-child { margin-top: 0; }
+
+/* ---------------------- Reference table ---------------------- */
+.table-scroll { overflow-x: auto; margin: 0 0 1.5rem; }
+table { border-collapse: collapse; width: 100%; min-width: 30rem; background: var(--surface); }
+caption { text-align: left; font-weight: 700; padding: 0 0 0.5rem; color: var(--muted); }
+th, td { border: 1px solid var(--border); padding: 0.6rem 0.7rem; text-align: left; vertical-align: top; }
+thead th { background: var(--panel-2); }
+tbody th { background: var(--panel); font-weight: 700; white-space: nowrap; }
+
+.status {
+  min-height: 1.4rem; font-weight: 600; color: var(--ok); background: var(--ok-bg);
+  border-radius: 8px; padding: 0.3rem 0.55rem; margin: 0.5rem 0 0;
+  max-width: var(--readw); font-size: 0.9375rem;
+}
+.status:empty { background: transparent; padding: 0; min-height: 0; }
+
+.footnote {
+  margin-top: 2.5rem; padding-top: 1rem; border-top: 1px solid var(--border-soft);
+  color: var(--muted); font-size: 0.9375rem; max-width: var(--readw);
+}
+
+.sr-only {
+  position: absolute !important; width: 1px; height: 1px; margin: -1px; padding: 0;
+  overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
+}
+
+@media print {
+  .skip-link, .video-frame, .transcript-search, .tablist { display: none !important; }
+  .transcript-panel { height: auto !important; max-height: none !important; overflow: visible; border: none; }
+  .topic-index__time, .pill--time { border: none; }
+  .tabpanel { display: block !important; border-radius: var(--radius); margin-bottom: 1rem; }
+  body { background: #fff; color: #000; }
+  .todo > li, .callout, table { break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+
+<a class="skip-link" href="#main">Skip to page content</a>
+
+<header class="page-head">
+  <div class="wrap">
+    <p class="eyebrow">CSC 104 &middot; Week 15 &middot; Outlook, part 1</p>
+    <h1>Managing Email with Outlook &mdash; Guided and Homework Walkthrough</h1>
+    <p class="lede">The last week covers Outlook, and it works differently from Word, Excel and PowerPoint. There are no
+      files to download. The guided assignment is a MindTap <strong>training</strong>: an Outlook simulation that
+      walks you through 26 email tasks. The homework is an <strong>exam</strong> on the same 26 tasks, without the
+      prompts. This video shows how both work. Every part is listed on this page with a button that jumps the video
+      to it, and the whole video is written out here so you can read it instead of watching.</p>
+    <ul class="facts">
+      <li><span class="k">Video:</span> 12 minutes</li>
+      <li><span class="k">Week 15:</span> 12/7/2026 &ndash; 12/11/2026</li>
+      <li><span class="k">Guided (training):</span> 25 pts</li>
+      <li><span class="k">Homework (exam):</span> 100 pts</li>
+      <li><span class="k">Due:</span> Fri 12/11, 11:59 PM</li>
+    </ul>
+  </div>
+</header>
+
+<main id="main" class="wrap" tabindex="-1">
+
+  <!-- ============ What to do this week ============ -->
+  <section aria-labelledby="todo-heading">
+    <h2 id="todo-heading" style="margin-top:1.25rem">What to do this week</h2>
+    <p>Two Outlook topics this week, email and calendars, each with a guided training and a homework exam. This page
+      is email; the calendar page is the second Outlook page in this week's module. Week 15 is short: <strong>everything
+      is due Friday 12/11 at 11:59 PM</strong>, when the course closes, and nothing is accepted after that.</p>
+
+    <ol class="todo">
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">1</span>
+          <p class="todo__title">Watch this video before you start</p>
+        </div>
+        <div class="todo__body">
+          <p>I don't walk through all 26 tasks. I show you how a task works and do two of them, because once you've
+            seen one, the training guides you through the rest itself.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="0.04">0:00</button>
+          <button type="button" class="pill pill--time" data-seek="39.3">0:39</button>
+          <span class="pill pill--setup">Not graded</span>
+        </p>
+      </li>
+
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">2</span>
+          <p class="todo__title">Do the email training: all 26 tasks, then Submit</p>
+        </div>
+        <div class="todo__body">
+          <p>Open the training in MindTap. Each task has an Observe, a Practice and an Apply part; the Apply part is
+            the one that counts. Work through all 26 and select <span class="ui">Submit</span> only at the end. Your
+            score is the number of tasks you completed.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="65.1">1:05</button>
+          <button type="button" class="pill pill--time" data-seek="460.98">7:40</button>
+          <span class="pill pill--graded">Graded &mdash; 25 pts</span>
+          <span class="pill pill--due">Due Fri 12/11, 11:59 PM</span>
+        </p>
+      </li>
+
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">3</span>
+          <p class="todo__title">Do the Managing Email with Outlook exam</p>
+        </div>
+        <div class="todo__body">
+          <p>The homework. It's the same 26 tasks with different names and details, and no Observe or Practice to
+            help. Do it right after the training while the steps are fresh.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="480.74">8:00</button>
+          <span class="pill pill--graded">Graded &mdash; 100 pts</span>
+          <span class="pill pill--due">Due Fri 12/11, 11:59 PM</span>
+        </p>
+      </li>
+
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">4</span>
+          <p class="todo__title">Then do the calendar training and exam</p>
+        </div>
+        <div class="todo__body">
+          <p>Same setup with 15 calendar tasks, on the calendar page. Also due Friday 12/11.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="678.34">11:18</button>
+          <span class="pill pill--due">Due Fri 12/11, 11:59 PM</span>
+        </p>
+      </li>
+
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">5</span>
+          <p class="todo__title">Do the module reading</p>
+        </div>
+        <div class="todo__body">
+          <p>The Outlook email chapter in the Shelly Cashman text. Skim it for <em>what</em> Outlook can do. The
+            training's own guide covers each task step by step. Not graded.</p>
+        </div>
+        <p class="todo__meta">
+          <span class="pill pill--setup">Not graded</span>
+        </p>
+      </li>
+    </ol>
+  </section>
+
+  <!-- ============ Video + transcript ============ -->
+  <section aria-labelledby="video-heading">
+    <h2 id="video-heading">The walkthrough video</h2>
+    <p>Twelve minutes. The first half is the training and how its tasks work; the second half is the exam. If you only
+      need one part, use the topic index below.</p>
+
+    <div class="video-row">
+      <div class="video-col">
+        <div class="video-frame" id="video-container">
+          <iframe id="youtube-player"
+                  src="https://www.youtube.com/embed/mtCbwZN980g?enablejsapi=1&amp;cc_load_policy=1&amp;iv_load_policy=3&amp;modestbranding=1&amp;rel=0"
+                  title="CSC 104 Managing Email with Outlook Walkthrough"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  referrerpolicy="strict-origin-when-cross-origin"
+                  allowfullscreen loading="lazy"></iframe>
+        </div>
+        <p class="video-caption">Closed captions are on by default. Select any line of the transcript to jump the
+          video to that moment.</p>
+      </div>
+
+      <div class="transcript-col">
+        <div class="transcript-head">
+          <h3 id="transcript-heading">Transcript</h3>
+          <div class="transcript-search">
+            <label for="transcript-filter">Search the transcript</label>
+            <input type="search" id="transcript-filter" autocomplete="off" spellcheck="false"
+                   aria-describedby="transcript-filter-status">
+          </div>
+        </div>
+        <div class="transcript-panel" id="transcript-container" role="group" aria-labelledby="transcript-heading">
+          <p class="transcript-note">Loading transcript&hellip;</p>
+        </div>
+        <p class="sr-only" role="status" aria-live="polite" id="transcript-filter-status"></p>
+        <p class="sr-only" role="status" aria-live="polite" id="transcript-status"></p>
+        <p style="margin:0.5rem 0 0"><a href="#topic-index-heading">Skip past the transcript</a></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ Topic index ============ -->
+  <section aria-labelledby="topic-index-heading">
+    <h2 id="topic-index-heading">Find a moment in the video</h2>
+    <p><strong>Select any time below and the video jumps there.</strong> This is the detailed contents of the
+      walkthrough.</p>
+
+    <div class="topic-index topic-cols" id="topic-index">
+
+      <div class="topic-index__group">How the Outlook modules work</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="0.04">0:00</button><span class="topic-index__label">The final week: email and calendars</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="24.24">0:24</button><span class="topic-index__label">Guided is a training; homework is an exam</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="39.3">0:39</button><span class="topic-index__label">Why I only do a couple of tasks</span></li>
+      </ul>
+
+      <div class="topic-index__group">The training (guided)</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="65.1">1:05</button><span class="topic-index__label">It opens a new window; 26 tasks</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="83">1:23</button><span class="topic-index__label">The task list in the hamburger menu</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="92.96">1:32</button><span class="topic-index__label">Mac Help and shortcut keys</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="112.4">1:52</button><span class="topic-index__label">Play, speed, transcript, mute</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="128.98">2:08</button><span class="topic-index__label">Observe, Practice, Apply</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="149.9">2:29</button><span class="topic-index__label">The guide for each task</span></li>
+      </ul>
+
+      <div class="topic-index__group">Task 1 &mdash; add an email account</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="188.26">3:08</button><span class="topic-index__label">Observe: watch it done</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="226.88">3:46</button><span class="topic-index__label">Practice: it waits for your click</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="256.88">4:16</button><span class="topic-index__label">File &rsaquo; Add Account &rsaquo; Connect</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="336.1">5:36</button><span class="topic-index__label">Apply: the same task, no prompts</span></li>
+      </ul>
+
+      <div class="topic-index__group">Task 2 &mdash; message sensitivity</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="384.94">6:24</button><span class="topic-index__label">Start with Practice if you like</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="405.12">6:45</button><span class="topic-index__label">Sensitivity &rsaquo; Confidential</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="438.62">7:18</button><span class="topic-index__label">Apply it to the open message</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="460.98">7:40</button><span class="topic-index__label">Submit, and the score: tasks completed</span></li>
+      </ul>
+
+      <div class="topic-index__group">The exam (homework)</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="480.74">8:00</button><span class="topic-index__label">Managing Email with Outlook: an exam</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="520.02">8:40</button><span class="topic-index__label">The same 26 tasks, different details</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="543.22">9:03</button><span class="topic-index__label">Attempts Remaining; Answer correct</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="589.38">9:49</button><span class="topic-index__label">Skip a task and do task 3</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="639.84">10:39</button><span class="topic-index__label">Go back to a skipped task</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="653.76">10:53</button><span class="topic-index__label">Ten attempts per task; no time limit</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="678.34">11:18</button><span class="topic-index__label">Wrap-up; calendars next</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ New ideas ============ -->
+  <section aria-labelledby="vocab-heading">
+    <h2 id="vocab-heading">How the training and the exam work</h2>
+    <p>Outlook runs as a simulation inside MindTap, so you don't need an Outlook account or anything set up on your
+      computer. That also means there's nothing to save or upload this week.</p>
+
+    <div class="table-scroll" tabindex="0" role="region" aria-label="Training and exam terms table, scrollable">
+      <table>
+        <caption>The parts of the Outlook training and exam, with the moment in the video where each one comes up.</caption>
+        <thead>
+          <tr><th scope="col">Part</th><th scope="col">What it is</th><th scope="col">In the video</th></tr>
+        </thead>
+        <tbody>
+          <tr><th scope="row">Training</th><td>The guided assignment, 25 points. A simulation that teaches each task and then has you do it.</td><td><button type="button" class="pill pill--time" data-seek="24.24">0:24</button></td></tr>
+          <tr><th scope="row">Task list</th><td>All 26 tasks, from the hamburger menu (three lines) at the top. Use it to see where you are or jump to a task.</td><td><button type="button" class="pill pill--time" data-seek="83">1:23</button></td></tr>
+          <tr><th scope="row">Observe</th><td>Watch the task being done, with narration. Speed goes up to 1.5&times;.</td><td><button type="button" class="pill pill--time" data-seek="188.26">3:08</button></td></tr>
+          <tr><th scope="row">Practice</th><td>Do the task yourself while the simulation tells you each click. It waits until you make it.</td><td><button type="button" class="pill pill--time" data-seek="226.88">3:46</button></td></tr>
+          <tr><th scope="row">Apply</th><td>Do the task with no prompts. This is the part that's scored.</td><td><button type="button" class="pill pill--time" data-seek="336.1">5:36</button></td></tr>
+          <tr><th scope="row">Guide, Mac Help, shortcut keys</th><td>Written help for each task: the ribbon steps, the keyboard way, and how it differs in Outlook for Mac.</td><td><button type="button" class="pill pill--time" data-seek="149.9">2:29</button></td></tr>
+          <tr><th scope="row">Exam</th><td>The homework, 100 points. The same tasks with different details, and only the Apply part.</td><td><button type="button" class="pill pill--time" data-seek="480.74">8:00</button></td></tr>
+          <tr><th scope="row">Attempts Remaining</th><td>Shown on each exam task. As far as I can tell it's ten tries <em>per task</em>, not ten for the whole exam.</td><td><button type="button" class="pill pill--time" data-seek="653.76">10:53</button></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout">
+      <h3>Don't submit early</h3>
+      <p>The training scores the tasks you've completed when you select <span class="ui">Submit</span>. At 7:40 I
+        submit after two tasks on purpose, to show you the score screen, and get 2 out of 26. Do all 26 first. The
+        exam works the same way: finish every task, then submit.</p>
+    </div>
+  </section>
+
+  <!-- ============ The steps ============ -->
+  <section aria-labelledby="steps-heading">
+    <h2 id="steps-heading">The assignment, step by step</h2>
+    <p>There's no instruction file this week. The training and the exam each tell you what every task asks. These
+      are the steps around them. <strong>Go by what MindTap shows you</strong>; the names, addresses and passwords in
+      the video are the simulation's examples, and yours will be different.</p>
+
+    <h3>The guided training (25 points)</h3>
+    <ol class="todo">
+      <li>
+        <div class="todo__top">
+          <span class="todo__num todo__num--setup" aria-hidden="true">A</span>
+          <p class="todo__title">Open the email training and start it</p>
+        </div>
+        <div class="todo__body">
+          <p>It opens in a new window. Make that window large so the simulated Outlook is easy to read.</p>
+        </div>
+        <p class="todo__meta"><button type="button" class="pill pill--time" data-seek="65.1">1:05</button></p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num todo__num--setup" aria-hidden="true">B</span>
+          <p class="todo__title">For each task: Observe, Practice, then Apply</p>
+        </div>
+        <div class="todo__body">
+          <p>Observe and Practice are optional; skip to Practice if you'd rather do it than watch. <strong>Apply</strong>
+            is required. When it's correct, the training moves you to the next task.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="128.98">2:08</button>
+          <button type="button" class="pill pill--time" data-seek="226.88">3:46</button>
+          <button type="button" class="pill pill--time" data-seek="336.1">5:36</button>
+        </p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num todo__num--setup" aria-hidden="true">C</span>
+          <p class="todo__title">Work through all 26 tasks</p>
+        </div>
+        <div class="todo__body">
+          <p>Use the task list in the hamburger menu to check that none are left. If you're stuck, open the guide for
+            that task, or Mac Help if you use a Mac.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="83">1:23</button>
+          <button type="button" class="pill pill--time" data-seek="143.74">2:23</button>
+        </p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num todo__num--setup" aria-hidden="true">D</span>
+          <p class="todo__title">Select Submit</p>
+        </div>
+        <div class="todo__body">
+          <p>Only after the last task. Your score is the share of tasks you completed.</p>
+        </div>
+        <p class="todo__meta"><button type="button" class="pill pill--time" data-seek="460.98">7:40</button></p>
+      </li>
+    </ol>
+
+    <h3>The homework exam (100 points)</h3>
+    <ol class="todo">
+      <li>
+        <div class="todo__top">
+          <span class="todo__num todo__num--setup" aria-hidden="true">E</span>
+          <p class="todo__title">Open Managing Email with Outlook</p>
+        </div>
+        <div class="todo__body">
+          <p>The same 26 tasks as the training, with different details. Each task shows only what to do, with no
+            prompts.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="480.74">8:00</button>
+          <button type="button" class="pill pill--time" data-seek="520.02">8:40</button>
+        </p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num todo__num--setup" aria-hidden="true">F</span>
+          <p class="todo__title">Do each task; skip and come back if you need to</p>
+        </div>
+        <div class="todo__body">
+          <p>"Answer correct" moves you on. You can skip a task and return to it later, and there's no time limit.
+            Watch the Attempts Remaining count on each task.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="543.22">9:03</button>
+          <button type="button" class="pill pill--time" data-seek="589.38">9:49</button>
+          <button type="button" class="pill pill--time" data-seek="653.76">10:53</button>
+        </p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num todo__num--setup" aria-hidden="true">G</span>
+          <p class="todo__title">Submit when every task is done</p>
+        </div>
+        <div class="todo__body">
+          <p>Before Friday 12/11 at 11:59 PM. Nothing can be accepted after the course closes.</p>
+        </div>
+        <p class="todo__meta"><button type="button" class="pill pill--time" data-seek="580.82">9:40</button></p>
+      </li>
+    </ol>
+  </section>
+
+  <!-- ============ Platform tabs ============ -->
+  <section aria-labelledby="platform-heading">
+    <h2 id="platform-heading">Windows and Mac differences</h2>
+    <p>The simulation runs in your browser, so it behaves the same on both. Pick your platform.</p>
+
+    <div class="tabs">
+      <div class="tablist" role="tablist" aria-label="Choose your platform">
+        <button type="button" class="tab" role="tab" id="tab-win" aria-controls="panel-win" aria-selected="true">Windows</button>
+        <button type="button" class="tab" role="tab" id="tab-mac" aria-controls="panel-mac" aria-selected="false" tabindex="-1">Mac</button>
+      </div>
+
+      <div class="tabpanel" role="tabpanel" id="panel-win" aria-labelledby="tab-win" tabindex="0">
+        <h3>On Windows</h3>
+        <ul style="max-width:none">
+          <li><strong>The simulated Outlook is Windows Outlook,</strong> so the ribbon and menus will look familiar
+            from Word, Excel and PowerPoint.</li>
+          <li><strong>Pop-ups:</strong> the training opens in a new window. If nothing appears, allow pop-ups for
+            MindTap in your browser.</li>
+          <li><strong>Shortcut keys:</strong> listed in the training if you'd rather use the keyboard.</li>
+        </ul>
+      </div>
+
+      <div class="tabpanel" role="tabpanel" id="panel-mac" aria-labelledby="tab-mac" tabindex="0" hidden>
+        <h3>On Mac</h3>
+        <p>The simulation shows Windows Outlook even on a Mac, so click what it shows you, not what your own Outlook
+          for Mac looks like. If something genuinely won't work, message me through the Canvas Inbox.</p>
+        <ul style="max-width:none">
+          <li><strong>Mac Help</strong> and the Office for Mac part of each task's guide explain how it's done in real
+            Outlook for Mac <em>(1:32)</em>.</li>
+          <li><strong>Right-click</strong> is Control-click, or a two-finger click on a trackpad.</li>
+          <li><strong>Pop-ups:</strong> in Safari, allow pop-ups for MindTap if the training window doesn't open.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ Corrections ============ -->
+  <section aria-labelledby="corrections-heading">
+    <h2 id="corrections-heading">Since this was recorded</h2>
+    <p>A few things in the video are worth a note. <strong>Where this page and the video disagree, this page is
+      right.</strong></p>
+
+    <div class="callout callout--warn callout--wide">
+      <ul style="margin:0; max-width:none">
+        <li><strong>"Combined into one week" at 0:00.</strong> For this section it is: email and calendars are both in
+          Week 15, and both are due Friday 12/11.</li>
+        <li><strong>"I'll show you those in separate videos" at 0:24.</strong> This one video covers both the email
+          training and the email exam. The calendar video covers both of those.</li>
+        <li><strong>2 out of 26 at 7:40.</strong> I submit early on purpose to show the score screen. Don't; do every
+          task first.</li>
+        <li><strong>The practice password at 5:00.</strong> I mistype it and start over. The account details in the
+          video are the simulation's examples.</li>
+        <li><strong>Ten attempts at 10:53.</strong> I say I think it's ten per task. Go by the Attempts Remaining
+          count MindTap shows you.</li>
+        <li><strong>Silence at the end.</strong> The video runs on for about 20 seconds after I sign off. Nothing is
+          missing.</li>
+        <li><strong>Module release.</strong> Modules post on the Friday before the week begins, so Week 15 opened
+          <strong>Friday 12/4</strong>. With only five days and two topics, start early.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ AI policy ============ -->
+  <section aria-labelledby="ai-heading">
+    <h2 id="ai-heading">Using AI on this assignment</h2>
+    <p>The course AI policy is <strong>Limited</strong>. You can ask an AI tool to explain what message sensitivity
+      or a signature is for, or to quiz you on the tasks afterward. <strong>You do every task in the training and the
+      exam yourself.</strong> The training's own guide is there for when you're stuck.</p>
+  </section>
+
+  <!-- ============ What's next ============ -->
+  <section aria-labelledby="next-heading">
+    <h2 id="next-heading">What's next</h2>
+    <p>Next is the calendar training and exam, on the other Outlook page in this week's module: 15 tasks, set up
+      exactly like this one. Everything for Week 15 is due <strong>Friday 12/11 at 11:59 PM</strong>, when the
+      course closes. There's no late window this week.</p>
+    <p>Stuck on a task? Open its guide first. If that doesn't help, send me a message in the Canvas Inbox and say which
+      task and what you tried.</p>
+  </section>
+
+  <!-- ============ Quick reference ============ -->
+  <section aria-labelledby="reference-heading">
+    <h2 id="reference-heading">Quick reference</h2>
+    <div class="table-scroll" tabindex="0" role="region" aria-label="Quick reference table, scrollable">
+      <table>
+        <caption>The two email assignments side by side.</caption>
+        <thead>
+          <tr><th scope="col">&nbsp;</th><th scope="col">Guided: the training</th><th scope="col">Homework: the exam</th></tr>
+        </thead>
+        <tbody>
+          <tr><th scope="row">Points</th><td>25</td><td>100</td></tr>
+          <tr><th scope="row">Tasks</th><td>26</td><td>The same 26, different details</td></tr>
+          <tr><th scope="row">Help</th><td>Observe, Practice, guide, Mac Help</td><td>None; Apply only</td></tr>
+          <tr><th scope="row">Scored on</th><td>Tasks completed when you submit</td><td>Each task, with Attempts Remaining shown</td></tr>
+          <tr><th scope="row">Files</th><td colspan="2">None. Nothing to download, save or upload.</td></tr>
+          <tr><th scope="row">Due</th><td colspan="2">Friday 12/11, 11:59 PM. The course closes then.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <p class="footnote">CSC 104 &middot; Computers and Computer Applications &middot; Fall 2026, Section 0840 &middot;
+    Mendocino College &middot; Instructor: David Pai &middot; <span class="mono">dpai@mendocino.edu</span>.
+    Nothing you type on this page is saved or submitted. Use the Canvas navigation outside this page to get back to
+    the Week 15 module.</p>
+</main>
+
+
+<script>
+(function () {
+  "use strict";
+
+  var VIDEO_ID = "mtCbwZN980g";
+
+  /* Transcript source: weeks/week15/csc104-outlook-email-corrected.vtt — the
+     Whisper output with its garbled and non-English fragments removed, its
+     repeated and duplicate cues collapsed, and its Outlook command names,
+     proper nouns and punctuation restored. Inlined rather than
+     fetched so this page stays self-contained inside the Canvas iframe. Keep
+     the two copies in step: if the YouTube captions are re-uploaded from the
+     .vtt, re-paste it here too. */
+  var vttContent = `WEBVTT
+
+NOTE
+CSC 104 — Week 15 — Managing Email with Outlook: Guided and Homework Walkthrough (YouTube mtCbwZN980g)
+Corrected transcript. Source: csc104-email.vtt (Whisper output, 120 cues).
+Cleanup applied: the run of 13 "you" cues over the silence at the end
+(11:46–12:09) and the single "you" cues at 3:46 and 11:09 deleted.
+Sentence casing and punctuation restored throughout; Outlook and MindTap
+names corrected (MindTap training, hamburger menu, Mac Help, shortcut keys,
+Observe, Practice, Apply, Ribbon, Keyboard, Office for Mac, Add Account,
+File tab, Connect, Sign In, Sensitivity, Confidential, Tags, dialog box
+launcher, Submit, Managing Email with Outlook, Attempts Remaining, Jim
+Benson, Jim.jpg, Pictures folder, Save and Close). "send a receipt email"
+→ send and receive email messages; "the same as a verb" → the same as
+Observe; "right click this dialog box monitor" → click this dialog box
+launcher; "I'll look displays" → Outlook displays; "click confident" →
+click Confidential; "set the center of the open message" → set the
+sensitivity of the open message; "because I'm doing an order" → because
+I'm doing them out of order. The simulation's practice email addresses
+and passwords (Sullivan111@outlook.com, GoCubs9689!, PatBlake@outlook.com,
+ShortCloudy5) are written as heard; each student's tasks give their own.
+At 6:45 the cue begins mid-sentence in the simulation's narration ("[It]
+should be shared"). Short cues merged into readable 1–2 sentence lines;
+timestamps normalized to HH:MM:SS.mmm. The instructor's voice and
+on-camera moments are preserved, including retyping the practice password
+at 5:00 ("oops, I'll start over"), submitting the training after 2 of 26
+tasks at 7:40 to show the score screen, skipping a task in the exam at
+9:49 and coming back to it, and "I think you get ten attempts at every
+task" at 10:53.
+
+00:00:00.040 --> 00:00:24.240
+Aloha. So this is the final week: managing email and calendars, okay, the final two topics. So in some classes this is combined into one week, and in other classes it's split, just depending upon the class and how much time we have. But in either case, they're not particularly that long, and I'll explain to you how this works.
+
+00:00:24.240 --> 00:00:39.300
+It's a little bit different than the PowerPoint, Excel and Word projects. It's done a little bit differently, because basically the guided assignment is a training module, and then the actual assignment is an exam. And I'll show you those in separate videos.
+
+00:00:39.300 --> 00:01:05.100
+So this is the guided assignment for email messages. So we'll open up the training module, and we will load it. And what I'm gonna do is, I'm not gonna go through the entire module. I'm just gonna do a couple, because when I show you how it's set up, I think you'll see why I'm not gonna do the whole thing.
+
+00:01:05.100 --> 00:01:23.000
+Okay, so you're gonna start, and it's gonna pop up a new window. So I'm gonna expand this window to make it easy to see. Okay, so this has 26 tasks in it. You can click on the hamburger menu, and you can see all 26 tasks, where they are.
+
+00:01:23.000 --> 00:01:32.960
+Okay, these are all... so: add a Microsoft account to Outlook, set the sensitivity of an email, add a picture to a contact, create a signature. These are all things you can do; these are all the tasks.
+
+00:01:32.960 --> 00:01:52.400
+Okay, there's a Mac Help, which gives you some help for Mac users. If you're a Mac user, you check those. There's shortcut keys within the system, okay, so if you want to use them.
+
+00:01:52.400 --> 00:02:08.980
+All right, each task is set up with a name, and then we have this: play, the speed we want to play, the transcript, if you want to see the transcript or not, and then do you want to mute the sound.
+
+00:02:08.980 --> 00:02:23.740
+There's three parts. There's an Observe, a Practice and an Apply. Apply is the actual task itself. Observe is to watch the task, Practice is to practice it, and Apply is to do one for yourself.
+
+00:02:23.740 --> 00:02:29.900
+Okay, and so you do Apply, and then you move on to the next task, and you walk your way through all 26 tasks, and when you're done, you submit it.
+
+00:02:29.900 --> 00:02:58.100
+Okay, there is a guide here that will help with each task, and it talks about, so, the first time you run Outlook, it guides you to set up an email account so you can send and receive email messages. You can add other accounts, but this is the typical: your company uses Outlook because it uses Microsoft email, and so it automatically links and sets everything up for you.
+
+00:02:58.100 --> 00:03:08.260
+All right, so you go to the Ribbon, Keyboard: you can do it off the keyboard. Or for Mac, Office for Mac, you can do it this way. So it has all that in here.
+
+00:03:08.260 --> 00:03:46.880
+All right, so we can Observe, and so we'll observe. So just play it. Okay, so you can watch this, and it'll work through it, and we can play it. You can up the speed if it's too slow. It only goes to one and a half, but you can do it one and a half times. Click the Add Account button. All right, so it does all this.
+
+00:03:46.880 --> 00:04:16.880
+Okay, and if you go to the Practice, Practice works the same way, except for... okay, now it's waiting for me to click the File tab, because it's no longer doing it for me. It's saying, here's how you do it.
+
+00:04:16.880 --> 00:04:44.020
+Click the File tab in the ribbon. So click Add Account. So this is where you type, you would type in your email address that you want to add. Click the Connect button. Outlook searches for your account.
+
+00:04:44.020 --> 00:05:00.080
+A Microsoft security dialog box is displayed. GoCubs9689! So we are entering the information for... oops, I'll start over. So, GoCubs9689!
+
+00:05:00.080 --> 00:05:36.100
+Okay, if you want to see your password, you can always click on the eye to see your password. Usually this is not live, but in a live one, click Sign In. Okay, so, practice complete.
+
+00:05:36.100 --> 00:05:45.120
+Then you Apply. Okay, it says add an email account to Outlook using the following information: email address Sullivan111@outlook.com, password GoCubs9689!
+
+00:05:45.120 --> 00:06:24.940
+So essentially do exactly what we just did, but now there's no prompting. So you got to go File, Add Account, right? And that's Sullivan111@outlook.com, Connect, and GoCubs9689!, Sign In. Essentially, added. Done.
+
+00:06:24.940 --> 00:06:45.120
+Okay, so I completed that task. It goes to the next task. It's the exact same thing. Okay, set the sensitivity of an email. You can Observe, or you can start with Practice if you want. Start with Practice, because essentially it's the same as Observe.
+
+00:06:45.120 --> 00:07:09.880
+[It] should be shared. Your organization may have protocols regarding the sensitivity of information. Okay, so what I'm gonna do is click this dialog box launcher. In the Settings section, click the Sensitivity button. Outlook displays the four sensitivity levels in the Sensitivity list. Click Confidential. Click Close.
+
+00:07:09.880 --> 00:07:18.620
+Okay, so you can go through this like this. Though the notification does not appear until the recipient opens the message.
+
+00:07:18.620 --> 00:07:40.980
+Okay, and then you can Apply, so then you do it: set the sensitivity of the open message to Confidential. So the Tags, right, Sensitivity, Confidential. Okay, Close. I did it, it worked, it's correct. Moves to the next ones.
+
+00:07:40.980 --> 00:08:00.740
+And then when you're done, you click Submit. Okay, and then it'll score your thing. I'm gonna click, even though I haven't finished it. I got 2 out of 26 tasks. Okay, so I didn't do great, but my assignment was submitted. I got that score.
+
+00:08:00.740 --> 00:08:40.020
+Okay, so to give you context: when you go to the next part of it, and you do the actual 100-point homework assignment, Managing Email with Outlook, when you open this, it's not the same as the other modules. It's an exam, because they don't have anything else.
+
+00:08:40.020 --> 00:09:03.220
+Okay, so: add an email account to Outlook using the following information: email address PatBlake@outlook.com, password ShortCloudy5. Okay, again there's 26 tasks. Pretty much looks like the same tasks that you did in the training, okay, the same 26 tasks. It's just different information.
+
+00:09:03.220 --> 00:09:40.820
+All right, and so then you would go through this. It's Attempts Remaining: 10. So I go File, Add Account, and I'm gonna add PatBlake@outlook.com, password of ShortCloudy5. If this works... yeah, that works. Sign In. Done. Answer correct. Advances you to the next.
+
+00:09:40.820 --> 00:09:49.380
+Okay, so you'd go through this the same way. You do everything just like you did on the other one, and you submit it for the hundred points when you're all through it.
+
+00:09:49.380 --> 00:10:39.840
+Okay, and you can, so if I skip this task, go to task 3. Okay, add a picture: add a picture to the contact record for Jim Benson using the Jim.jpg picture in the Pictures folder. So you gotta go to Jim Benson, okay, edit the contact, add a picture. Click that, a picture of Jim, say OK. We added a picture to Jim. Save and Close.
+
+00:10:39.840 --> 00:10:53.760
+All right, so I did the third one. Notice I skipped one, so I can go back to this one, and I can do it now, 'cause I'm doing them out of order. Okay, let's go back.
+
+00:10:53.760 --> 00:11:18.340
+Okay, and the Attempts Remaining: I think you get ten attempts at every task, not ten tries total, does that make sense? But anyway, there's no limit to how long you take in this one. We want to set the message level to Confidential. I'm going to go back to this one. Okay, so it'll jump to whatever the next task is.
+
+00:11:18.340 --> 00:11:46.380
+All right, so this is email, and I covered both the guided, which is the training, and the non-guided, which is the exam. All right, so, yeah, so good luck with Outlook email, and I will see you in the last one, which will be Outlook calendaring.
+`;
+
+  var player = null, timeUpdater = null, parsedTranscript = [], playerReady = false;
+
+  try {
+    if (!CSS.supports("selector(:focus-visible)")) { document.body.classList.add("no-fv"); }
+  } catch (e) { document.body.classList.add("no-fv"); }
+
+  /* ---------------- VTT parsing ---------------- */
+  function timeToSeconds(timeStr) {
+    if (!timeStr) { return 0; }
+    var parts = timeStr.trim().split(":");
+    if (parts.length === 2) {
+      return (parseInt(parts[0], 10) || 0) * 60 + (parseFloat(parts[1]) || 0);
+    }
+    if (parts.length === 3) {
+      return (parseInt(parts[0], 10) || 0) * 3600 + (parseInt(parts[1], 10) || 0) * 60 + (parseFloat(parts[2]) || 0);
+    }
+    return 0;
+  }
+
+  function formatTime(sec) {
+    sec = Math.max(0, Math.floor(sec));
+    var h = Math.floor(sec / 3600), m = Math.floor((sec % 3600) / 60), s = sec % 60;
+    var mm = (h > 0 && m < 10) ? "0" + m : String(m);
+    return (h > 0 ? h + ":" : "") + mm + ":" + (s < 10 ? "0" + s : s);
+  }
+
+  function parseVtt(vttText) {
+    var blocks = vttText.trim().split(/\n\n+/);
+    var cues = [];
+    blocks.forEach(function (block) {
+      var trimmed = block.trim();
+      if (!trimmed || trimmed.indexOf("WEBVTT") === 0 || trimmed.indexOf("NOTE") === 0) { return; }
+      var lines = trimmed.split("\n");
+      var timeLine = null, timeIndex = -1;
+      for (var i = 0; i < lines.length; i++) {
+        if (lines[i].indexOf("-->") !== -1) { timeLine = lines[i]; timeIndex = i; break; }
+      }
+      if (!timeLine) { return; }
+      var ends = timeLine.split("-->");
+      var text = lines.slice(timeIndex + 1).join(" ").trim();
+      if (!text) { return; }
+      cues.push({ start: timeToSeconds(ends[0]), end: timeToSeconds(ends[1]), text: text });
+    });
+    return cues;
+  }
+
+  /* ---------------- Transcript panel ---------------- */
+  function seek(seconds) {
+    if (!player || !player.seekTo) { return false; }
+    player.seekTo(seconds, true);
+    if (player.playVideo) { player.playVideo(); }
+    return true;
+  }
+
+  function scrollPlayerIntoView() {
+    var frame = document.getElementById("video-container");
+    if (frame && frame.scrollIntoView) { frame.scrollIntoView({ behavior: "smooth", block: "center" }); }
+  }
+
+  function populateTranscript() {
+    var container = document.getElementById("transcript-container");
+    if (!container) { return; }
+    container.innerHTML = "";
+    parsedTranscript.forEach(function (cue, i) {
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "transcript-line";
+      btn.dataset.start = cue.start;
+      btn.dataset.end = cue.end;
+      btn.dataset.index = i;
+
+      var stamp = document.createElement("span");
+      stamp.className = "t";
+      stamp.textContent = formatTime(cue.start);
+
+      var body = document.createElement("span");
+      body.className = "tx";
+      body.textContent = cue.text;
+
+      btn.appendChild(stamp);
+      btn.appendChild(body);
+      btn.setAttribute("aria-label", "Jump to " + formatTime(cue.start) + ". " + cue.text);
+
+      btn.addEventListener("click", function () {
+        if (seek(cue.start)) { scrollPlayerIntoView(); }
+      });
+      container.appendChild(btn);
+    });
+  }
+
+  /* ---------------- Active-line highlight ---------------- */
+  var lastAnnounced = null;
+  function announceLine(text) {
+    if (text === lastAnnounced) { return; }
+    lastAnnounced = text;
+    var s = document.getElementById("transcript-status");
+    if (s) { s.textContent = text || ""; }
+  }
+
+  function highlightCurrentLine() {
+    if (!player || !player.getCurrentTime) { return; }
+    var now = player.getCurrentTime();
+    var lines = document.querySelectorAll("#transcript-container .transcript-line");
+    var active = null;
+    Array.prototype.forEach.call(lines, function (line) {
+      var start = parseFloat(line.dataset.start), end = parseFloat(line.dataset.end);
+      if (now >= start && now < end) { active = line; }
+    });
+    var prev = document.querySelector("#transcript-container .is-active");
+    if (active === prev) { return; }
+    if (prev) { prev.classList.remove("is-active"); }
+    if (active) {
+      active.classList.add("is-active");
+      var body = active.querySelector(".tx");
+      announceLine(body ? body.textContent : active.textContent);
+      if (!active.hidden) { active.scrollIntoView({ behavior: "smooth", block: "center" }); }
+    }
+  }
+
+  /* ---------------- Panel height ---------------- */
+  function syncTranscriptHeight() {
+    var videoContainer = document.getElementById("video-container");
+    var panel = document.getElementById("transcript-container");
+    if (!videoContainer || !panel) { return; }
+    // Match the panel to the video only when the two columns actually sit side
+    // by side. Compared by rendered position rather than a viewport-width test,
+    // because in a Canvas iframe a media query measures the iframe, not the
+    // browser window, and can disagree with the flex-wrap result.
+    var videoCol = videoContainer.parentNode;
+    var transcriptCol = panel.parentNode;
+    var sideBySide = Math.abs(
+      transcriptCol.getBoundingClientRect().top - videoCol.getBoundingClientRect().top) < 40
+      && transcriptCol.getBoundingClientRect().left !== videoCol.getBoundingClientRect().left;
+    // Side by side, the panel should end level with the video, so subtract the
+    // heading/search row that sits above it inside the transcript column.
+    var head = transcriptCol.querySelector(".transcript-head");
+    var headH = head ? head.offsetHeight + 8 : 0;
+    var h = sideBySide ? Math.max(240, videoContainer.offsetHeight - headH) + "px" : "24rem";
+    panel.style.height = h;
+    panel.style.maxHeight = h;
+  }
+
+  /* ---------------- Transcript search ---------------- */
+  function escapeRe(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); }
+
+  function runFilter(term) {
+    var lines = document.querySelectorAll("#transcript-container .transcript-line");
+    var status = document.getElementById("transcript-filter-status");
+    var q = term.trim().toLowerCase();
+    var shown = 0;
+
+    Array.prototype.forEach.call(lines, function (line) {
+      var body = line.querySelector(".tx");
+      var cue = parsedTranscript[parseInt(line.dataset.index, 10)];
+      if (!body || !cue) { return; }
+      if (!q) {
+        body.textContent = cue.text;
+        line.hidden = false;
+        shown++;
+        return;
+      }
+      if (cue.text.toLowerCase().indexOf(q) === -1) {
+        body.textContent = cue.text;
+        line.hidden = true;
+        return;
+      }
+      line.hidden = false;
+      shown++;
+      // Rebuild with <mark> around the matches, without using innerHTML on
+      // user-supplied text.
+      body.textContent = "";
+      var re = new RegExp(escapeRe(term.trim()), "ig");
+      var last = 0, m;
+      while ((m = re.exec(cue.text)) !== null) {
+        if (m.index > last) { body.appendChild(document.createTextNode(cue.text.slice(last, m.index))); }
+        var mk = document.createElement("mark");
+        mk.textContent = m[0];
+        body.appendChild(mk);
+        last = m.index + m[0].length;
+        if (m[0].length === 0) { re.lastIndex++; }
+      }
+      if (last < cue.text.length) { body.appendChild(document.createTextNode(cue.text.slice(last))); }
+    });
+
+    if (status) {
+      status.textContent = q
+        ? (shown === 0 ? "No transcript lines match " + term : shown + " transcript line" + (shown === 1 ? "" : "s") + " match " + term)
+        : "Showing the whole transcript.";
+    }
+  }
+
+  function wireSearch() {
+    var input = document.getElementById("transcript-filter");
+    if (!input) { return; }
+    var t = null;
+    input.addEventListener("input", function () {
+      clearTimeout(t);
+      t = setTimeout(function () { runFilter(input.value); }, 250);
+    });
+  }
+
+  /* ---------------- Seek buttons (topic index + step pills) ----------------
+     Buttons wired to the embedded player, never youtu.be?t= links: a time link
+     would navigate the Canvas iframe away from this page. If the player never
+     comes up, the buttons are turned back into plain text so the index reads
+     as a reference list rather than as controls that silently do nothing. */
+  function wireSeekButtons() {
+    var btns = document.querySelectorAll("[data-seek]");
+    Array.prototype.forEach.call(btns, function (btn) {
+      var t = parseFloat(btn.getAttribute("data-seek")) || 0;
+      var item = btn.closest(".topic-index__item") || btn.closest(".todo > li") || btn.closest("tr");
+      var text = item ? item.querySelector(".topic-index__label, .todo__title, th[scope=row]") : null;
+      btn.setAttribute("aria-label", "Jump to " + formatTime(t) + (text ? " — " + text.textContent : "") + " in the video");
+      btn.addEventListener("click", function () {
+        if (seek(t)) { scrollPlayerIntoView(); }
+      });
+    });
+  }
+
+  function degradeToStatic(message) {
+    if (playerReady) { return; }
+    document.body.classList.add("no-player");
+    var idx = document.getElementById("topic-index");
+    if (idx) { idx.classList.add("topic-index--static"); }
+    Array.prototype.forEach.call(document.querySelectorAll("[data-seek]"), function (btn) {
+      btn.disabled = true;
+      btn.removeAttribute("aria-label");
+    });
+    var note = document.getElementById("topic-index-fallback");
+    if (note) { note.hidden = false; note.textContent = message; }
+  }
+
+  /* ---------------- Platform tabs ---------------- */
+  function wireTabs() {
+    var tablist = document.querySelector(".tablist");
+    if (!tablist) { return; }
+    var tabs = Array.prototype.slice.call(tablist.querySelectorAll('[role="tab"]'));
+
+    function select(tab, focus) {
+      tabs.forEach(function (t) {
+        var selected = t === tab;
+        t.setAttribute("aria-selected", selected ? "true" : "false");
+        t.tabIndex = selected ? 0 : -1;
+        var panel = document.getElementById(t.getAttribute("aria-controls"));
+        if (panel) { panel.hidden = !selected; }
+      });
+      if (focus) { tab.focus(); }
+    }
+
+    tabs.forEach(function (tab, i) {
+      tab.addEventListener("click", function () { select(tab, false); });
+      tab.addEventListener("keydown", function (e) {
+        var next = null;
+        if (e.key === "ArrowRight") { next = tabs[(i + 1) % tabs.length]; }
+        else if (e.key === "ArrowLeft") { next = tabs[(i - 1 + tabs.length) % tabs.length]; }
+        else if (e.key === "Home") { next = tabs[0]; }
+        else if (e.key === "End") { next = tabs[tabs.length - 1]; }
+        if (next) { e.preventDefault(); select(next, true); }
+      });
+    });
+  }
+
+  /* ---------------- YouTube player ---------------- */
+  window.onYouTubeIframeAPIReady = function () {
+    if (!VIDEO_ID || !document.getElementById("youtube-player")) { return; }
+    player = new YT.Player("youtube-player", {
+      events: {
+        onReady: function () {
+          playerReady = true;
+          syncTranscriptHeight();
+        },
+        onStateChange: function (event) {
+          clearInterval(timeUpdater);
+          if (event.data === YT.PlayerState.PLAYING) {
+            timeUpdater = setInterval(highlightCurrentLine, 300);
+          } else {
+            highlightCurrentLine();
+          }
+        }
+      }
+    });
+  };
+
+  document.addEventListener("DOMContentLoaded", function () {
+    parsedTranscript = parseVtt(vttContent);
+    populateTranscript();
+    wireSearch();
+    wireSeekButtons();
+    wireTabs();
+    setTimeout(syncTranscriptHeight, 100);
+
+    if (typeof YT === "undefined" || typeof YT.Player === "undefined") {
+      var tag = document.createElement("script");
+      tag.src = "https://www.youtube.com/iframe_api";
+      tag.onerror = function () {
+        degradeToStatic("The video player could not load, so the times below are listed for reference rather than as buttons. The full transcript is above.");
+      };
+      document.head.appendChild(tag);
+    } else {
+      window.onYouTubeIframeAPIReady();
+    }
+
+    // If the API never reports ready — blocked script, offline, restrictive
+    // network — fall back rather than leaving dead buttons on the page.
+    setTimeout(function () {
+      degradeToStatic("The video player did not load, so the times below are listed for reference rather than as buttons. The full transcript is above.");
+    }, 8000);
+  });
+
+  var resizeTimeout;
+  window.addEventListener("resize", function () {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(syncTranscriptHeight, 250);
+  });
+
+  /* Report height to a Canvas parent that listens for it. Harmless otherwise. */
+  function postHeight() {
+    try {
+      if (window.parent && window.parent !== window) {
+        var h = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
+        window.parent.postMessage({ subject: "lti.frameResize", height: h }, "*");
+      }
+    } catch (e) { /* cross-origin parent — ignore */ }
+  }
+  window.addEventListener("load", postHeight);
+  if (window.ResizeObserver) { new ResizeObserver(postHeight).observe(document.body); }
+})();
+</script>
+</body>
+</html>
