@@ -1,0 +1,1515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CSC 104 — PowerPoint Module 3 Guided Assignment</title>
+<style>
+/* ============================================================
+   CSC 104 — Week 14 — PowerPoint Module 3 Guided Assignment
+   Self-contained SPA for embedding in a Canvas iframe.
+   Vanilla CSS + vanilla JS, one file, no outbound links.
+   The only external resources are the YouTube player iframe and
+   the YouTube IFrame API (needed for click-to-seek); the page
+   degrades to a readable transcript and a plain topic list if
+   either is blocked.
+   Token block and layout match weeks/week03/01-guided-assign-word-1.html.
+   ============================================================ */
+
+:root {
+  color-scheme: light dark;
+  --surface:      #ffffff;
+  --panel:        #f6f8fb;
+  --panel-2:      #eef2f8;
+  --accent-bg:    #e8f0fe;
+  --ink:          #16202f;
+  --muted:        #46536b;
+  --brand:        #1d4ed8;
+  --brand-ink:    #17399c;
+  --border:       #c3cddc;
+  --border-soft:  #dde4ee;
+  --field-border: #6b7a92;
+  --btn-bg:       #1d4ed8;
+  --btn-fg:       #ffffff;
+  --btn-bg-hover: #17399c;
+  --btn2-bg:      #ffffff;
+  --btn2-fg:      #17399c;
+  --ok:           #1a6b3c;
+  --ok-bg:        #e6f4ec;
+  --warn-ink:     #7a4a06;
+  --warn-bg:      #fdf3e0;
+  --warn-rule:    #b8860b;
+  --focus:        #b4530a;
+  --hit:          #fff2b8;
+  --hit-ink:      #3a2c00;
+  --radius:       10px;
+  --maxw:         70rem;
+  --readw:        46rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --surface:      #0f1726;
+    --panel:        #17223a;
+    --panel-2:      #1e2b45;
+    --accent-bg:    #1a2a4d;
+    --ink:          #e9eefa;
+    --muted:        #b6c3d8;
+    --brand:        #9dbcff;
+    --brand-ink:    #bcd2ff;
+    --border:       #3a4a68;
+    --border-soft:  #2b3a56;
+    --field-border: #7b89a3;
+    --btn-bg:       #9dbcff;
+    --btn-fg:       #0b1424;
+    --btn-bg-hover: #c3d6ff;
+    --btn2-bg:      #17223a;
+    --btn2-fg:      #bcd2ff;
+    --ok:           #8fe0b0;
+    --ok-bg:        #123328;
+    --warn-ink:     #f6d59a;
+    --warn-bg:      #3a2c11;
+    --warn-rule:    #d9a441;
+    --focus:        #ffb066;
+    --hit:          #5c4a10;
+    --hit-ink:      #ffeeb8;
+  }
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--surface);
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; border-radius: 4px; }
+.no-fv :focus { outline: 3px solid var(--focus); outline-offset: 2px; }
+
+.skip-link {
+  position: absolute; left: -9999px; top: 0; z-index: 60;
+  background: var(--btn-bg); color: var(--btn-fg);
+  padding: 0.6rem 1rem; font-weight: 700; border-radius: 0 0 var(--radius) 0;
+}
+.skip-link:focus { left: 0; outline: 3px solid var(--focus); outline-offset: 2px; }
+
+.wrap { max-width: var(--maxw); margin: 0 auto; padding: 1rem 1rem 3rem; }
+.read { max-width: var(--readw); }
+
+/* ---------------------- Header ---------------------- */
+.page-head { background: var(--panel); border-bottom: 3px solid var(--brand); }
+.page-head .wrap { padding-bottom: 1.25rem; }
+
+.eyebrow {
+  font-size: 0.8125rem; letter-spacing: 0.09em; text-transform: uppercase;
+  font-weight: 700; color: var(--brand-ink); margin: 0.75rem 0 0.35rem;
+}
+h1 { font-size: clamp(1.5rem, 4.2vw, 2.15rem); line-height: 1.22; margin: 0 0 0.6rem; }
+.lede { margin: 0; color: var(--muted); max-width: var(--readw); }
+
+.facts { list-style: none; display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 1rem 0 0; padding: 0; }
+.facts li {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 999px; padding: 0.3rem 0.85rem; font-size: 0.875rem;
+}
+.facts .k { font-weight: 700; color: var(--brand-ink); }
+
+/* ---------------------- Typography ---------------------- */
+h2 {
+  font-size: clamp(1.25rem, 3.2vw, 1.6rem);
+  margin: 2.5rem 0 0.75rem; color: var(--brand-ink);
+  padding-bottom: 0.35rem; border-bottom: 2px solid var(--border-soft);
+}
+h3 { font-size: 1.125rem; margin: 1.75rem 0 0.5rem; }
+p { margin: 0 0 1rem; max-width: var(--readw); }
+ul, ol { margin: 0 0 1rem; padding-left: 1.35rem; max-width: var(--readw); }
+li { margin-bottom: 0.4rem; }
+.mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.9375em; }
+.ui { font-weight: 700; }
+
+.callout {
+  border-left: 5px solid var(--brand); background: var(--accent-bg);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding: 0.9rem 1.1rem; margin: 0 0 1.25rem; max-width: var(--readw);
+}
+.callout > :last-child { margin-bottom: 0; }
+.callout h3 { margin-top: 0; font-size: 1.05rem; }
+.callout--warn { border-left-color: var(--warn-rule); background: var(--warn-bg); color: var(--warn-ink); }
+.callout--wide { max-width: none; }
+
+/* ---------------------- Video + transcript ---------------------- */
+.video-row { display: flex; flex-wrap: wrap; gap: 1.25rem; margin: 0 0 1.5rem; }
+.video-col { flex: 1 1 32rem; min-width: min(100%, 20rem); }
+.transcript-col { flex: 1 1 20rem; min-width: min(100%, 17rem); display: flex; flex-direction: column; }
+
+.video-frame {
+  position: relative; width: 100%; padding-top: 56.25%;
+  background: #000; border-radius: var(--radius); overflow: hidden;
+  border: 1px solid var(--field-border);
+}
+.video-frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+.video-caption { font-size: 0.875rem; color: var(--muted); margin-top: 0.5rem; }
+
+.transcript-head { display: flex; flex-wrap: wrap; gap: 0.5rem 0.75rem; align-items: flex-end; margin-bottom: 0.5rem; }
+.transcript-head h3 { margin: 0 0 0.3rem; font-size: 1rem; flex: 0 1 auto; }
+.transcript-search { flex: 1 1 10rem; }
+.transcript-search label { display: block; font-size: 0.8125rem; font-weight: 600; color: var(--muted); }
+.transcript-search input {
+  font: inherit; width: 100%; min-height: 2.5rem; color: var(--ink);
+  background: var(--surface); border: 1px solid var(--field-border);
+  border-radius: 8px; padding: 0.35rem 0.55rem;
+}
+
+.transcript-panel {
+  height: 24rem; max-height: 24rem; overflow-y: auto;
+  border: 1px solid var(--field-border); border-radius: var(--radius);
+  background: var(--panel); padding: 0.4rem;
+}
+.transcript-line {
+  display: block; width: 100%; text-align: left; font: inherit;
+  font-size: 0.9375rem; line-height: 1.5; color: var(--ink);
+  background: transparent; border: 0; border-radius: 6px;
+  padding: 0.45rem 0.6rem; cursor: pointer;
+}
+.transcript-line:hover { background: var(--accent-bg); }
+.transcript-line .t {
+  display: inline-block; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.8125rem; font-weight: 700; color: var(--brand-ink); margin-right: 0.5rem;
+}
+.transcript-line.is-active {
+  background: var(--accent-bg);
+  box-shadow: inset 3px 0 0 0 var(--brand);
+  font-weight: 600;
+}
+.transcript-line[hidden] { display: none; }
+.transcript-line mark { background: var(--hit); color: var(--hit-ink); }
+.transcript-note { color: var(--muted); font-size: 0.875rem; padding: 0.6rem; margin: 0; }
+
+/* Static fallback when the player never loads */
+.no-player .transcript-line { cursor: default; }
+.no-player .transcript-line:hover { background: transparent; }
+
+/* ---------------------- Topic index ---------------------- */
+.topic-index { margin: 0 0 1.5rem; }
+.topic-index__group {
+  font-weight: 700; color: var(--brand-ink); margin: 1.25rem 0 0.4rem;
+  font-size: 0.9375rem; letter-spacing: 0.02em;
+}
+.topic-index__group:first-child { margin-top: 0; }
+.topic-index__list { list-style: none; padding: 0; margin: 0; max-width: none; }
+.topic-index__item {
+  display: flex; gap: 0.7rem; align-items: baseline;
+  padding: 0.28rem 0; margin: 0; border-bottom: 1px solid var(--border-soft);
+}
+.topic-index__list li:last-child { border-bottom: none; }
+.topic-index__time {
+  flex: 0 0 auto; font: inherit;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.875rem; font-weight: 700;
+  min-width: 4.25rem; min-height: 2rem; text-align: center;
+  color: var(--btn2-fg); background: var(--btn2-bg);
+  border: 1px solid var(--field-border); border-radius: 6px;
+  padding: 0.15rem 0.4rem; cursor: pointer;
+}
+.topic-index__time:hover { background: var(--accent-bg); }
+.topic-index__label { flex: 1 1 auto; }
+
+.topic-index--static .topic-index__time {
+  cursor: default; background: transparent; border-color: transparent;
+  color: var(--muted); text-align: left; padding-left: 0;
+}
+.topic-index--static .topic-index__time:hover { background: transparent; }
+
+@media (min-width: 52em) {
+  .topic-cols { column-count: 2; column-gap: 2.25rem; }
+  .topic-cols .topic-index__group { break-after: avoid; }
+  .topic-cols .topic-index__list { break-inside: avoid; }
+}
+
+/* ---------------------- To-do / step lists ---------------------- */
+.todo { list-style: none; padding: 0; margin: 0 0 1.5rem; max-width: none; }
+.todo > li {
+  background: var(--panel); border: 1px solid var(--border-soft);
+  border-radius: var(--radius); padding: 0.85rem 1rem;
+  margin: 0 0 0.75rem;
+}
+.todo__top { display: flex; flex-wrap: wrap; gap: 0.6rem; align-items: baseline; }
+.todo__num {
+  flex: 0 0 auto; min-width: 1.9rem; height: 1.9rem; padding: 0 0.4rem; border-radius: 999px;
+  background: var(--btn-bg); color: var(--btn-fg); font-weight: 700; font-size: 0.9375rem;
+  display: flex; align-items: center; justify-content: center; align-self: flex-start;
+}
+.todo__num--setup { background: var(--btn2-bg); color: var(--btn2-fg); border: 1px solid var(--field-border); }
+.todo__title { flex: 1 1 14rem; font-weight: 700; margin: 0; }
+.todo__body { margin: 0.35rem 0 0 2.5rem; max-width: var(--readw); }
+.todo__body p { margin: 0 0 0.5rem; }
+.todo__body ul { margin: 0 0 0.5rem; }
+.todo__body > :last-child { margin-bottom: 0; }
+.todo__meta { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0.5rem 0 0 2.5rem; }
+.pill {
+  font-size: 0.8125rem; font-weight: 700; border-radius: 999px;
+  padding: 0.1rem 0.6rem; border: 1px solid currentColor; white-space: nowrap;
+}
+.pill--graded { color: var(--ok); background: var(--ok-bg); }
+.pill--setup { color: var(--brand-ink); background: var(--accent-bg); }
+.pill--due { color: var(--warn-ink); background: var(--warn-bg); }
+.pill--time {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  color: var(--btn2-fg); background: var(--btn2-bg); border-color: var(--field-border);
+  cursor: pointer; font-size: 0.8125rem; min-height: 1.9rem;
+}
+.pill--time:hover { background: var(--accent-bg); }
+.no-player .pill--time { cursor: default; }
+
+/* ---------------------- Platform tabs ---------------------- */
+.tabs { margin: 0 0 1.5rem; }
+.tablist { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0 0 -1px; padding: 0; }
+.tab {
+  font: inherit; font-weight: 700; cursor: pointer;
+  color: var(--btn2-fg); background: var(--btn2-bg);
+  border: 1px solid var(--field-border); border-bottom-color: transparent;
+  border-radius: var(--radius) var(--radius) 0 0;
+  padding: 0.5rem 1rem; min-height: 2.5rem;
+}
+.tab[aria-selected="true"] { background: var(--accent-bg); border-bottom-color: var(--accent-bg); }
+.tab:hover { background: var(--accent-bg); }
+.tabpanel {
+  border: 1px solid var(--field-border); border-radius: 0 var(--radius) var(--radius) var(--radius);
+  background: var(--panel); padding: 1rem 1.1rem;
+}
+.tabpanel > :last-child { margin-bottom: 0; }
+.tabpanel h3:first-child { margin-top: 0; }
+
+/* ---------------------- Reference table ---------------------- */
+.table-scroll { overflow-x: auto; margin: 0 0 1.5rem; }
+table { border-collapse: collapse; width: 100%; min-width: 30rem; background: var(--surface); }
+caption { text-align: left; font-weight: 700; padding: 0 0 0.5rem; color: var(--muted); }
+th, td { border: 1px solid var(--border); padding: 0.6rem 0.7rem; text-align: left; vertical-align: top; }
+thead th { background: var(--panel-2); }
+tbody th { background: var(--panel); font-weight: 700; white-space: nowrap; }
+
+.status {
+  min-height: 1.4rem; font-weight: 600; color: var(--ok); background: var(--ok-bg);
+  border-radius: 8px; padding: 0.3rem 0.55rem; margin: 0.5rem 0 0;
+  max-width: var(--readw); font-size: 0.9375rem;
+}
+.status:empty { background: transparent; padding: 0; min-height: 0; }
+
+.footnote {
+  margin-top: 2.5rem; padding-top: 1rem; border-top: 1px solid var(--border-soft);
+  color: var(--muted); font-size: 0.9375rem; max-width: var(--readw);
+}
+
+.sr-only {
+  position: absolute !important; width: 1px; height: 1px; margin: -1px; padding: 0;
+  overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
+}
+
+@media print {
+  .skip-link, .video-frame, .transcript-search, .tablist { display: none !important; }
+  .transcript-panel { height: auto !important; max-height: none !important; overflow: visible; border: none; }
+  .topic-index__time, .pill--time { border: none; }
+  .tabpanel { display: block !important; border-radius: var(--radius); margin-bottom: 1rem; }
+  body { background: #fff; color: #000; }
+  .todo > li, .callout, table { break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+
+<a class="skip-link" href="#main">Skip to page content</a>
+
+<header class="page-head">
+  <div class="wrap">
+    <p class="eyebrow">CSC 104 &middot; Week 14 &middot; Guided Assignment</p>
+    <h1>PowerPoint Module 3 &mdash; Guided Assignment Walkthrough</h1>
+    <p class="lede">Week 14 is the last PowerPoint module: WordArt, picture adjustments and media. The video below walks
+      through a park proposal presentation for the town of Renfrew: sharpening and recoloring pictures, WordArt styles
+      and text effects, cropping, smart guides, aligning objects, and inserting a video. Every step is listed on this
+      page with a button that jumps the video straight to it, and the whole video is written out here so you can read
+      it instead of watching.</p>
+    <ul class="facts">
+      <li><span class="k">Video:</span> 21 minutes</li>
+      <li><span class="k">Week 14:</span> 11/30/2026 &ndash; 12/6/2026</li>
+      <li><span class="k">This assignment:</span> 25 pts in MindTap</li>
+      <li><span class="k">Attempts:</span> up to 10</li>
+      <li><span class="k">Due:</span> Sun 12/6, 11:59 PM</li>
+    </ul>
+  </div>
+</header>
+
+<main id="main" class="wrap" tabindex="-1">
+
+  <!-- ============ What to do this week ============ -->
+  <section aria-labelledby="todo-heading">
+    <h2 id="todo-heading" style="margin-top:1.25rem">What to do this week</h2>
+    <p>Same pattern as every week: a <strong>guided</strong> assignment we walk through together, then a
+      <strong>homework</strong> assignment you do on your own. Do them in that order. This is a shorter module than
+      PowerPoint 2, six steps and about twenty minutes of video. Each time stamp below jumps the video to the part
+      that explains it.</p>
+
+    <ol class="todo">
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">1</span>
+          <p class="todo__title">Watch the walkthrough with PowerPoint open beside it</p>
+        </div>
+        <div class="todo__body">
+          <p>Pause after each step and do it in your own file. Most of this week is in galleries (WordArt styles,
+            picture styles, color tones, text effects), so have the instruction file open to read each exact name.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="0.24">0:00</button>
+          <button type="button" class="pill pill--time" data-seek="104.48">1:44</button>
+          <span class="pill pill--setup">Not graded</span>
+        </p>
+      </li>
+
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">2</span>
+          <p class="todo__title">Download the assignment files from MindTap</p>
+        </div>
+        <div class="todo__body">
+          <p>Four files: the instruction file, a PowerPoint start file with your name on it, a lake
+            <strong>picture</strong> and a lake <strong>video</strong>. Use <span class="ui">Download All</span>, the
+            same as always.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="20.08">0:20</button>
+          <span class="pill pill--setup">Not graded</span>
+        </p>
+      </li>
+
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">3</span>
+          <p class="todo__title">Do the six steps and submit the guided assignment</p>
+        </div>
+        <div class="todo__body">
+          <p>Every step is written out further down this page. Save as the <span class="mono">_2</span> version first,
+            work through the steps, then upload the file and select <span class="ui">Submit</span>. Check the
+            <span class="ui">Graded Summary Report</span> afterwards. If it marks you wrong on something you're sure
+            you did, step H below says what to send me.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="147.46">2:27</button>
+          <button type="button" class="pill pill--time" data-seek="981.28">16:21</button>
+          <span class="pill pill--graded">Graded &mdash; 25 pts</span>
+          <span class="pill pill--due">Due Sun 12/6, 11:59 PM</span>
+        </p>
+      </li>
+
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">4</span>
+          <p class="todo__title">Do the PowerPoint Module 3 homework on your own</p>
+        </div>
+        <div class="todo__body">
+          <p>The second MindTap assignment this week. It's a different presentation with the same commands, and
+            there's no walkthrough. That's the point. Start it right after the guided one is submitted, while you
+            still remember where the WordArt and picture galleries are.</p>
+        </div>
+        <p class="todo__meta">
+          <span class="pill pill--graded">Graded &mdash; 100 pts</span>
+          <span class="pill pill--due">Due Sun 12/6, 11:59 PM</span>
+        </p>
+      </li>
+
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">5</span>
+          <p class="todo__title">Do the module reading</p>
+        </div>
+        <div class="todo__body">
+          <p>The PowerPoint Module 3 chapter in the Shelly Cashman text. Skim it for <em>what</em> PowerPoint can do,
+            and come back to it as a step-by-step reference when an assignment names something you haven't seen. Not
+            graded.</p>
+        </div>
+        <p class="todo__meta">
+          <span class="pill pill--setup">Not graded</span>
+        </p>
+      </li>
+    </ol>
+  </section>
+
+  <!-- ============ Video + transcript ============ -->
+  <section aria-labelledby="video-heading">
+    <h2 id="video-heading">The walkthrough video</h2>
+    <p>Twenty-one minutes, start to finish. It covers downloading the files, saving your copy, all six steps, a check
+      in Slide Sorter view, submitting, and two resubmissions. If you're stuck on one step, use the topic index below
+      rather than scrubbing through.</p>
+
+    <div class="video-row">
+      <div class="video-col">
+        <div class="video-frame" id="video-container">
+          <iframe id="youtube-player"
+                  src="https://www.youtube.com/embed/x-D6oitWJMU?enablejsapi=1&amp;cc_load_policy=1&amp;iv_load_policy=3&amp;modestbranding=1&amp;rel=0"
+                  title="CSC 104 PowerPoint Module 3 Guided Assignment Walkthrough"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  referrerpolicy="strict-origin-when-cross-origin"
+                  allowfullscreen loading="lazy"></iframe>
+        </div>
+        <p class="video-caption">Closed captions are on by default. Select any line of the transcript to jump the
+          video to that moment.</p>
+      </div>
+
+      <div class="transcript-col">
+        <div class="transcript-head">
+          <h3 id="transcript-heading">Transcript</h3>
+          <div class="transcript-search">
+            <label for="transcript-filter">Search the transcript</label>
+            <input type="search" id="transcript-filter" autocomplete="off" spellcheck="false"
+                   aria-describedby="transcript-filter-status">
+          </div>
+        </div>
+        <div class="transcript-panel" id="transcript-container" role="group" aria-labelledby="transcript-heading">
+          <p class="transcript-note">Loading transcript&hellip;</p>
+        </div>
+        <p class="sr-only" role="status" aria-live="polite" id="transcript-filter-status"></p>
+        <p class="sr-only" role="status" aria-live="polite" id="transcript-status"></p>
+        <p style="margin:0.5rem 0 0"><a href="#topic-index-heading">Skip past the transcript</a></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ Topic index ============ -->
+  <section aria-labelledby="topic-index-heading">
+    <h2 id="topic-index-heading">Find a moment in the video</h2>
+    <p><strong>Select any time below and the video jumps there.</strong> This is the detailed contents of the
+      walkthrough. If one step isn't working, find it here and watch just that minute.</p>
+
+    <div class="topic-index topic-cols" id="topic-index">
+
+      <div class="topic-index__group">Getting started</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="0.24">0:00</button><span class="topic-index__label">PowerPoint Module 3</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="20.08">0:20</button><span class="topic-index__label">Four files, including a picture and a video</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="73.44">1:13</button><span class="topic-index__label">Save As the _2 copy; check your name</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="104.48">1:44</button><span class="topic-index__label">The scenario: a Renfrew park proposal</span></li>
+      </ul>
+
+      <div class="topic-index__group">Step 1 &mdash; the title slide</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="147.46">2:27</button><span class="topic-index__label">Corrections &rsaquo; Sharpen: 25%</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="175.9">2:55</button><span class="topic-index__label">The same settings in Format Picture</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="215.5">3:35</button><span class="topic-index__label">Park Proposal as WordArt: what it asks for</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="289.86">4:49</button><span class="topic-index__label">Shape Format &rsaquo; WordArt Styles</span></li>
+      </ul>
+
+      <div class="topic-index__group">Steps 2 and 3 &mdash; the lake picture</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="319.86">5:19</button><span class="topic-index__label">Insert the picture on slide 2</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="349.86">5:49</button><span class="topic-index__label">Height 6"</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="379.86">6:19</button><span class="topic-index__label">Picture style: Metal Oval</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="404.94">6:44</button><span class="topic-index__label">Color &rsaquo; Color Tone: Temperature 5300 K</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="434.94">7:14</button><span class="topic-index__label">Crop about 0.5" off the top</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="476.58">7:56</button><span class="topic-index__label">Reading Figure 1's smart guides</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="524.5">8:44</button><span class="topic-index__label">Dragging until all three guides show</span></li>
+      </ul>
+
+      <div class="topic-index__group">Step 4 &mdash; three pictures on slide 3</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="585.46">9:45</button><span class="topic-index__label">Delete the Picnicking shape</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="619.38">10:19</button><span class="topic-index__label">Space Hiking evenly between the other two</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="665.7">11:05</button><span class="topic-index__label">Shift-click all three</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="682.18">11:22</button><span class="topic-index__label">Align Selected Objects, then Align Top</span></li>
+      </ul>
+
+      <div class="topic-index__group">Steps 5 and 6 &mdash; video and WordArt</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="708.6">11:48</button><span class="topic-index__label">Step 5: slide 7, insert the video</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="758.6">12:38</button><span class="topic-index__label">A beveled video style</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="784.2">13:04</button><span class="topic-index__label">Step 6: Questions? as WordArt on slide 8</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="844.2">14:04</button><span class="topic-index__label">Text Effects &rsaquo; Transform &rsaquo; Wave: Up</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="866.22">14:26</button><span class="topic-index__label">3-D Rotation: Off Axis 1: Right</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="886.22">14:46</button><span class="topic-index__label">Width 9"</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="903.9">15:03</button><span class="topic-index__label">Centered: the plus sign of smart guides</span></li>
+      </ul>
+
+      <div class="topic-index__group">Checking, submitting, resubmitting</div>
+      <ul class="topic-index__list">
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="953.42">15:53</button><span class="topic-index__label">View &rsaquo; Slide Sorter, against the final figure</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="981.28">16:21</button><span class="topic-index__label">Save, submit: 23 out of 25</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1021.06">17:01</button><span class="topic-index__label">The report says the tops aren't aligned</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1114.34">18:34</button><span class="topic-index__label">Second try: same result</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1156.8">19:16</button><span class="topic-index__label">Third try: move one, realign, save</span></li>
+        <li class="topic-index__item"><button type="button" class="topic-index__time" data-seek="1235.3">20:35</button><span class="topic-index__label">If it happens to you: send me two files</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ New ideas ============ -->
+  <section aria-labelledby="vocab-heading">
+    <h2 id="vocab-heading">New ideas this week</h2>
+    <p>This module is mostly about galleries: pick the object, find the right tab, pick the named option. The
+      instruction file uses these words without explaining them, so here they are in one place.</p>
+
+    <div class="table-scroll" tabindex="0" role="region" aria-label="New PowerPoint ideas table, scrollable">
+      <table>
+        <caption>The PowerPoint ideas this assignment uses, with the moment in the video where each one comes up.</caption>
+        <thead>
+          <tr><th scope="col">Idea</th><th scope="col">What it means</th><th scope="col">In the video</th></tr>
+        </thead>
+        <tbody>
+          <tr><th scope="row">Corrections</th><td>Picture adjustments for sharpness, brightness and contrast. "Sharpen: 25%" is one of the preset choices.</td><td><button type="button" class="pill pill--time" data-seek="147.46">2:27</button></td></tr>
+          <tr><th scope="row">WordArt</th><td>Text with a preset decorative style: fill, outline, glow, shadow. Each style's name lists its parts, which is how the instruction file names it.</td><td><button type="button" class="pill pill--time" data-seek="289.86">4:49</button></td></tr>
+          <tr><th scope="row">Picture style</th><td>A preset frame and shape for a picture, such as Metal Oval.</td><td><button type="button" class="pill pill--time" data-seek="379.86">6:19</button></td></tr>
+          <tr><th scope="row">Color tone</th><td>A picture's warmth, measured as a color temperature in kelvin (K). Lower numbers look cooler and bluer; higher numbers look warmer.</td><td><button type="button" class="pill pill--time" data-seek="404.94">6:44</button></td></tr>
+          <tr><th scope="row">Crop</th><td>Trimming the edges of a picture. Drag a crop handle in, then click outside the picture to accept it.</td><td><button type="button" class="pill pill--time" data-seek="434.94">7:14</button></td></tr>
+          <tr><th scope="row">Align Selected Objects</th><td>An option at the bottom of the Align menu. Checked, Align Top lines objects up with <em>each other</em>; otherwise PowerPoint aligns them to the edge of the slide.</td><td><button type="button" class="pill pill--time" data-seek="682.18">11:22</button></td></tr>
+          <tr><th scope="row">Video style</th><td>A preset frame for a video on a slide, like a picture style.</td><td><button type="button" class="pill pill--time" data-seek="758.6">12:38</button></td></tr>
+          <tr><th scope="row">Text effects</th><td>Extra effects for WordArt. <em>Transform</em> bends the text into a shape such as a wave; <em>3-D Rotation</em> tilts it.</td><td><button type="button" class="pill pill--time" data-seek="844.2">14:04</button></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout">
+      <h3>Reading a smart-guide figure</h3>
+      <p>Figures 1 and 2 show where an object goes by showing the dashed smart guides you'll see when it's in the right
+        place. Drag slowly; the guides appear only for a moment.</p>
+      <ul style="margin:0 0 0.75rem">
+        <li><strong>A straight line</strong> means two edges line up, like the bottom of the picture and the bottom of
+          the text box in Figure 1 <em>(8:11)</em>.</li>
+        <li><strong>Double-headed arrows</strong> mean two gaps are equal, like the space on each side of the picture
+          in Figure 1, or Hiking's space on each side in step 4 <em>(8:28)</em>.</li>
+        <li><strong>A plus sign</strong> of a vertical and a horizontal guide means centered on the slide, as in
+          Figure 2 <em>(15:03)</em>.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ The steps ============ -->
+  <section aria-labelledby="steps-heading">
+    <h2 id="steps-heading">The assignment, step by step</h2>
+    <p>Four setup items, then the six graded steps, then submitting. Each one says <em>what</em> to change; the time
+      button next to it shows you <em>how</em>. <strong>Always go by the instruction file MindTap gave you.</strong>
+      The wording below is a summary, and MindTap grades against its own file.</p>
+
+    <div class="callout">
+      <h3>Four details worth knowing</h3>
+      <ul style="margin:0 0 0.75rem">
+        <li><strong>Select the object first.</strong> The WordArt, Picture Format and Video Format galleries only show
+          up when the right thing is selected. If you can't find a gallery, click the object and look again
+          <em>(4:49)</em>.</li>
+        <li><strong>Use the exact names.</strong> Several styles look alike. Hover over a gallery choice to see its
+          name, and match it to the instruction file.</li>
+        <li><strong>Check Align Selected Objects before Align Top</strong> in step 4, so the three pictures line up
+          with each other and not with the top of the slide <em>(11:22)</em>.</li>
+        <li><strong>The start file looks different</strong> from the last two modules. That's expected
+          <em>(0:45)</em>.</li>
+      </ul>
+      <p style="margin:0">The numbers below follow the order of the instruction file as I read it in the video. If
+        your file groups or numbers something differently, go by your file.</p>
+    </div>
+
+    <h3>Before you start</h3>
+    <ol class="todo">
+      <li>
+        <div class="todo__top">
+          <span class="todo__num todo__num--setup" aria-hidden="true">A</span>
+          <p class="todo__title">Download all four files</p>
+        </div>
+        <div class="todo__body">
+          <p>The instruction file, a PowerPoint start file with your name in it ending in <span class="mono">_1</span>,
+            the lake picture and the lake video. They land in your Downloads folder.</p>
+        </div>
+        <p class="todo__meta"><button type="button" class="pill pill--time" data-seek="20.08">0:20</button></p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num todo__num--setup" aria-hidden="true">B</span>
+          <p class="todo__title">Open the instruction file and read it</p>
+        </div>
+        <div class="todo__body">
+          <p>Select <span class="ui">Enable Editing</span>, then <span class="ui">View &rsaquo; Page Width</span> to
+            make it readable. Keep it open in a second window. Figures 1 and 2 and the final figure show where things
+            go.</p>
+        </div>
+        <p class="todo__meta"><button type="button" class="pill pill--time" data-seek="45.92">0:45</button></p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num todo__num--setup" aria-hidden="true">C</span>
+          <p class="todo__title">Open the start file and save it as the _2 version</p>
+        </div>
+        <div class="todo__body">
+          <p><span class="ui">Enable Editing</span>, then <span class="ui">File &rsaquo; Save As</span>. Leave it in
+            Downloads, change the <span class="mono">1</span> at the end of the file name to a
+            <span class="mono">2</span>, and save. <strong>Everything you do from here goes in the
+            <span class="mono">_2</span> file.</strong></p>
+        </div>
+        <p class="todo__meta"><button type="button" class="pill pill--time" data-seek="73.44">1:13</button></p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num todo__num--setup" aria-hidden="true">D</span>
+          <p class="todo__title">Check that it's your file</p>
+        </div>
+        <div class="todo__body">
+          <p>Your name should be in the start file where the instruction file says to look. If it isn't your name,
+            delete the file and download it again.</p>
+        </div>
+        <p class="todo__meta"><button type="button" class="pill pill--time" data-seek="73.44">1:13</button></p>
+      </li>
+    </ol>
+
+    <h3>The six graded steps</h3>
+    <ol class="todo">
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">1</span>
+          <p class="todo__title">Slide 1: sharpen the picture; Park Proposal as WordArt</p>
+        </div>
+        <div class="todo__body">
+          <p>Sharpen the title slide's picture with <strong>Sharpen: 25%</strong>. Convert the text <em>Park
+            Proposal</em> to WordArt with the <strong>Fill: White; Outline: Green, Accent color 1; Glow: Green, Accent
+            color 1</strong> style.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="147.46">2:27</button>
+          <button type="button" class="pill pill--time" data-seek="215.5">3:35</button>
+          <button type="button" class="pill pill--time" data-seek="289.86">4:49</button>
+        </p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">2</span>
+          <p class="todo__title">Slide 2: insert and style the lake picture</p>
+        </div>
+        <div class="todo__body">
+          <p>Insert the lake support picture. Change its height to <strong>6"</strong> and let the width adjust, apply
+            the <strong>Metal Oval</strong> picture style, and change its color tone to <strong>Temperature:
+            5300 K</strong>.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="319.86">5:19</button>
+          <button type="button" class="pill pill--time" data-seek="349.86">5:49</button>
+          <button type="button" class="pill pill--time" data-seek="379.86">6:19</button>
+          <button type="button" class="pill pill--time" data-seek="404.94">6:44</button>
+        </p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">3</span>
+          <p class="todo__title">Slide 2: crop the sky and place the picture</p>
+        </div>
+        <div class="todo__body">
+          <p>Crop about <strong>0.5"</strong> from the <strong>top</strong> of the picture. Then use smart guides to
+            place it to the right of the text, as in <strong>Figure 1</strong>: bottoms lined up, equal space on each
+            side.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="434.94">7:14</button>
+          <button type="button" class="pill pill--time" data-seek="459.06">7:39</button>
+          <button type="button" class="pill pill--time" data-seek="491.02">8:11</button>
+          <button type="button" class="pill pill--time" data-seek="524.5">8:44</button>
+        </p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">4</span>
+          <p class="todo__title">Slide 3: delete one, space one, align three</p>
+        </div>
+        <div class="todo__body">
+          <p>On <strong>Callahan Lake Park Recreation</strong>, delete the shape with the text
+            <strong>Picnicking</strong>. Move <strong>Hiking</strong> so it's evenly spaced between Fishing and
+            Swimming. Then select all three and use <strong>Align Top</strong> so their tops are level with each
+            other.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="585.46">9:45</button>
+          <button type="button" class="pill pill--time" data-seek="619.38">10:19</button>
+          <button type="button" class="pill pill--time" data-seek="665.7">11:05</button>
+          <button type="button" class="pill pill--time" data-seek="682.18">11:22</button>
+        </p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">5</span>
+          <p class="todo__title">Slide 7: insert and style the video</p>
+        </div>
+        <div class="todo__body">
+          <p>On <strong>Preserve and Protect</strong>, use the content placeholder to insert the lake video file. Apply
+            the beveled rectangle <strong>video style</strong> your instruction file names.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="708.6">11:48</button>
+          <button type="button" class="pill pill--time" data-seek="729.12">12:09</button>
+          <button type="button" class="pill pill--time" data-seek="758.6">12:38</button>
+        </p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num" aria-hidden="true">6</span>
+          <p class="todo__title">Slide 8: Questions? as WordArt</p>
+        </div>
+        <div class="todo__body">
+          <p>Insert WordArt with the text <strong>Questions?</strong> in the <strong>Pattern Fill: Green, Accent color
+            1, 50%; Hard Shadow: Green, Accent color 1</strong> style (third column, fourth row). Apply the
+            <strong>Wave: Up</strong> transform and the <strong>Off Axis 1: Right</strong> 3-D rotation, make it
+            <strong>9"</strong> wide, and center it on the slide as in <strong>Figure 2</strong>.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="784.2">13:04</button>
+          <button type="button" class="pill pill--time" data-seek="844.2">14:04</button>
+          <button type="button" class="pill pill--time" data-seek="866.22">14:26</button>
+          <button type="button" class="pill pill--time" data-seek="886.22">14:46</button>
+          <button type="button" class="pill pill--time" data-seek="903.9">15:03</button>
+        </p>
+      </li>
+    </ol>
+
+    <h3>Submitting</h3>
+    <ol class="todo">
+      <li>
+        <div class="todo__top">
+          <span class="todo__num todo__num--setup" aria-hidden="true">E</span>
+          <p class="todo__title">Compare with the final figure, then save and close</p>
+        </div>
+        <div class="todo__body">
+          <p>Switch to <strong>Slide Sorter</strong> view and check every slide against the final figure in the
+            instruction file. Save the <span class="mono">_2</span> file and close PowerPoint.</p>
+        </div>
+        <p class="todo__meta"><button type="button" class="pill pill--time" data-seek="953.42">15:53</button></p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num todo__num--setup" aria-hidden="true">F</span>
+          <p class="todo__title">Upload the _2 file and select Submit</p>
+        </div>
+        <div class="todo__body">
+          <p>Drag and drop it into the MindTap assignment and submit it for grading. Make sure it's the
+            <span class="mono">_2</span> <span class="mono">.pptx</span>, not the <span class="mono">_1</span>.</p>
+        </div>
+        <p class="todo__meta"><button type="button" class="pill pill--time" data-seek="981.28">16:21</button></p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num todo__num--setup" aria-hidden="true">G</span>
+          <p class="todo__title">Read the Graded Summary Report, and fix anything it flags</p>
+        </div>
+        <div class="todo__body">
+          <p>Fix just what it flags in your <span class="mono">_2</span> file, save and close it. To resubmit, close the
+            MindTap screen, reload the page and relaunch the assignment before you upload again. You have up to ten
+            attempts.</p>
+        </div>
+        <p class="todo__meta">
+          <button type="button" class="pill pill--time" data-seek="1021.06">17:01</button>
+          <button type="button" class="pill pill--time" data-seek="1081.48">18:01</button>
+        </p>
+      </li>
+      <li>
+        <div class="todo__top">
+          <span class="todo__num todo__num--setup" aria-hidden="true">H</span>
+          <p class="todo__title">Sure you did it right? Send me both files</p>
+        </div>
+        <div class="todo__body">
+          <p>If the report keeps marking a step wrong that you're sure you did, send me a Canvas Inbox message with
+            two attachments: the <strong>Graded Summary Report</strong> and the <strong>PowerPoint file you
+            submitted</strong>. Say which step you think it misgraded. I'll review it and correct your score if it
+            graded you wrong.</p>
+        </div>
+        <p class="todo__meta"><button type="button" class="pill pill--time" data-seek="1235.3">20:35</button></p>
+      </li>
+    </ol>
+  </section>
+
+  <!-- ============ Platform tabs ============ -->
+  <section aria-labelledby="platform-heading">
+    <h2 id="platform-heading">Windows and Mac differences</h2>
+    <p>The steps are the same on both. Most of this week is on the Picture Format, Shape Format and Video Format tabs,
+      which look much the same on Mac and Windows. Pick your platform.</p>
+
+    <div class="tabs">
+      <div class="tablist" role="tablist" aria-label="Choose your platform">
+        <button type="button" class="tab" role="tab" id="tab-win" aria-controls="panel-win" aria-selected="true">Windows</button>
+        <button type="button" class="tab" role="tab" id="tab-mac" aria-controls="panel-mac" aria-selected="false" tabindex="-1">Mac</button>
+      </div>
+
+      <div class="tabpanel" role="tabpanel" id="panel-win" aria-labelledby="tab-win" tabindex="0">
+        <h3>On Windows</h3>
+        <ul style="max-width:none">
+          <li><strong>Enable Editing.</strong> Downloaded files open in Protected View with a yellow bar across the
+            top. Select <span class="ui">Enable Editing</span> before anything works.</li>
+          <li><strong>Picture adjustments:</strong> <span class="ui">Picture Format &rsaquo; Corrections</span>,
+            <span class="ui">Color</span>, <span class="ui">Picture Styles</span>, <span class="ui">Crop</span> and
+            <span class="ui">Height</span>.</li>
+          <li><strong>WordArt:</strong> <span class="ui">Shape Format &rsaquo; WordArt Styles</span> and
+            <span class="ui">Text Effects</span>; <span class="ui">Insert &rsaquo; WordArt</span> for new WordArt.</li>
+          <li><strong>Align:</strong> <span class="ui">Shape Format</span> or <span class="ui">Picture Format
+            &rsaquo; Align</span>; check <span class="ui">Align Selected Objects</span> at the bottom first.</li>
+          <li><strong>Video:</strong> the Insert Video icon in the content placeholder; styles on the
+            <span class="ui">Video Format</span> tab.</li>
+          <li><strong>Gallery names:</strong> hover over any choice for its name in a tooltip.</li>
+        </ul>
+      </div>
+
+      <div class="tabpanel" role="tabpanel" id="panel-mac" aria-labelledby="tab-mac" tabindex="0" hidden>
+        <h3>On Mac</h3>
+        <p>Cengage's material is written for Windows. Most of this assignment matches, but check these before you
+          decide something is broken. I've done these assignments on a Mac myself. If a command genuinely isn't where
+          I say it is, message me through the Canvas Inbox rather than guessing at a substitute.</p>
+        <ul style="max-width:none">
+          <li><strong>No Protected View.</strong> There's no Enable Editing bar.</li>
+          <li><strong>Picture adjustments and WordArt:</strong> on the same Picture Format and Shape Format tabs as
+            Windows.</li>
+          <li><strong>Align:</strong> <span class="ui">Arrange &rsaquo; Align</span> on the format tab; check Align
+            Selected Objects first, as on Windows.</li>
+          <li><strong>Video:</strong> the video icon in the content placeholder, or <span class="ui">Insert &rsaquo;
+            Video</span>.</li>
+          <li><strong>Gallery names:</strong> hover for a tooltip, the same as Windows. If a name is cut off, widen
+            the PowerPoint window.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ Corrections ============ -->
+  <section aria-labelledby="corrections-heading">
+    <h2 id="corrections-heading">Since this was recorded</h2>
+    <p>A few things in the video are worth a note. <strong>Where this page and the video disagree, this page is
+      right.</strong></p>
+
+    <div class="callout callout--warn callout--wide">
+      <ul style="margin:0; max-width:none">
+        <li><strong>No captions from 1:57 to 2:27.</strong> The automatic captions lost this stretch, where I finish
+          the scenario, read step 1 and start sharpening the title-slide picture. The video is fine; only the
+          transcript has a gap. Step 1 above lists what it asks for.</li>
+        <li><strong>Finding WordArt Styles, 3:55 to 4:49.</strong> I hunt for it for a minute. It's on the
+          <span class="ui">Shape Format</span> tab, with the text box selected.</li>
+        <li><strong>The crop at 7:39.</strong> I drag to "a little over a half inch." The step says approximately
+          0.5".</li>
+        <li><strong>The video style name at 12:38.</strong> I read it quickly and it's hard to make out. Use the exact
+          style name in your instruction file.</li>
+        <li><strong>23 out of 25, 16:21 to 20:28.</strong> The report says the three slide 3 pictures aren't aligned at
+          the top. I realign them twice and resubmit, and it still says so; the video ends there. "It worked for me
+          the very first time" at 18:34 means when I did this assignment before recording. If it happens to you,
+          check Align Selected Objects, then use step H.</li>
+        <li><strong>Picnicking, 9:45.</strong> I mention its spelling. You delete that shape in step 4, so there's
+          nothing to fix.</li>
+        <li><strong>Several garbled spots.</strong> At 3:55, 6:13, 10:42, 11:28, 13:56 and 17:59&ndash;18:31 the
+          automatic captions invented words, repeated themselves or filled silence. The transcript leaves those out;
+          no instructions are missing.</li>
+        <li><strong>Module release.</strong> Modules post on the Friday before the week begins, so Week 14 opened
+          <strong>Friday 11/27</strong>.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ AI policy ============ -->
+  <section aria-labelledby="ai-heading">
+    <h2 id="ai-heading">Using AI on this assignment</h2>
+    <p>The course AI policy is <strong>Limited</strong>. You can ask an AI tool to explain what a color temperature or
+      a 3-D rotation does, where a gallery is in Mac PowerPoint, or what your Graded Summary Report means, or to quiz
+      you afterward. <strong>You build the PowerPoint file yourself.</strong> That includes not letting Copilot in
+      PowerPoint do a step for you. Spell check is an ordinary PowerPoint feature and is always allowed.</p>
+  </section>
+
+  <!-- ============ What's next ============ -->
+  <section aria-labelledby="next-heading">
+    <h2 id="next-heading">What's next</h2>
+    <p>Once the guided assignment is submitted, go straight to the <strong>PowerPoint Module 3 homework</strong> in
+      MindTap. It's the same commands on a different presentation, with no walkthrough, for 100 points. Both are due
+      <strong>Sunday 12/6</strong>. Late work takes a 15% deduction and is accepted only until the course closes on
+      <strong>Friday 12/11 at 11:59 PM</strong>.</p>
+    <p>That's the last PowerPoint module. Week 15 is <strong>Outlook</strong>, email and calendars, and it's a short
+      week: everything is due <strong>Friday 12/11 at 11:59 PM</strong>, when the course closes. Nothing is accepted
+      after that.</p>
+    <p>Stuck on a step after re-watching it? Send me a message in the Canvas Inbox and say which step number and what
+      you tried. That's faster than burning attempts.</p>
+  </section>
+
+  <!-- ============ Quick reference ============ -->
+  <section aria-labelledby="reference-heading">
+    <h2 id="reference-heading">Quick reference</h2>
+    <div class="table-scroll" tabindex="0" role="region" aria-label="Quick reference table, scrollable">
+      <table>
+        <caption>Every value this assignment asks for, in one place. Confirm each one, including the exact style names,
+          against your own instruction file.</caption>
+        <thead>
+          <tr><th scope="col">Step</th><th scope="col">Where it lives</th><th scope="col">Exact setting</th></tr>
+        </thead>
+        <tbody>
+          <tr><th scope="row">1. Title slide</th><td>Picture Format &rsaquo; Corrections; Shape Format &rsaquo; WordArt Styles</td><td>Picture: Sharpen: 25%. Park Proposal: Fill: White; Outline: Green, Accent color 1; Glow: Green, Accent color 1</td></tr>
+          <tr><th scope="row">2. Lake picture</th><td>Slide 2; Picture Format</td><td>Height 6"; Metal Oval; Color Tone: Temperature 5300 K</td></tr>
+          <tr><th scope="row">3. Crop and place</th><td>Picture Format &rsaquo; Crop; smart guides</td><td>About 0.5" off the top; placed as in Figure 1</td></tr>
+          <tr><th scope="row">4. Slide 3</th><td>Delete key; smart guides; Align</td><td>Picnicking deleted; Hiking evenly spaced; Align Selected Objects &rsaquo; Align Top</td></tr>
+          <tr><th scope="row">5. Video</th><td>Slide 7 content placeholder; Video Format &rsaquo; Video Styles</td><td>Lake video; the beveled rectangle style your file names</td></tr>
+          <tr><th scope="row">6. Questions?</th><td>Slide 8; Insert &rsaquo; WordArt; Text Effects</td><td>Pattern Fill: Green, Accent color 1, 50%; Hard Shadow: Green, Accent color 1; Wave: Up; Off Axis 1: Right; 9" wide; centered as in Figure 2</td></tr>
+          <tr><th scope="row">File name</th><td>File &rsaquo; Save As</td><td>The <span class="mono">_2</span> version (.pptx), in Downloads</td></tr>
+          <tr><th scope="row">Submission</th><td>MindTap</td><td>Upload the <span class="mono">_2</span> file, select Submit, read the Graded Summary Report</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <p class="footnote">CSC 104 &middot; Computers and Computer Applications &middot; Fall 2026, Section 0840 &middot;
+    Mendocino College &middot; Instructor: David Pai &middot; <span class="mono">dpai@mendocino.edu</span>.
+    Nothing you type on this page is saved or submitted. Use the Canvas navigation outside this page to get back to
+    the Week 14 module.</p>
+</main>
+
+
+<script>
+(function () {
+  "use strict";
+
+  var VIDEO_ID = "x-D6oitWJMU";
+
+  /* Transcript source: weeks/week14/csc104-ppt-3-guided-corrected.vtt — the
+     Whisper output with its garbled and non-English fragments removed, its
+     repeated and duplicate cues collapsed, and its PowerPoint command names,
+     slide text, proper nouns and punctuation restored. Inlined rather than
+     fetched so this page stays self-contained inside the Canvas iframe. Keep
+     the two copies in step: if the YouTube captions are re-uploaded from the
+     .vtt, re-paste it here too. */
+  var vttContent = `WEBVTT
+
+NOTE
+CSC 104 — Week 14 — PowerPoint Module 3 Guided Assignment Walkthrough (YouTube x-D6oitWJMU)
+Corrected transcript. Source: csc104-ppt3.vtt (Whisper output, 201 cues).
+CAPTION GAP: 1:57–2:27 came out of Whisper as nothing but » and « marks.
+That is where the scenario finishes, step 1 is read, and the title-slide
+picture is first sharpened. Nothing there could be recovered, so the
+transcript ends that cue with "asking us to…" and resumes at 2:27, partway
+through step 1. The page lists step 1 from the parts that are audible.
+Other cleanup: the hallucinated passages at 3:55–4:02 ("if we think
+something is up or down and I'm going to move it right over to refresh
+okay all right ready I gotta put this thing"), 10:42 ("chandler is ok.
+sleeping camera is op. spare camera is also ok."), 13:56–14:02 (mixed-
+language word-salad: "hive transform bevel leftover động d 더",
+"imageordre and child... vous avez dat") and 6:13 ("apply the method to
+the height of the picture") deleted; "not align top and you want to see
+down at the bottom" ×3 at 11:28–11:35 collapsed; "Oh No" ×2 at 17:01 kept
+once; the lone "you" cues at 17:59 and 18:26–18:30, "," at 18:31 and "to do
+to do to" at 18:01 removed; "so I have a 3x2 right" at 16:03 dropped
+(unclear). Sentence casing and punctuation restored throughout; PowerPoint
+command names and proper nouns corrected (Renfrew, Rocky Mountains,
+Corrections, Sharpen: 25%, Sharpen/Soften, Brightness/Contrast, Format
+Picture, Park Proposal, WordArt, Fill: White; Outline: Green, Accent color
+1; Glow: Green, Accent color 1, Shape Format, WordArt Styles, Text
+Direction, SmartArt, Lake.jpg, From Device, Metal Oval, Metal Rounded,
+Color, Color Tone, Temperature: 5300 K, Crop, Figure 1, Figure 2, Callahan
+Lake Park Recreation, Picnicking, Hiking, Fishing, Swimming, Arrange,
+Align, Align to Slide, Align Selected Objects, Align Top, Preserve and
+Protect, Insert Video, Video Styles, Questions?, Pattern Fill: Green,
+Accent color 1, 50%; Hard Shadow: Green, Accent color 1, Text Effects,
+Transform, Wave: Up, 3-D Rotation, Off Axis 1: Right, Width, Slide Sorter,
+.pptx, Submit for Grade, Graded Summary Report, Outlook). "startix file" →
+starter file; "Blake dot JPG" / "late touch APG" → Lake.jpg (the full
+support-file name is not matched character for character); "batter fill"
+→ Pattern Fill; "metric off axis" → Off Axis; "summer report" → Graded
+Summary Report; "phil says" → still says. The video style at 12:38 is
+spoken as "sloped bevel rectangle" and "simple beveled"; it is written as
+Simple Beveled Rectangle, as best heard. Short cues merged into readable
+1–2 sentence lines; timestamps normalized to HH:MM:SS.mmm. The instructor's
+voice, hedges and on-camera moments are preserved, including "hopefully
+this time, unlike last time" at 0:00, "how do I do this... now I'm all
+messed up" at 3:55–4:49, "blah blah blah" at 5:19, Picnicking "not spelled
+right" at 9:45, the 23 out of 25 at 16:21, the two resubmissions at
+17:14–20:28 that still report the tops as not aligned, and his closing
+offer to correct a misgraded score.
+
+00:00:00.240 --> 00:00:20.080
+Aloha. So this is PowerPoint Module 3, Inserting WordArt, Charts, and Tables. I'm going to walk you through this. Hopefully this time, unlike last time, we'll be able to get it right on the first shot, instead of having to redo, um, you know, and figure out how to redo it and where we missed stuff.
+
+00:00:20.080 --> 00:00:45.920
+All right, so we'll do this the same. There are our instruction file, our starter file, an image file, and a video that we're going to embed into our PowerPoint presentation. So I'm going to download them all, and then it will open up that location.
+
+00:00:45.920 --> 00:01:13.440
+And I need the instructions, so we'll have our instructions here. And then we also need our initial PowerPoint file. You can see it looks quite different than the previous ones. So let's open up our instructions and get started.
+
+00:01:13.440 --> 00:01:44.480
+So the first thing we want to do is rename our file from 1 to 2, you know, changing the 1 to a 2. So again I'll just do my File, Save As, and I'm working in my Downloads folder again, and I'll go ahead and change the 1 to a 2 and save it. Okay, and verify that your name is in there and that you have these other files. All right, and my name is in there.
+
+00:01:44.480 --> 00:02:01.220
+Okay, so first, step 1. So you work for a parks and rec department in this community, Renfrew, in the foothills of the Rocky Mountains, asking us to…
+
+00:02:27.460 --> 00:02:55.900
+I'm just gonna show you, it's all in here as well. It's under Corrections. So we've got Corrections: Sharpen/Soften, Brightness/Contrast. Okay, and so we can pick the ones we want if they're in here. Sharpen and Soften: Sharpen: 25%. So it's this one, and you can kind of see them change in the preview. So we want Sharpen: 25%.
+
+00:02:55.900 --> 00:03:14.840
+Okay, the other way to do it is you can right-click on the image and go to your Format Picture, and then on the side here, Corrections. Or here you can go Corrections, and then you can change the sharpness here, and the brightness and the contrast.
+
+00:03:14.840 --> 00:03:35.500
+So I typically do it here, because they're all right there. But for something as simple as just changing the sharpness, going to Corrections and selecting it from the list of possible values. And you can see what it did is it sharpened up that image,
+
+00:03:35.500 --> 00:03:55.900
+so that, you know, the skyline is very clear on the title slide. Convert the text Park Proposal to a WordArt object using the Fill: White; Outline: Green, Accent color 1; Glow: Green, Accent color 1 WordArt style. Okay.
+
+00:03:55.900 --> 00:04:49.860
+All right, let's see here. Oh, well, I don't know, how do I do this? What's this stuff? All right. And so, it's like, how do I do this, off the top of my head? I'm trying to remember. Line, text, Text Direction. This is SmartArt, we don't want that. Not here. Now I'm all messed up.
+
+00:04:49.860 --> 00:05:19.860
+We want to go to Shape Format. That's where we want to go. And we want to go to WordArt Styles, and we're gonna go down here and we're gonna find the one that says, I think it's, Fill: White; Outline: Green, Accent color 1; Glow: Green, Accent color 1. So the fourth one across. And that will change the words Park Proposal a little bit.
+
+00:05:19.860 --> 00:05:49.860
+Okay, on slide 2, insert the picture file, support, blah blah blah, Lake.jpg. So on slide 2 we're gonna add that picture file. It's gonna go over on the right. So let's insert a picture. Oops, maybe click on the thing on that slide. Insert a picture, From Device.
+
+00:05:49.860 --> 00:06:19.860
+Lake.jpg, Insert that. There's our picture. We're gonna get rid of the design suggestions. Change the height of the picture to 6 inches, and allow the width to go wherever it goes. So we can click down to 6 inches. Okay, I set that here to 6 inches. Okay.
+
+00:06:19.860 --> 00:06:44.940
+Metal Oval picture style. So Picture Styles, we'll click on this, and we will look for these oval ones. That's a soft edge; this one I believe is the metal, Metal Rounded, Metal Oval. That's what we want, Metal Oval.
+
+00:06:44.940 --> 00:07:14.940
+Change the color tone of the picture to Temperature: 5300 K. So we have our picture, so Color, Color Tone: 4700, 5300. So you can pick different color temperatures. Like if we picked 11,200, it would be really bright, kind of washed-out bright. Oops, my color. We want 5300. Okay.
+
+00:07:14.940 --> 00:07:39.060
+Crop approximately 0.5 inches from the top of the picture to reduce the amount of sky showing. Okay, so we're going to reduce the amount of sky showing, and so in our picture you want to crop it. Okay, Crop it.
+
+00:07:39.060 --> 00:07:56.580
+And so what we're gonna do is just pick this top one, and I'm gonna look at the ruler, and I'm gonna drag it down to about the 3, which is about a little over a half inch. But okay, there's my half inch. And then just click outside of it, double-click outside of it, to accept that cropping.
+
+00:07:56.580 --> 00:08:11.020
+Okay, then use smart guides to position the picture to the right of the text, as shown in Figure 1. So let's scroll down to Figure 1.
+
+00:08:11.020 --> 00:08:28.060
+Okay, so Figure 1, the key here is you see these guides, these smart guides. So the left side, the right side. So you're gonna drag it so kind of the bottom of the picture lines up. It's gonna get this line across the bottom, which is the bottom of the text box.
+
+00:08:28.060 --> 00:08:44.500
+These two double-headed arrows, left and right, mean the distance from the right edge to the image, and from the text box to the left edge, are the same. Okay, so it'll be the same border on the right and left side, and the bottom.
+
+00:08:44.500 --> 00:09:20.820
+All right, so that's how you're going to move it, until you get those double-headed arrows, those three lines, lined up like that on your slide. So we're going to move this, and it'll be hard to see. Let me see if... And it happens really fast. There's the bottom one. There's the double-headed, but there it is. There they are.
+
+00:09:20.820 --> 00:09:45.460
+Okay, so you move it to get that picture with the smart guides on there. All right, so when you do the image, look for these smart guides here on this image, and look for them in your PowerPoint file when you're moving that image around. And it does take a little bit of work to get it exactly where it says.
+
+00:09:45.460 --> 00:10:02.100
+Okay, number 4. On slide 3, Callahan Lake Park Recreation, delete the shape containing the text Picnicking, which is not spelled right, but anyway. So we're gonna go to slide 3.
+
+00:10:02.100 --> 00:10:19.380
+Okay, and we have these four images. We want to get rid of this one, so we just click on it. Okay, and I like to use the Delete key. That's how I typically do it. Delete, it's gone.
+
+00:10:19.380 --> 00:10:30.020
+Move the picture containing the text Hiking so that it appears evenly spaced between the picture containing Fishing and the picture containing Swimming.
+
+00:10:30.020 --> 00:10:52.820
+Okay, so what we're going to do is grab this one, and we're going to move it. Now, if you have these smart guides, you're going to move it around until you get it, like, the left and the right. You'll obviously see there's, um, lines, and this is when they're on both sides of it, like between Hiking and Fishing and between Hiking and Swimming.
+
+00:10:52.820 --> 00:11:05.700
+When it has them, then they're lined up. I mean, it's equally distant between the two, so it's evenly distributed. All right, so you just drop it there to get it left and right.
+
+00:11:05.700 --> 00:11:22.180
+And then it says use the Align Objects command to align the three shapes so the tops are level with each other. Okay, so you just have to use the Shift key and select all three of them, so all three are selected.
+
+00:11:22.180 --> 00:11:40.260
+Okay, and then you go under Shape Format, Arrange, Align. Not Align Top yet: you want to see, down at the bottom, Align to Slide, Align Selected Objects, so they're aligned to each other. And Align Top.
+
+00:11:40.260 --> 00:11:48.600
+Okay, so now they're all aligned at the same height, or the tops are all aligned to each other.
+
+00:11:48.600 --> 00:12:09.120
+Okay, on slide 7, Preserve and Protect, use the content placeholder to insert a video file. So we're gonna drop. Here's 1, 2, 3, let's skip 4, 5, 6, and we're gonna jump to 7.
+
+00:12:09.120 --> 00:12:26.300
+Here's this content area. We want to insert a video, so we click on the Insert Video. It automatically tries to find it from our same file folder that we're in, so here's our lake video, and we Insert it. There it is.
+
+00:12:26.300 --> 00:12:38.600
+Let me go back and get rid of these design suggestions. That's just the smartness of PowerPoint, trying to do stuff to make yours look better.
+
+00:12:38.600 --> 00:13:04.200
+Apply the Simple Beveled Rectangle video style. So we're gonna go up to our Video Styles, and we're gonna look for Simple Beveled... Okay, I'm gonna find the one that says Beveled. All right, and so it's gonna put that kind of bevel around the outside edges.
+
+00:13:04.200 --> 00:13:24.660
+All right, on to number 6, which is step 6. On slide 8, insert WordArt using the text Questions? and the Pattern Fill: Green, Accent color 1, 50%; Hard Shadow: Green, Accent color 1 WordArt style, third column, fourth row.
+
+00:13:24.660 --> 00:13:47.460
+All right, so we're gonna go to the next one here. Okay, and we want to insert. Third column, fourth row, is Pattern Fill: Green, Accent color 1, 50%; Hard Shadow: Green, Accent color 1. And the text we want to type in there is Questions, with a question mark.
+
+00:13:47.460 --> 00:13:56.820
+And then apply the Wave: Up transform effect.
+
+00:14:04.200 --> 00:14:26.220
+That's Text Effects, Transform, and we're gonna go through all these different ones. We're gonna look for the Wave Up. Wave Down, Wave Up. Okay, so it waves up.
+
+00:14:26.220 --> 00:14:46.220
+Change the 3-D Rotation effect to Off Axis 1: Right. Right, so this is what we want, Off Axis 1: Right, for the 3-D Rotation. Text Effects, 3-D Rotation, and so Off Axis 1: Right is this one.
+
+00:14:46.220 --> 00:15:03.900
+Increase the width of the WordArt object to 9 inches. So we will go over to the Width, and let's just type in 9, instead of clicking on it that way. 9 inches.
+
+00:15:03.900 --> 00:15:28.580
+Position the WordArt object in the center of the slide, as shown in Figure 2. Okay, so in Figure 2 you can see it's got this plus for the smart guides, and it's right there where that T crosses, the bottom of the T. So that's where we want to put that object.
+
+00:15:28.580 --> 00:15:53.420
+So you want to get a plus looking, so we have both the vertical and the horizontal smart guides. So I will put Questions in the middle.
+
+00:15:53.420 --> 00:16:21.280
+In Slide Sorter view, your presentation should look like this. Okay, so we will go to Slide Sorter view. View, Slide Sorter, and we'll expand, make it bigger. And that pretty much looks just like what it's supposed to look like. Okay, there's your Protect, Questions.
+
+00:16:21.280 --> 00:17:01.060
+All right, so what I want to do is save our file, exit, get rid of those, go in here and find our _2 .pptx, drop it in, submit it, and then Submit for Grade, and then get our Graded Summary Report. And hopefully we got it right the first time this time. We got 23.
+
+00:17:01.060 --> 00:17:14.720
+Oh no. I think I know why. So, I don't know why it says the tops of the three pictures should be aligned with each other. They were; you saw me do that.
+
+00:17:14.720 --> 00:18:01.480
+But you can go back in, so let's do it real quick. Let's go in here. And, don't know why, no idea why it's saying that these were not aligned to each other. They didn't move; they're exactly in the same place. Align Top. I believe that was the instruction.
+
+00:18:01.480 --> 00:18:26.640
+What I have, I have. Oops, this is the _2, right. Close it. We'll go back. I don't know if I could start this over and it'll work. Oh, yeah.
+
+00:18:34.340 --> 00:18:48.240
+Drop it in, submit it, and hopefully this time it worked. It worked for me the very first time. I have no idea why it didn't work the second time; I didn't do anything different.
+
+00:18:48.240 --> 00:19:16.800
+Yeah, see, so still it thinks it's not aligned, but they are. You saw me do it. So, I think what happened is it didn't save it, because it didn't really change it.
+
+00:19:16.800 --> 00:19:41.540
+Let me try one more time, real quick. Let's do this. Let's move this one up a little bit. Okay, let's choose this, and then let's choose the other two, and let's do Arrange, Align Top.
+
+00:19:41.540 --> 00:20:13.060
+File, Save, close it. Make sure that when I go here, I got number 2. It's the latest one. So let's, uh, drop it in, Submit for Grade, get a new Graded Summary Report.
+
+00:20:13.060 --> 00:20:35.300
+Like I said, I have no idea why it did that, because the very first time I did it, it worked fine. So, it still says they're not lined up. Okay, so I have no idea why it's saying that they're not lined up, but they are lined up.
+
+00:20:35.300 --> 00:20:43.860
+So again, if this kind of happens to you, like I said, just let me know. Send me your two files; I will correct your score manually.
+
+00:20:43.860 --> 00:20:56.900
+Okay, so this is the last, uh, one before we do Outlook next. So I'll see you in the Outlook video. Bye.
+`;
+
+  var player = null, timeUpdater = null, parsedTranscript = [], playerReady = false;
+
+  try {
+    if (!CSS.supports("selector(:focus-visible)")) { document.body.classList.add("no-fv"); }
+  } catch (e) { document.body.classList.add("no-fv"); }
+
+  /* ---------------- VTT parsing ---------------- */
+  function timeToSeconds(timeStr) {
+    if (!timeStr) { return 0; }
+    var parts = timeStr.trim().split(":");
+    if (parts.length === 2) {
+      return (parseInt(parts[0], 10) || 0) * 60 + (parseFloat(parts[1]) || 0);
+    }
+    if (parts.length === 3) {
+      return (parseInt(parts[0], 10) || 0) * 3600 + (parseInt(parts[1], 10) || 0) * 60 + (parseFloat(parts[2]) || 0);
+    }
+    return 0;
+  }
+
+  function formatTime(sec) {
+    sec = Math.max(0, Math.floor(sec));
+    var h = Math.floor(sec / 3600), m = Math.floor((sec % 3600) / 60), s = sec % 60;
+    var mm = (h > 0 && m < 10) ? "0" + m : String(m);
+    return (h > 0 ? h + ":" : "") + mm + ":" + (s < 10 ? "0" + s : s);
+  }
+
+  function parseVtt(vttText) {
+    var blocks = vttText.trim().split(/\n\n+/);
+    var cues = [];
+    blocks.forEach(function (block) {
+      var trimmed = block.trim();
+      if (!trimmed || trimmed.indexOf("WEBVTT") === 0 || trimmed.indexOf("NOTE") === 0) { return; }
+      var lines = trimmed.split("\n");
+      var timeLine = null, timeIndex = -1;
+      for (var i = 0; i < lines.length; i++) {
+        if (lines[i].indexOf("-->") !== -1) { timeLine = lines[i]; timeIndex = i; break; }
+      }
+      if (!timeLine) { return; }
+      var ends = timeLine.split("-->");
+      var text = lines.slice(timeIndex + 1).join(" ").trim();
+      if (!text) { return; }
+      cues.push({ start: timeToSeconds(ends[0]), end: timeToSeconds(ends[1]), text: text });
+    });
+    return cues;
+  }
+
+  /* ---------------- Transcript panel ---------------- */
+  function seek(seconds) {
+    if (!player || !player.seekTo) { return false; }
+    player.seekTo(seconds, true);
+    if (player.playVideo) { player.playVideo(); }
+    return true;
+  }
+
+  function scrollPlayerIntoView() {
+    var frame = document.getElementById("video-container");
+    if (frame && frame.scrollIntoView) { frame.scrollIntoView({ behavior: "smooth", block: "center" }); }
+  }
+
+  function populateTranscript() {
+    var container = document.getElementById("transcript-container");
+    if (!container) { return; }
+    container.innerHTML = "";
+    parsedTranscript.forEach(function (cue, i) {
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "transcript-line";
+      btn.dataset.start = cue.start;
+      btn.dataset.end = cue.end;
+      btn.dataset.index = i;
+
+      var stamp = document.createElement("span");
+      stamp.className = "t";
+      stamp.textContent = formatTime(cue.start);
+
+      var body = document.createElement("span");
+      body.className = "tx";
+      body.textContent = cue.text;
+
+      btn.appendChild(stamp);
+      btn.appendChild(body);
+      btn.setAttribute("aria-label", "Jump to " + formatTime(cue.start) + ". " + cue.text);
+
+      btn.addEventListener("click", function () {
+        if (seek(cue.start)) { scrollPlayerIntoView(); }
+      });
+      container.appendChild(btn);
+    });
+  }
+
+  /* ---------------- Active-line highlight ---------------- */
+  var lastAnnounced = null;
+  function announceLine(text) {
+    if (text === lastAnnounced) { return; }
+    lastAnnounced = text;
+    var s = document.getElementById("transcript-status");
+    if (s) { s.textContent = text || ""; }
+  }
+
+  function highlightCurrentLine() {
+    if (!player || !player.getCurrentTime) { return; }
+    var now = player.getCurrentTime();
+    var lines = document.querySelectorAll("#transcript-container .transcript-line");
+    var active = null;
+    Array.prototype.forEach.call(lines, function (line) {
+      var start = parseFloat(line.dataset.start), end = parseFloat(line.dataset.end);
+      if (now >= start && now < end) { active = line; }
+    });
+    var prev = document.querySelector("#transcript-container .is-active");
+    if (active === prev) { return; }
+    if (prev) { prev.classList.remove("is-active"); }
+    if (active) {
+      active.classList.add("is-active");
+      var body = active.querySelector(".tx");
+      announceLine(body ? body.textContent : active.textContent);
+      if (!active.hidden) { active.scrollIntoView({ behavior: "smooth", block: "center" }); }
+    }
+  }
+
+  /* ---------------- Panel height ---------------- */
+  function syncTranscriptHeight() {
+    var videoContainer = document.getElementById("video-container");
+    var panel = document.getElementById("transcript-container");
+    if (!videoContainer || !panel) { return; }
+    // Match the panel to the video only when the two columns actually sit side
+    // by side. Compared by rendered position rather than a viewport-width test,
+    // because in a Canvas iframe a media query measures the iframe, not the
+    // browser window, and can disagree with the flex-wrap result.
+    var videoCol = videoContainer.parentNode;
+    var transcriptCol = panel.parentNode;
+    var sideBySide = Math.abs(
+      transcriptCol.getBoundingClientRect().top - videoCol.getBoundingClientRect().top) < 40
+      && transcriptCol.getBoundingClientRect().left !== videoCol.getBoundingClientRect().left;
+    // Side by side, the panel should end level with the video, so subtract the
+    // heading/search row that sits above it inside the transcript column.
+    var head = transcriptCol.querySelector(".transcript-head");
+    var headH = head ? head.offsetHeight + 8 : 0;
+    var h = sideBySide ? Math.max(240, videoContainer.offsetHeight - headH) + "px" : "24rem";
+    panel.style.height = h;
+    panel.style.maxHeight = h;
+  }
+
+  /* ---------------- Transcript search ---------------- */
+  function escapeRe(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); }
+
+  function runFilter(term) {
+    var lines = document.querySelectorAll("#transcript-container .transcript-line");
+    var status = document.getElementById("transcript-filter-status");
+    var q = term.trim().toLowerCase();
+    var shown = 0;
+
+    Array.prototype.forEach.call(lines, function (line) {
+      var body = line.querySelector(".tx");
+      var cue = parsedTranscript[parseInt(line.dataset.index, 10)];
+      if (!body || !cue) { return; }
+      if (!q) {
+        body.textContent = cue.text;
+        line.hidden = false;
+        shown++;
+        return;
+      }
+      if (cue.text.toLowerCase().indexOf(q) === -1) {
+        body.textContent = cue.text;
+        line.hidden = true;
+        return;
+      }
+      line.hidden = false;
+      shown++;
+      // Rebuild with <mark> around the matches, without using innerHTML on
+      // user-supplied text.
+      body.textContent = "";
+      var re = new RegExp(escapeRe(term.trim()), "ig");
+      var last = 0, m;
+      while ((m = re.exec(cue.text)) !== null) {
+        if (m.index > last) { body.appendChild(document.createTextNode(cue.text.slice(last, m.index))); }
+        var mk = document.createElement("mark");
+        mk.textContent = m[0];
+        body.appendChild(mk);
+        last = m.index + m[0].length;
+        if (m[0].length === 0) { re.lastIndex++; }
+      }
+      if (last < cue.text.length) { body.appendChild(document.createTextNode(cue.text.slice(last))); }
+    });
+
+    if (status) {
+      status.textContent = q
+        ? (shown === 0 ? "No transcript lines match " + term : shown + " transcript line" + (shown === 1 ? "" : "s") + " match " + term)
+        : "Showing the whole transcript.";
+    }
+  }
+
+  function wireSearch() {
+    var input = document.getElementById("transcript-filter");
+    if (!input) { return; }
+    var t = null;
+    input.addEventListener("input", function () {
+      clearTimeout(t);
+      t = setTimeout(function () { runFilter(input.value); }, 250);
+    });
+  }
+
+  /* ---------------- Seek buttons (topic index + step pills) ----------------
+     Buttons wired to the embedded player, never youtu.be?t= links: a time link
+     would navigate the Canvas iframe away from this page. If the player never
+     comes up, the buttons are turned back into plain text so the index reads
+     as a reference list rather than as controls that silently do nothing. */
+  function wireSeekButtons() {
+    var btns = document.querySelectorAll("[data-seek]");
+    Array.prototype.forEach.call(btns, function (btn) {
+      var t = parseFloat(btn.getAttribute("data-seek")) || 0;
+      var item = btn.closest(".topic-index__item") || btn.closest(".todo > li") || btn.closest("tr");
+      var text = item ? item.querySelector(".topic-index__label, .todo__title, th[scope=row]") : null;
+      btn.setAttribute("aria-label", "Jump to " + formatTime(t) + (text ? " — " + text.textContent : "") + " in the video");
+      btn.addEventListener("click", function () {
+        if (seek(t)) { scrollPlayerIntoView(); }
+      });
+    });
+  }
+
+  function degradeToStatic(message) {
+    if (playerReady) { return; }
+    document.body.classList.add("no-player");
+    var idx = document.getElementById("topic-index");
+    if (idx) { idx.classList.add("topic-index--static"); }
+    Array.prototype.forEach.call(document.querySelectorAll("[data-seek]"), function (btn) {
+      btn.disabled = true;
+      btn.removeAttribute("aria-label");
+    });
+    var note = document.getElementById("topic-index-fallback");
+    if (note) { note.hidden = false; note.textContent = message; }
+  }
+
+  /* ---------------- Platform tabs ---------------- */
+  function wireTabs() {
+    var tablist = document.querySelector(".tablist");
+    if (!tablist) { return; }
+    var tabs = Array.prototype.slice.call(tablist.querySelectorAll('[role="tab"]'));
+
+    function select(tab, focus) {
+      tabs.forEach(function (t) {
+        var selected = t === tab;
+        t.setAttribute("aria-selected", selected ? "true" : "false");
+        t.tabIndex = selected ? 0 : -1;
+        var panel = document.getElementById(t.getAttribute("aria-controls"));
+        if (panel) { panel.hidden = !selected; }
+      });
+      if (focus) { tab.focus(); }
+    }
+
+    tabs.forEach(function (tab, i) {
+      tab.addEventListener("click", function () { select(tab, false); });
+      tab.addEventListener("keydown", function (e) {
+        var next = null;
+        if (e.key === "ArrowRight") { next = tabs[(i + 1) % tabs.length]; }
+        else if (e.key === "ArrowLeft") { next = tabs[(i - 1 + tabs.length) % tabs.length]; }
+        else if (e.key === "Home") { next = tabs[0]; }
+        else if (e.key === "End") { next = tabs[tabs.length - 1]; }
+        if (next) { e.preventDefault(); select(next, true); }
+      });
+    });
+  }
+
+  /* ---------------- YouTube player ---------------- */
+  window.onYouTubeIframeAPIReady = function () {
+    if (!VIDEO_ID || !document.getElementById("youtube-player")) { return; }
+    player = new YT.Player("youtube-player", {
+      events: {
+        onReady: function () {
+          playerReady = true;
+          syncTranscriptHeight();
+        },
+        onStateChange: function (event) {
+          clearInterval(timeUpdater);
+          if (event.data === YT.PlayerState.PLAYING) {
+            timeUpdater = setInterval(highlightCurrentLine, 300);
+          } else {
+            highlightCurrentLine();
+          }
+        }
+      }
+    });
+  };
+
+  document.addEventListener("DOMContentLoaded", function () {
+    parsedTranscript = parseVtt(vttContent);
+    populateTranscript();
+    wireSearch();
+    wireSeekButtons();
+    wireTabs();
+    setTimeout(syncTranscriptHeight, 100);
+
+    if (typeof YT === "undefined" || typeof YT.Player === "undefined") {
+      var tag = document.createElement("script");
+      tag.src = "https://www.youtube.com/iframe_api";
+      tag.onerror = function () {
+        degradeToStatic("The video player could not load, so the times below are listed for reference rather than as buttons. The full transcript is above.");
+      };
+      document.head.appendChild(tag);
+    } else {
+      window.onYouTubeIframeAPIReady();
+    }
+
+    // If the API never reports ready — blocked script, offline, restrictive
+    // network — fall back rather than leaving dead buttons on the page.
+    setTimeout(function () {
+      degradeToStatic("The video player did not load, so the times below are listed for reference rather than as buttons. The full transcript is above.");
+    }, 8000);
+  });
+
+  var resizeTimeout;
+  window.addEventListener("resize", function () {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(syncTranscriptHeight, 250);
+  });
+
+  /* Report height to a Canvas parent that listens for it. Harmless otherwise. */
+  function postHeight() {
+    try {
+      if (window.parent && window.parent !== window) {
+        var h = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
+        window.parent.postMessage({ subject: "lti.frameResize", height: h }, "*");
+      }
+    } catch (e) { /* cross-origin parent — ignore */ }
+  }
+  window.addEventListener("load", postHeight);
+  if (window.ResizeObserver) { new ResizeObserver(postHeight).observe(document.body); }
+})();
+</script>
+</body>
+</html>
